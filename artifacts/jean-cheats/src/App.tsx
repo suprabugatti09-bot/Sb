@@ -8,6 +8,19 @@ const TIKTOK_JAY_URL = "https://www.tiktok.com/@jayxxx047";
 const FREE_KEY = "JEAN-FREE-2024-JC"; // ← cambia esta key aquí
 const FREE_SCRIPT = `loadstring(game:HttpGet("https://rawscripts.net/raw/South-Bronx:-The-Trenches-BEST-AUTO-FARM-UNDETECTED-41818"))()`;
 
+const KEY_SCRIPT = `loadstring(game:HttpGet("https://raw.githubusercontent.com/mateoyandi02-droid/Script/refs/heads/main/Whitelist%20Acusado"))()`;
+
+const VALID_KEYS = new Set([
+  "JXJ-A3K7-QP21", "JXJ-B8M2-XR54", "JXJ-C1N9-LT87", "JXJ-D4W6-ZV30",
+  "JXJ-E7F3-MK65", "JXJ-F2H8-YN98", "JXJ-G5J1-WS43", "JXJ-H9K4-UC76",
+  "JXJ-I6L7-PD09", "JXJ-J0M2-RE32", "JXJ-K3N5-SB68", "JXJ-L8P0-TA91",
+  "JXJ-M1Q4-VF24", "JXJ-N6R9-XG57", "JXJ-O2S3-YH80", "JXJ-P7T8-ZI13",
+  "JXJ-Q4U1-AJ46", "JXJ-R9V6-BK79", "JXJ-S3W2-CL02", "JXJ-T8X7-DM35",
+  "JXJ-U1Y0-EN68", "JXJ-V6Z5-FO91", "JXJ-W2A9-GP24", "JXJ-X7B4-HQ57",
+  "JXJ-Y0C8-IR80", "JXJ-Z5D3-JS13", "JXJ-AA4E-KT46", "JXJ-BB9F-LU79",
+  "JXJ-CC2G-MV02", "JXJ-DD7H-NW35",
+]);
+
 const cheats = [
   {
     id: 1,
@@ -31,6 +44,91 @@ function DripsTop() {
       ))}
       <rect x="0" y="0" width="1200" height="10" fill="#f5c518" />
     </svg>
+  );
+}
+
+function KeyScriptCard() {
+  const [input, setInput] = useState("");
+  const [status, setStatus] = useState<"idle" | "valid" | "invalid">("idle");
+  const [copied, setCopied] = useState(false);
+
+  const handleCheck = () => {
+    if (VALID_KEYS.has(input.trim().toUpperCase())) {
+      setStatus("valid");
+    } else {
+      setStatus("invalid");
+      setTimeout(() => setStatus("idle"), 2000);
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(KEY_SCRIPT);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="cheat-card ks-card">
+      <div className="card-stripe ks-stripe" />
+      <div className="card-header">
+        <div className="card-number ks-number">06</div>
+        <div className="card-icon">🔐</div>
+        <div className="card-info">
+          <h2 className="card-title ks-title">SCRIPT CON KEY</h2>
+          <p className="card-description">
+            {status === "valid" ? "Key válida — script desbloqueado" : "Ingresa tu key para obtener el script"}
+          </p>
+        </div>
+        <div className="ks-badge">KEY</div>
+      </div>
+
+      <div className="card-divider" />
+
+      <div className="free-body">
+        {status !== "valid" ? (
+          <>
+            <div className="gate-msg">
+              <span className="ks-step">PASO 1 —</span> Ingresa tu key de acceso
+            </div>
+            <div className="ks-input-row">
+              <input
+                className={`ks-input${status === "invalid" ? " ks-input--error" : ""}`}
+                type="text"
+                placeholder="JXJ-XXXX-XXXX"
+                value={input}
+                onChange={e => setInput(e.target.value.toUpperCase())}
+                onKeyDown={e => e.key === "Enter" && handleCheck()}
+                maxLength={14}
+                spellCheck={false}
+              />
+              <button className="ks-check-btn" onClick={handleCheck}>
+                {status === "invalid" ? "✗ INVÁLIDA" : "VERIFICAR"}
+              </button>
+            </div>
+            {status === "invalid" && (
+              <p className="ks-error-msg">Key incorrecta. Contacta a @jean14_17 en Discord.</p>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="gate-msg unlocked">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>SCRIPT DESBLOQUEADO — COPIA Y PEGA EN TU EXECUTOR</span>
+            </div>
+            <div className="script-box ks-box">
+              <div className="script-label ks-label">SCRIPT ACUSADO</div>
+              <div className="script-code ks-code">{KEY_SCRIPT}</div>
+              <button className="copy-btn ks-copy" onClick={handleCopy}>
+                {copied
+                  ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>COPIADO ✓</span></>
+                  : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>COPIAR SCRIPT</span></>
+                }
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -404,6 +502,7 @@ export default function App() {
           {cheats.map((cheat) => (
             <CheatCard key={cheat.id} cheat={cheat} />
           ))}
+          <KeyScriptCard />
           <FreeScriptCard />
           <FreeKeysCard />
           <DiscordVentasCard />
