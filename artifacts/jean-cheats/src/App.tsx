@@ -388,9 +388,9 @@ export default function App() {
         <div className="header-section">
           <div className="tag-line">// EST. 2024 //</div>
           <h1 className="title">
-            <span className="title-jean">JEAN</span>
+            <span className="title-jean">JEAN X</span>
             <br />
-            <span className="title-cheats">CHEATS</span>
+            <span className="title-cheats">JAY</span>
           </h1>
           <div className="gold-bar" />
           <p className="subtitle">OG SCRIPT MENU — DISCORD ONLY</p>
