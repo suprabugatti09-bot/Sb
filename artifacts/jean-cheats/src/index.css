@@ -426,6 +426,18 @@ body {
 .keys-copy  { border-top-color: #2a2000; color: #f59e0b; background: rgba(245,158,11,0.08); }
 .keys-copy:hover { background: rgba(245,158,11,0.18); }
 
+.keys-discord-btn {
+  width: 100%;
+  background: rgba(88, 101, 242, 0.15);
+  border-color: rgba(88, 101, 242, 0.45);
+  color: #7b8ef5;
+  font-size: 1.05rem;
+}
+
+.keys-discord-btn:hover {
+  box-shadow: 0 4px 20px rgba(88,101,242,0.35);
+}
+
 /* ── Discord Ventas Card ── */
 .ventas-card {
   border-left-color: #5865f2;
