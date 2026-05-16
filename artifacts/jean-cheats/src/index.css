@@ -345,6 +345,46 @@ body {
   text-transform: uppercase;
 }
 
+/* ── Discord Ventas Card ── */
+.ventas-card {
+  border-left-color: #5865f2;
+  background: linear-gradient(135deg, #0d0f1f 0%, #090b18 100%);
+  border-color: #1a1d3a;
+  text-decoration: none;
+}
+
+.ventas-card:hover {
+  border-color: #5865f2;
+}
+
+.ventas-stripe {
+  background: linear-gradient(90deg, #5865f2, #a0a8ff 50%, #5865f2) !important;
+}
+
+.ventas-number {
+  color: #1a1d3a !important;
+}
+
+.ventas-title {
+  color: #7b8ef5 !important;
+}
+
+.ventas-arrow {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.ventas-card:hover .ventas-arrow {
+  transform: translateX(5px);
+}
+
+/* card-inner used by ventas card */
+.card-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.4rem 1.6rem;
+}
+
 /* ── Free Script Card ── */
 .free-card {
   border-color: #1a2a1a;

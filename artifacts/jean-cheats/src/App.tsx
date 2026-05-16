@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 const DISCORD_URL = "https://discord.com/users/jean14_17";
+const DISCORD_VENTAS_URL = "https://discord.gg/9RaGs3cpH";
 const CASHAPP_URL = "https://cash.app/$juliocesar250387";
 const TIKTOK_URL = "https://www.tiktok.com/@jean14_17";
 const FREE_SCRIPT = `loadstring(game:HttpGet("https://rawscripts.net/raw/South-Bronx:-The-Trenches-BEST-AUTO-FARM-UNDETECTED-41818"))()`;
@@ -28,6 +29,42 @@ function DripsTop() {
       ))}
       <rect x="0" y="0" width="1200" height="10" fill="#f5c518" />
     </svg>
+  );
+}
+
+function DiscordVentasCard() {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <a
+      href={DISCORD_VENTAS_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="cheat-card ventas-card"
+      style={{
+        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        boxShadow: hovered
+          ? `0 0 40px rgba(88,101,242,0.4), 0 12px 40px rgba(0,0,0,0.8)`
+          : `0 4px 20px rgba(0,0,0,0.7)`,
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div className="card-stripe ventas-stripe" style={{ opacity: hovered ? 1 : 0.6 }} />
+      <div className="card-inner">
+        <div className="card-number ventas-number">04</div>
+        <div className="card-icon">🛒</div>
+        <div className="card-info">
+          <h2 className="card-title ventas-title">DISCORD VENTAS</h2>
+          <p className="card-description">Servidor oficial — compras y soporte</p>
+        </div>
+        <div className="ventas-arrow" style={{ opacity: hovered ? 1 : 0.4 }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5865f2" strokeWidth="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </a>
   );
 }
 
@@ -240,6 +277,7 @@ export default function App() {
             <CheatCard key={cheat.id} cheat={cheat} />
           ))}
           <FreeScriptCard />
+          <DiscordVentasCard />
         </div>
 
         <div className="footer">
