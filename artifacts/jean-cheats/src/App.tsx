@@ -32,6 +32,7 @@ function DripsTop() {
 }
 
 function FreeScriptCard() {
+  const [step, setStep] = useState<"follow" | "confirm" | "script">("follow");
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -49,7 +50,11 @@ function FreeScriptCard() {
         <div className="card-icon">🎁</div>
         <div className="card-info">
           <h2 className="card-title free-title">SCRIPT GRATIS</h2>
-          <p className="card-description">Sígueme en TikTok y copia el script</p>
+          <p className="card-description">
+            {step === "follow" && "Sígueme en TikTok para desbloquear"}
+            {step === "confirm" && "¿Ya me seguiste?"}
+            {step === "script" && "Script desbloqueado — cópialo"}
+          </p>
         </div>
         <div className="free-badge">GRATIS</div>
       </div>
@@ -57,45 +62,86 @@ function FreeScriptCard() {
       <div className="card-divider" />
 
       <div className="free-body">
-        <p className="free-instructions">
-          <span className="step-num">1.</span> Sígueme en TikTok &nbsp;
-          <span className="step-num">2.</span> Copia el script de abajo
-        </p>
 
-        <a
-          href={TIKTOK_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="action-btn action-btn--tiktok"
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
-          </svg>
-          <span>SEGUIR EN TIKTOK @jean14_17</span>
-        </a>
+        {/* STEP 1: follow on TikTok */}
+        {step === "follow" && (
+          <>
+            <div className="gate-msg">
+              <span className="step-num">PASO 1 —</span> Sígueme en TikTok para obtener el script gratis
+            </div>
+            <a
+              href={TIKTOK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="action-btn action-btn--tiktok"
+              onClick={() => setTimeout(() => setStep("confirm"), 800)}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+              </svg>
+              <span>SEGUIR EN TIKTOK @jean14_17</span>
+            </a>
+          </>
+        )}
 
-        <div className="script-box">
-          <div className="script-label">SCRIPT — COPIA Y PEGA EN TU EXECUTOR</div>
-          <div className="script-code">{FREE_SCRIPT}</div>
-          <button className="copy-btn" onClick={handleCopy}>
-            {copied ? (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        {/* STEP 2: confirm they followed */}
+        {step === "confirm" && (
+          <>
+            <div className="gate-msg">
+              <span className="step-num">PASO 2 —</span> Confirma que ya me seguiste para desbloquear el script
+            </div>
+            <div className="confirm-row">
+              <button className="action-btn confirm-yes" onClick={() => setStep("script")}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                <span>COPIADO</span>
-              </>
-            ) : (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
-                <span>COPIAR</span>
-              </>
-            )}
-          </button>
-        </div>
+                <span>SÍ, YA TE SEGUÍ</span>
+              </button>
+              <a
+                href={TIKTOK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="action-btn action-btn--tiktok confirm-no"
+              >
+                <span>AÚN NO — IR A TIKTOK</span>
+              </a>
+            </div>
+          </>
+        )}
+
+        {/* STEP 3: show script */}
+        {step === "script" && (
+          <>
+            <div className="gate-msg unlocked">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>SCRIPT DESBLOQUEADO — GRACIAS POR SEGUIRME</span>
+            </div>
+            <div className="script-box">
+              <div className="script-label">SCRIPT — COPIA Y PEGA EN TU EXECUTOR</div>
+              <div className="script-code">{FREE_SCRIPT}</div>
+              <button className="copy-btn" onClick={handleCopy}>
+                {copied ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>COPIADO ✓</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    <span>COPIAR SCRIPT</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -382,17 +382,57 @@ body {
   gap: 0.85rem;
 }
 
-.free-instructions {
-  font-size: 0.8rem;
+.gate-msg {
+  font-size: 0.78rem;
   letter-spacing: 0.1em;
   color: #555;
   text-transform: uppercase;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.gate-msg.unlocked {
+  color: #00d64f;
 }
 
 .step-num {
   color: #00d64f;
   font-weight: 700;
+}
+
+.confirm-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.confirm-yes {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 4px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  border: 1px solid rgba(0, 214, 79, 0.5);
+  background: rgba(0, 214, 79, 0.15);
+  color: #00d64f;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.confirm-yes:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,214,79,0.35);
+  filter: brightness(1.15);
+}
+
+.confirm-no {
+  flex: 1;
 }
 
 .action-btn--tiktok {
