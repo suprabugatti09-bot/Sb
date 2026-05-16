@@ -345,6 +345,87 @@ body {
   text-transform: uppercase;
 }
 
+/* ── Free Keys Card ── */
+.keys-card {
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, #1a1400 0%, #120f00 100%);
+  border-color: #2a2000;
+}
+
+.keys-card:hover {
+  border-color: #f59e0b;
+}
+
+.keys-stripe {
+  background: linear-gradient(90deg, #f59e0b, #fde68a 50%, #f59e0b) !important;
+}
+
+.keys-number { color: #2a2000 !important; }
+.keys-title  { color: #f59e0b !important; }
+
+.keys-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  color: #000;
+  background: #f59e0b;
+  padding: 0.2rem 0.75rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.keys-step { color: #f59e0b; font-weight: 700; }
+
+/* Progress bar */
+.keys-progress {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 0.25rem;
+}
+
+.progress-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1a1500;
+  border: 1px solid #3a3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.8rem;
+  color: #4a4000;
+  flex-shrink: 0;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.progress-dot.active {
+  border-color: #f59e0b;
+  color: #f59e0b;
+  background: rgba(245,158,11,0.1);
+  box-shadow: 0 0 10px rgba(245,158,11,0.3);
+}
+
+.progress-dot.done {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #000;
+}
+
+.progress-line {
+  flex: 1;
+  height: 1px;
+  background: #2a2000;
+}
+
+/* Key box overrides */
+.keys-box  { border-color: #2a2000; }
+.keys-label { color: #f59e0b; background: #120f00; border-bottom-color: #2a2000; }
+.keys-code  { color: #fde68a; font-size: 1rem; letter-spacing: 0.1em; font-weight: 700; text-align: center; }
+.keys-copy  { border-top-color: #2a2000; color: #f59e0b; background: rgba(245,158,11,0.08); }
+.keys-copy:hover { background: rgba(245,158,11,0.18); }
+
 /* ── Discord Ventas Card ── */
 .ventas-card {
   border-left-color: #5865f2;

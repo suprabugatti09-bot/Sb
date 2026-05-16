@@ -4,6 +4,8 @@ const DISCORD_URL = "https://discord.com/users/jean14_17";
 const DISCORD_VENTAS_URL = "https://discord.gg/9RaGs3cpH";
 const CASHAPP_URL = "https://cash.app/$juliocesar250387";
 const TIKTOK_URL = "https://www.tiktok.com/@jean14_17";
+const TIKTOK_JAY_URL = "https://www.tiktok.com/@jayxxx047";
+const FREE_KEY = "JEAN-FREE-2024-JC"; // ← cambia esta key aquí
 const FREE_SCRIPT = `loadstring(game:HttpGet("https://rawscripts.net/raw/South-Bronx:-The-Trenches-BEST-AUTO-FARM-UNDETECTED-41818"))()`;
 
 const cheats = [
@@ -29,6 +31,132 @@ function DripsTop() {
       ))}
       <rect x="0" y="0" width="1200" height="10" fill="#f5c518" />
     </svg>
+  );
+}
+
+function FreeKeysCard() {
+  const [step, setStep] = useState<"step1" | "step1confirm" | "step2" | "step2confirm" | "unlocked">("step1");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(FREE_KEY);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="cheat-card keys-card">
+      <div className="card-stripe keys-stripe" />
+
+      <div className="card-header">
+        <div className="card-number keys-number">05</div>
+        <div className="card-icon">🔑</div>
+        <div className="card-info">
+          <h2 className="card-title keys-title">FREE KEYS</h2>
+          <p className="card-description">
+            {step === "step1" && "Sigue a 2 cuentas para desbloquear tu key"}
+            {step === "step1confirm" && "¿Ya seguiste a @jean14_17?"}
+            {step === "step2" && "Ahora sigue a @jayxxx047"}
+            {step === "step2confirm" && "¿Ya seguiste a @jayxxx047?"}
+            {step === "unlocked" && "Key desbloqueada — cópiala"}
+          </p>
+        </div>
+        <div className="keys-badge">FREE</div>
+      </div>
+
+      <div className="card-divider" />
+
+      <div className="free-body">
+
+        {/* Progress dots */}
+        <div className="keys-progress">
+          <div className={`progress-dot ${["step1confirm","step2","step2confirm","unlocked"].includes(step) ? "done" : step === "step1" ? "active" : ""}`}>1</div>
+          <div className="progress-line" />
+          <div className={`progress-dot ${["step2confirm","unlocked"].includes(step) ? "done" : step === "step2" ? "active" : ""}`}>2</div>
+          <div className="progress-line" />
+          <div className={`progress-dot ${step === "unlocked" ? "done" : ""}`}>🔑</div>
+        </div>
+
+        {/* Step 1: follow jean14_17 */}
+        {step === "step1" && (
+          <>
+            <div className="gate-msg"><span className="keys-step">PASO 1 —</span> Sigue a @jean14_17 en TikTok</div>
+            <a href={TIKTOK_URL} target="_blank" rel="noopener noreferrer"
+              className="action-btn action-btn--tiktok"
+              onClick={() => setTimeout(() => setStep("step1confirm"), 800)}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+              <span>SEGUIR @jean14_17</span>
+            </a>
+          </>
+        )}
+
+        {/* Step 1 confirm */}
+        {step === "step1confirm" && (
+          <>
+            <div className="gate-msg"><span className="keys-step">CONFIRMA —</span> ¿Ya seguiste a @jean14_17?</div>
+            <div className="confirm-row">
+              <button className="action-btn confirm-yes" onClick={() => setStep("step2")}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>SÍ, YA SEGUÍ</span>
+              </button>
+              <a href={TIKTOK_URL} target="_blank" rel="noopener noreferrer" className="action-btn action-btn--tiktok confirm-no">
+                <span>AÚN NO</span>
+              </a>
+            </div>
+          </>
+        )}
+
+        {/* Step 2: follow jayxxx047 */}
+        {step === "step2" && (
+          <>
+            <div className="gate-msg"><span className="keys-step">PASO 2 —</span> Ahora sigue a @jayxxx047 en TikTok</div>
+            <a href={TIKTOK_JAY_URL} target="_blank" rel="noopener noreferrer"
+              className="action-btn action-btn--tiktok"
+              onClick={() => setTimeout(() => setStep("step2confirm"), 800)}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+              <span>SEGUIR @jayxxx047</span>
+            </a>
+          </>
+        )}
+
+        {/* Step 2 confirm */}
+        {step === "step2confirm" && (
+          <>
+            <div className="gate-msg"><span className="keys-step">CONFIRMA —</span> ¿Ya seguiste a @jayxxx047?</div>
+            <div className="confirm-row">
+              <button className="action-btn confirm-yes" onClick={() => setStep("unlocked")}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>SÍ, YA SEGUÍ</span>
+              </button>
+              <a href={TIKTOK_JAY_URL} target="_blank" rel="noopener noreferrer" className="action-btn action-btn--tiktok confirm-no">
+                <span>AÚN NO</span>
+              </a>
+            </div>
+          </>
+        )}
+
+        {/* Unlocked: show key */}
+        {step === "unlocked" && (
+          <>
+            <div className="gate-msg unlocked">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>KEY DESBLOQUEADA — GRACIAS POR SEGUIRNOS</span>
+            </div>
+            <div className="script-box keys-box">
+              <div className="script-label keys-label">TU FREE KEY</div>
+              <div className="script-code keys-code">{FREE_KEY}</div>
+              <button className="copy-btn keys-copy" onClick={handleCopy}>
+                {copied ? (
+                  <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>COPIADO ✓</span></>
+                ) : (
+                  <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>COPIAR KEY</span></>
+                )}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -277,6 +405,7 @@ export default function App() {
             <CheatCard key={cheat.id} cheat={cheat} />
           ))}
           <FreeScriptCard />
+          <FreeKeysCard />
           <DiscordVentasCard />
         </div>
 
