@@ -331,10 +331,102 @@ router.get("/script", (_req, res) => {
   res.send(luaScript);
 });
 
+const jxjScript = `
+-- JEAN X JAY
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+if PlayerGui:FindFirstChild("JXJTag") then
+  PlayerGui.JXJTag:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JXJTag"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+-- Top banner
+local Banner = Instance.new("Frame")
+Banner.Size = UDim2.new(0, 260, 0, 44)
+Banner.Position = UDim2.new(0.5, -130, 0, -50)
+Banner.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+Banner.BorderSizePixel = 0
+Banner.ZIndex = 10
+Banner.Parent = ScreenGui
+
+local BannerCorner = Instance.new("UICorner")
+BannerCorner.CornerRadius = UDim.new(0, 6)
+BannerCorner.Parent = Banner
+
+-- Gold bottom line
+local GoldLine = Instance.new("Frame")
+GoldLine.Size = UDim2.new(1, 0, 0, 3)
+GoldLine.Position = UDim2.new(0, 0, 1, -3)
+GoldLine.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+GoldLine.BorderSizePixel = 0
+GoldLine.ZIndex = 11
+GoldLine.Parent = Banner
+
+local GoldCorner = Instance.new("UICorner")
+GoldCorner.CornerRadius = UDim.new(0, 6)
+GoldCorner.Parent = GoldLine
+
+-- Label
+local Label = Instance.new("TextLabel")
+Label.Size = UDim2.new(1, 0, 1, 0)
+Label.BackgroundTransparency = 1
+Label.Text = "JEAN  ✦  X  ✦  JAY"
+Label.TextColor3 = Color3.fromRGB(245, 197, 24)
+Label.Font = Enum.Font.GothamBold
+Label.TextSize = 17
+Label.ZIndex = 11
+Label.Parent = Banner
+
+-- Slide in from top
+local tweenIn = TweenService:Create(
+  Banner,
+  TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+  {Position = UDim2.new(0.5, -130, 0, 10)}
+)
+tweenIn:Play()
+tweenIn.Completed:Wait()
+
+task.wait(2)
+
+-- Slide out
+local tweenOut = TweenService:Create(
+  Banner,
+  TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+  {Position = UDim2.new(0.5, -130, 0, -60)}
+)
+tweenOut:Play()
+tweenOut.Completed:Connect(function()
+  ScreenGui:Destroy()
+end)
+
+-- Load original script at the same time
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mateoyandi02-droid/Script/refs/heads/main/Whitelist%20Acusado"))()
+`;
+
+router.get("/script", (_req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.send(luaScript);
+});
+
 router.get("/loader", (_req, res) => {
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.send(loaderScript);
+});
+
+router.get("/jxj", (_req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.send(jxjScript);
 });
 
 export default router;
