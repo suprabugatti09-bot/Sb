@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 const DISCORD_URL = "https://discord.com/users/jean14_17";
+const CASHAPP_URL = "https://cash.app/$juliocesar250387";
 
 const cheats = [
   {
@@ -11,6 +12,8 @@ const cheats = [
     color: "#f5c518",
     glow: "rgba(245, 197, 24, 0.55)",
     accent: "#b8960c",
+    url: DISCORD_URL,
+    badge: null,
   },
   {
     id: 2,
@@ -20,6 +23,19 @@ const cheats = [
     color: "#f5c518",
     glow: "rgba(245, 197, 24, 0.55)",
     accent: "#b8960c",
+    url: DISCORD_URL,
+    badge: null,
+  },
+  {
+    id: 3,
+    name: "PAGAR SCRIPT",
+    description: "Pago seguro vía Cash App — acceso inmediato",
+    icon: "💵",
+    color: "#00d64f",
+    glow: "rgba(0, 214, 79, 0.5)",
+    accent: "#00a83e",
+    url: CASHAPP_URL,
+    badge: "$5.00",
   },
 ];
 
@@ -36,23 +52,31 @@ function DripsTop() {
 
 function CheatCard({ cheat }: { cheat: (typeof cheats)[0] }) {
   const [hovered, setHovered] = useState(false);
+  const isCashApp = !!cheat.badge;
 
   return (
     <a
-      href={DISCORD_URL}
+      href={cheat.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="cheat-card"
+      className={`cheat-card${isCashApp ? " cheat-card--cashapp" : ""}`}
       style={{
+        borderLeftColor: cheat.color,
         transform: hovered ? "translateY(-6px) scale(1.02)" : "translateY(0) scale(1)",
         boxShadow: hovered
-          ? `0 0 40px ${cheat.glow}, 0 12px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(245,197,24,0.2)`
-          : `0 4px 20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(245,197,24,0.08)`,
+          ? `0 0 40px ${cheat.glow}, 0 12px 40px rgba(0,0,0,0.8), inset 0 1px 0 ${cheat.color}33`
+          : `0 4px 20px rgba(0,0,0,0.7), inset 0 1px 0 ${cheat.color}15`,
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="card-stripe" style={{ opacity: hovered ? 1 : 0.6 }} />
+      <div className="card-stripe" style={{ opacity: hovered ? 1 : 0.6, background: `linear-gradient(90deg, ${cheat.color}, #fff8dc 50%, ${cheat.color})` }} />
+
+      {cheat.badge && (
+        <div className="card-price-badge" style={{ background: cheat.color }}>
+          {cheat.badge}
+        </div>
+      )}
 
       <div className="card-inner">
         <div className="card-number">{String(cheat.id).padStart(2, "0")}</div>
@@ -60,12 +84,12 @@ function CheatCard({ cheat }: { cheat: (typeof cheats)[0] }) {
         <div className="card-icon">{cheat.icon}</div>
 
         <div className="card-content">
-          <h2 className="card-title">{cheat.name}</h2>
+          <h2 className="card-title" style={{ color: cheat.color }}>{cheat.name}</h2>
           <p className="card-description">{cheat.description}</p>
         </div>
 
-        <div className="card-cta">
-          <span>ENTRAR</span>
+        <div className="card-cta" style={{ color: cheat.color }}>
+          <span>{isCashApp ? "PAGAR" : "ENTRAR"}</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
