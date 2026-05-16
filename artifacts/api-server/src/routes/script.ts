@@ -164,10 +164,177 @@ Button.MouseButton1Click:Connect(function()
 end)
 `;
 
+const loaderScript = `
+-- JEAN CHEAT X JAY CHEAT
+-- Loader Script
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+if PlayerGui:FindFirstChild("JXJLoader") then
+  PlayerGui.JXJLoader:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JXJLoader"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+-- Dark overlay
+local Overlay = Instance.new("Frame")
+Overlay.Size = UDim2.new(1, 0, 1, 0)
+Overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Overlay.BackgroundTransparency = 0.3
+Overlay.ZIndex = 1
+Overlay.Parent = ScreenGui
+
+-- Main card
+local Card = Instance.new("Frame")
+Card.Size = UDim2.new(0, 460, 0, 260)
+Card.Position = UDim2.new(0.5, -230, 0.5, -130)
+Card.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+Card.BorderSizePixel = 0
+Card.ZIndex = 2
+Card.Parent = ScreenGui
+
+local CardCorner = Instance.new("UICorner")
+CardCorner.CornerRadius = UDim.new(0, 8)
+CardCorner.Parent = Card
+
+-- Gold accent top
+local GoldBar = Instance.new("Frame")
+GoldBar.Size = UDim2.new(1, 0, 0, 5)
+GoldBar.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+GoldBar.BorderSizePixel = 0
+GoldBar.ZIndex = 3
+GoldBar.Parent = Card
+
+local GoldCorner = Instance.new("UICorner")
+GoldCorner.CornerRadius = UDim.new(0, 8)
+GoldCorner.Parent = GoldBar
+
+-- "JEAN CHEAT" line 1
+local Line1 = Instance.new("TextLabel")
+Line1.Size = UDim2.new(1, 0, 0, 70)
+Line1.Position = UDim2.new(0, 0, 0, 14)
+Line1.BackgroundTransparency = 1
+Line1.Text = "JEAN CHEAT"
+Line1.TextColor3 = Color3.fromRGB(255, 255, 255)
+Line1.Font = Enum.Font.GothamBold
+Line1.TextSize = 42
+Line1.ZIndex = 3
+Line1.Parent = Card
+
+-- "X" separator
+local LineX = Instance.new("TextLabel")
+LineX.Size = UDim2.new(1, 0, 0, 30)
+LineX.Position = UDim2.new(0, 0, 0, 80)
+LineX.BackgroundTransparency = 1
+LineX.Text = "✦  X  ✦"
+LineX.TextColor3 = Color3.fromRGB(245, 197, 24)
+LineX.Font = Enum.Font.GothamBold
+LineX.TextSize = 18
+LineX.ZIndex = 3
+LineX.Parent = Card
+
+-- "JAY CHEAT" line 2
+local Line2 = Instance.new("TextLabel")
+Line2.Size = UDim2.new(1, 0, 0, 55)
+Line2.Position = UDim2.new(0, 0, 0, 106)
+Line2.BackgroundTransparency = 1
+Line2.Text = "JAY CHEAT"
+Line2.TextColor3 = Color3.fromRGB(245, 197, 24)
+Line2.Font = Enum.Font.GothamBold
+Line2.TextSize = 42
+Line2.ZIndex = 3
+Line2.Parent = Card
+
+-- Status text
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, 0, 0, 22)
+StatusLabel.Position = UDim2.new(0, 0, 0, 168)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Iniciando..."
+StatusLabel.TextColor3 = Color3.fromRGB(130, 130, 130)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 13
+StatusLabel.ZIndex = 3
+StatusLabel.Parent = Card
+
+-- Progress bar track
+local BarTrack = Instance.new("Frame")
+BarTrack.Size = UDim2.new(0, 400, 0, 8)
+BarTrack.Position = UDim2.new(0, 30, 0, 200)
+BarTrack.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+BarTrack.BorderSizePixel = 0
+BarTrack.ZIndex = 3
+BarTrack.Parent = Card
+
+local TrackCorner = Instance.new("UICorner")
+TrackCorner.CornerRadius = UDim.new(1, 0)
+TrackCorner.Parent = BarTrack
+
+-- Progress bar fill
+local BarFill = Instance.new("Frame")
+BarFill.Size = UDim2.new(0, 0, 1, 0)
+BarFill.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+BarFill.BorderSizePixel = 0
+BarFill.ZIndex = 4
+BarFill.Parent = BarTrack
+
+local FillCorner = Instance.new("UICorner")
+FillCorner.CornerRadius = UDim.new(1, 0)
+FillCorner.Parent = BarFill
+
+-- Version label bottom
+local VersionLabel = Instance.new("TextLabel")
+VersionLabel.Size = UDim2.new(1, 0, 0, 20)
+VersionLabel.Position = UDim2.new(0, 0, 0, 234)
+VersionLabel.BackgroundTransparency = 1
+VersionLabel.Text = "v1.0  |  discord: jean14_17  |  @jayxxx047"
+VersionLabel.TextColor3 = Color3.fromRGB(55, 55, 55)
+VersionLabel.Font = Enum.Font.Gotham
+VersionLabel.TextSize = 11
+VersionLabel.ZIndex = 3
+VersionLabel.Parent = Card
+
+-- Animate loading bar
+local steps = {
+  {pct = 0.25, text = "Cargando recursos...",   delay = 0.6},
+  {pct = 0.55, text = "Verificando acceso...",  delay = 0.7},
+  {pct = 0.80, text = "Preparando script...",   delay = 0.5},
+  {pct = 1.00, text = "Listo!",                 delay = 0.4},
+}
+
+for _, step in ipairs(steps) do
+  StatusLabel.Text = step.text
+  local tween = TweenService:Create(
+    BarFill,
+    TweenInfo.new(step.delay, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+    {Size = UDim2.new(step.pct, 0, 1, 0)}
+  )
+  tween:Play()
+  tween.Completed:Wait()
+end
+
+task.wait(0.3)
+ScreenGui:Destroy()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mateoyandi02-droid/Script/refs/heads/main/Whitelist%20Acusado"))()
+`;
+
 router.get("/script", (_req, res) => {
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.send(luaScript);
+});
+
+router.get("/loader", (_req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.send(loaderScript);
 });
 
 export default router;
