@@ -206,11 +206,12 @@ body {
   transition: opacity 0.25s;
 }
 
-.card-inner {
+/* Card header row */
+.card-header {
   display: flex;
   align-items: center;
   gap: 1.2rem;
-  padding: 1.4rem 1.6rem;
+  padding: 1.4rem 1.6rem 1rem;
 }
 
 .card-number {
@@ -233,7 +234,7 @@ body {
   transform: scale(1.2) rotate(-5deg);
 }
 
-.card-content {
+.card-info {
   flex: 1;
 }
 
@@ -256,23 +257,71 @@ body {
   font-weight: 600;
 }
 
-.card-cta {
+/* Divider inside card */
+.card-divider {
+  height: 1px;
+  margin: 0 1.6rem;
+  background: linear-gradient(90deg, transparent, #2a2a2a, transparent);
+}
+
+/* Action buttons row */
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.6rem 1.4rem;
+}
+
+.action-btn {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 4px;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1rem;
   letter-spacing: 0.15em;
-  color: #f5c518;
-  opacity: 0;
-  transform: translateX(-8px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  flex-shrink: 0;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  border: 1px solid transparent;
 }
 
-.cheat-card:hover .card-cta {
-  opacity: 1;
-  transform: translateX(0);
+.action-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+
+.action-btn--discord {
+  background: rgba(88, 101, 242, 0.12);
+  border-color: rgba(88, 101, 242, 0.35);
+  color: #7b8ef5;
+}
+
+.action-btn--discord:hover {
+  box-shadow: 0 4px 20px rgba(88,101,242,0.3);
+}
+
+.action-btn--cashapp {
+  background: rgba(0, 214, 79, 0.1);
+  border-color: rgba(0, 214, 79, 0.4);
+  color: #00d64f;
+}
+
+.action-btn--cashapp:hover {
+  box-shadow: 0 4px 20px rgba(0,214,79,0.3);
+}
+
+.cashapp-price {
+  background: #00d64f;
+  color: #000;
+  font-size: 0.75rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  line-height: 1.4;
 }
 
 /* ── Footer ── */
