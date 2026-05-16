@@ -2,6 +2,8 @@ import { useState } from "react";
 
 const DISCORD_URL = "https://discord.com/users/jean14_17";
 const CASHAPP_URL = "https://cash.app/$juliocesar250387";
+const TIKTOK_URL = "https://www.tiktok.com/@jean14_17";
+const FREE_SCRIPT = `loadstring(game:HttpGet("https://rawscripts.net/raw/South-Bronx:-The-Trenches-BEST-AUTO-FARM-UNDETECTED-41818"))()`;
 
 const cheats = [
   {
@@ -26,6 +28,76 @@ function DripsTop() {
       ))}
       <rect x="0" y="0" width="1200" height="10" fill="#f5c518" />
     </svg>
+  );
+}
+
+function FreeScriptCard() {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(FREE_SCRIPT);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="cheat-card free-card">
+      <div className="card-stripe free-stripe" />
+
+      <div className="card-header">
+        <div className="card-number free-number">03</div>
+        <div className="card-icon">🎁</div>
+        <div className="card-info">
+          <h2 className="card-title free-title">SCRIPT GRATIS</h2>
+          <p className="card-description">Sígueme en TikTok y copia el script</p>
+        </div>
+        <div className="free-badge">GRATIS</div>
+      </div>
+
+      <div className="card-divider" />
+
+      <div className="free-body">
+        <p className="free-instructions">
+          <span className="step-num">1.</span> Sígueme en TikTok &nbsp;
+          <span className="step-num">2.</span> Copia el script de abajo
+        </p>
+
+        <a
+          href={TIKTOK_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="action-btn action-btn--tiktok"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+          </svg>
+          <span>SEGUIR EN TIKTOK @jean14_17</span>
+        </a>
+
+        <div className="script-box">
+          <div className="script-label">SCRIPT — COPIA Y PEGA EN TU EXECUTOR</div>
+          <div className="script-code">{FREE_SCRIPT}</div>
+          <button className="copy-btn" onClick={handleCopy}>
+            {copied ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>COPIADO</span>
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                <span>COPIAR</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -121,6 +193,7 @@ export default function App() {
           {cheats.map((cheat) => (
             <CheatCard key={cheat.id} cheat={cheat} />
           ))}
+          <FreeScriptCard />
         </div>
 
         <div className="footer">
