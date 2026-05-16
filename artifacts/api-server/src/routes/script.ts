@@ -332,66 +332,80 @@ router.get("/script", (_req, res) => {
 });
 
 const jxjScript = `
--- JEAN X JAY
+-- JEAN Script Hub
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
-if PlayerGui:FindFirstChild("JXJTag") then
-  PlayerGui.JXJTag:Destroy()
+if PlayerGui:FindFirstChild("JEANHub") then
+  PlayerGui.JEANHub:Destroy()
 end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "JXJTag"
+ScreenGui.Name = "JEANHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = PlayerGui
 
--- Top banner
-local Banner = Instance.new("Frame")
-Banner.Size = UDim2.new(0, 260, 0, 44)
-Banner.Position = UDim2.new(0.5, -130, 0, -50)
-Banner.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
-Banner.BorderSizePixel = 0
-Banner.ZIndex = 10
-Banner.Parent = ScreenGui
+-- Card
+local Card = Instance.new("Frame")
+Card.Size = UDim2.new(0, 280, 0, 64)
+Card.Position = UDim2.new(0.5, -140, 0, -80)
+Card.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+Card.BorderSizePixel = 0
+Card.ZIndex = 10
+Card.Parent = ScreenGui
 
-local BannerCorner = Instance.new("UICorner")
-BannerCorner.CornerRadius = UDim.new(0, 6)
-BannerCorner.Parent = Banner
+local CardCorner = Instance.new("UICorner")
+CardCorner.CornerRadius = UDim.new(0, 8)
+CardCorner.Parent = Card
 
--- Gold bottom line
-local GoldLine = Instance.new("Frame")
-GoldLine.Size = UDim2.new(1, 0, 0, 3)
-GoldLine.Position = UDim2.new(0, 0, 1, -3)
-GoldLine.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
-GoldLine.BorderSizePixel = 0
-GoldLine.ZIndex = 11
-GoldLine.Parent = Banner
+-- Gold left accent bar
+local GoldAccent = Instance.new("Frame")
+GoldAccent.Size = UDim2.new(0, 4, 1, 0)
+GoldAccent.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+GoldAccent.BorderSizePixel = 0
+GoldAccent.ZIndex = 11
+GoldAccent.Parent = Card
 
-local GoldCorner = Instance.new("UICorner")
-GoldCorner.CornerRadius = UDim.new(0, 6)
-GoldCorner.Parent = GoldLine
+local AccentCorner = Instance.new("UICorner")
+AccentCorner.CornerRadius = UDim.new(0, 8)
+AccentCorner.Parent = GoldAccent
 
--- Label
-local Label = Instance.new("TextLabel")
-Label.Size = UDim2.new(1, 0, 1, 0)
-Label.BackgroundTransparency = 1
-Label.Text = "JEAN  ✦  X  ✦  JAY"
-Label.TextColor3 = Color3.fromRGB(245, 197, 24)
-Label.Font = Enum.Font.GothamBold
-Label.TextSize = 17
-Label.ZIndex = 11
-Label.Parent = Banner
+-- Main name "JEAN"
+local NameLabel = Instance.new("TextLabel")
+NameLabel.Size = UDim2.new(1, -14, 0, 36)
+NameLabel.Position = UDim2.new(0, 14, 0, 4)
+NameLabel.BackgroundTransparency = 1
+NameLabel.Text = "JEAN"
+NameLabel.TextColor3 = Color3.fromRGB(245, 197, 24)
+NameLabel.Font = Enum.Font.GothamBold
+NameLabel.TextSize = 28
+NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+NameLabel.ZIndex = 11
+NameLabel.Parent = Card
 
--- Animation runs in background so it does NOT block script execution
+-- Subtitle
+local SubLabel = Instance.new("TextLabel")
+SubLabel.Size = UDim2.new(1, -14, 0, 20)
+SubLabel.Position = UDim2.new(0, 14, 0, 38)
+SubLabel.BackgroundTransparency = 1
+SubLabel.Text = "Script Hub  |  by Jean"
+SubLabel.TextColor3 = Color3.fromRGB(90, 90, 90)
+SubLabel.Font = Enum.Font.Gotham
+SubLabel.TextSize = 12
+SubLabel.TextXAlignment = Enum.TextXAlignment.Left
+SubLabel.ZIndex = 11
+SubLabel.Parent = Card
+
+-- Animation runs in background, does NOT block script execution
 task.spawn(function()
-  -- Slide in
+  -- Slide in from top
   local tweenIn = TweenService:Create(
-    Banner,
+    Card,
     TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-    {Position = UDim2.new(0.5, -130, 0, 10)}
+    {Position = UDim2.new(0.5, -140, 0, 12)}
   )
   tweenIn:Play()
   tweenIn.Completed:Wait()
@@ -400,9 +414,9 @@ task.spawn(function()
 
   -- Slide out
   local tweenOut = TweenService:Create(
-    Banner,
+    Card,
     TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
-    {Position = UDim2.new(0.5, -130, 0, -60)}
+    {Position = UDim2.new(0.5, -140, 0, -90)}
   )
   tweenOut:Play()
   tweenOut.Completed:Wait()
