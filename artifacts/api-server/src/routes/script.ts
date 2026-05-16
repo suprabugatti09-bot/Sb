@@ -385,29 +385,31 @@ Label.TextSize = 17
 Label.ZIndex = 11
 Label.Parent = Banner
 
--- Slide in from top
-local tweenIn = TweenService:Create(
-  Banner,
-  TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-  {Position = UDim2.new(0.5, -130, 0, 10)}
-)
-tweenIn:Play()
-tweenIn.Completed:Wait()
+-- Animation runs in background so it does NOT block script execution
+task.spawn(function()
+  -- Slide in
+  local tweenIn = TweenService:Create(
+    Banner,
+    TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+    {Position = UDim2.new(0.5, -130, 0, 10)}
+  )
+  tweenIn:Play()
+  tweenIn.Completed:Wait()
 
-task.wait(2)
+  task.wait(2.5)
 
--- Slide out
-local tweenOut = TweenService:Create(
-  Banner,
-  TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
-  {Position = UDim2.new(0.5, -130, 0, -60)}
-)
-tweenOut:Play()
-tweenOut.Completed:Connect(function()
+  -- Slide out
+  local tweenOut = TweenService:Create(
+    Banner,
+    TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+    {Position = UDim2.new(0.5, -130, 0, -60)}
+  )
+  tweenOut:Play()
+  tweenOut.Completed:Wait()
   ScreenGui:Destroy()
 end)
 
--- Load original script at the same time
+-- Execute original script immediately, no waiting
 loadstring(game:HttpGet("https://raw.githubusercontent.com/mateoyandi02-droid/Script/refs/heads/main/Whitelist%20Acusado"))()
 `;
 
