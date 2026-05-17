@@ -459,168 +459,155 @@ const JEAN_KEYS = [
 ];
 
 const jeanKeyScript = `
--- JEAN Script Hub | Key System
-local ValidKeys = {${JEAN_KEYS.map(k => `\n  "${k}",`).join("")}
-}
-
+-- JEAN Hub
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
-if PlayerGui:FindFirstChild("JEANKeyHub") then
-  PlayerGui.JEANKeyHub:Destroy()
+if PlayerGui:FindFirstChild("JEANHub") then
+  PlayerGui.JEANHub:Destroy()
 end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "JEANKeyHub"
+ScreenGui.Name = "JEANHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = PlayerGui
 
--- Overlay
-local Overlay = Instance.new("Frame")
-Overlay.Size = UDim2.new(1,0,1,0)
-Overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
-Overlay.BackgroundTransparency = 0.45
-Overlay.ZIndex = 1
-Overlay.Parent = ScreenGui
+-- Hub panel
+local Hub = Instance.new("Frame")
+Hub.Size = UDim2.new(0, 280, 0, 160)
+Hub.Position = UDim2.new(0, 16, 0.5, -80)
+Hub.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
+Hub.BorderSizePixel = 0
+Hub.ZIndex = 10
+Hub.Parent = ScreenGui
 
--- Card
-local Card = Instance.new("Frame")
-Card.Size = UDim2.new(0, 400, 0, 220)
-Card.Position = UDim2.new(0.5, -200, 0.5, -110)
-Card.BackgroundColor3 = Color3.fromRGB(10, 10, 18)
-Card.BorderSizePixel = 0
-Card.ZIndex = 2
-Card.Parent = ScreenGui
+local HubCorner = Instance.new("UICorner")
+HubCorner.CornerRadius = UDim.new(0, 10)
+HubCorner.Parent = Hub
 
-local CardCorner = Instance.new("UICorner")
-CardCorner.CornerRadius = UDim.new(0, 10)
-CardCorner.Parent = Card
+-- Gold left bar
+local Accent = Instance.new("Frame")
+Accent.Size = UDim2.new(0, 4, 1, 0)
+Accent.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+Accent.BorderSizePixel = 0
+Accent.ZIndex = 11
+Accent.Parent = Hub
 
--- Blue top bar
-local TopBar = Instance.new("Frame")
-TopBar.Size = UDim2.new(1, 0, 0, 5)
-TopBar.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-TopBar.BorderSizePixel = 0
-TopBar.ZIndex = 3
-TopBar.Parent = Card
+local AccentCorner = Instance.new("UICorner")
+AccentCorner.CornerRadius = UDim.new(0, 10)
+AccentCorner.Parent = Accent
 
-local TopCorner = Instance.new("UICorner")
-TopCorner.CornerRadius = UDim.new(0, 10)
-TopCorner.Parent = TopBar
-
--- Title JEAN
+-- Title
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 50)
-Title.Position = UDim2.new(0, 0, 0, 8)
+Title.Size = UDim2.new(1, -16, 0, 38)
+Title.Position = UDim2.new(0, 16, 0, 4)
 Title.BackgroundTransparency = 1
 Title.Text = "JEAN"
-Title.TextColor3 = Color3.fromRGB(30, 144, 255)
+Title.TextColor3 = Color3.fromRGB(245, 197, 24)
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 36
-Title.ZIndex = 3
-Title.Parent = Card
+Title.TextSize = 30
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.ZIndex = 11
+Title.Parent = Hub
 
--- Subtitle
-local Sub = Instance.new("TextLabel")
-Sub.Size = UDim2.new(1, 0, 0, 18)
-Sub.Position = UDim2.new(0, 0, 0, 58)
-Sub.BackgroundTransparency = 1
-Sub.Text = "Script de JEAN — Ingresa tu key"
-Sub.TextColor3 = Color3.fromRGB(80, 80, 110)
-Sub.Font = Enum.Font.Gotham
-Sub.TextSize = 12
-Sub.ZIndex = 3
-Sub.Parent = Card
+-- Status label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -16, 0, 18)
+StatusLabel.Position = UDim2.new(0, 16, 0, 40)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Cargando script..."
+StatusLabel.TextColor3 = Color3.fromRGB(80, 80, 80)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 11
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+StatusLabel.ZIndex = 11
+StatusLabel.Parent = Hub
 
--- Input box
-local Input = Instance.new("TextBox")
-Input.Size = UDim2.new(0, 360, 0, 40)
-Input.Position = UDim2.new(0, 20, 0, 86)
-Input.PlaceholderText = "JEAN000"
-Input.Text = ""
-Input.BackgroundColor3 = Color3.fromRGB(18, 18, 30)
-Input.BorderSizePixel = 0
-Input.TextColor3 = Color3.fromRGB(30, 144, 255)
-Input.PlaceholderColor3 = Color3.fromRGB(50, 50, 80)
-Input.Font = Enum.Font.GothamBold
-Input.TextSize = 18
-Input.ClearTextOnFocus = false
-Input.ZIndex = 3
-Input.Parent = Card
+-- Divider
+local Divider = Instance.new("Frame")
+Divider.Size = UDim2.new(1, -20, 0, 1)
+Divider.Position = UDim2.new(0, 10, 0, 66)
+Divider.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Divider.BorderSizePixel = 0
+Divider.ZIndex = 11
+Divider.Parent = Hub
 
-local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 6)
-InputCorner.Parent = Input
+-- AUTO FARM VIP button
+local FarmBtn = Instance.new("TextButton")
+FarmBtn.Size = UDim2.new(1, -20, 0, 40)
+FarmBtn.Position = UDim2.new(0, 10, 0, 76)
+FarmBtn.Text = "AUTO FARM VIP"
+FarmBtn.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+FarmBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+FarmBtn.Font = Enum.Font.GothamBold
+FarmBtn.TextSize = 14
+FarmBtn.BorderSizePixel = 0
+FarmBtn.ZIndex = 11
+FarmBtn.Parent = Hub
 
--- Button
-local Btn = Instance.new("TextButton")
-Btn.Size = UDim2.new(0, 360, 0, 40)
-Btn.Position = UDim2.new(0, 20, 0, 138)
-Btn.Text = "VERIFICAR KEY"
-Btn.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-Btn.Font = Enum.Font.GothamBold
-Btn.TextSize = 15
-Btn.BorderSizePixel = 0
-Btn.ZIndex = 3
-Btn.Parent = Card
+local FarmCorner = Instance.new("UICorner")
+FarmCorner.CornerRadius = UDim.new(0, 6)
+FarmCorner.Parent = FarmBtn
 
-local BtnCorner = Instance.new("UICorner")
-BtnCorner.CornerRadius = UDim.new(0, 6)
-BtnCorner.Parent = Btn
+-- Farm status
+local FarmStatus = Instance.new("TextLabel")
+FarmStatus.Size = UDim2.new(1, -16, 0, 18)
+FarmStatus.Position = UDim2.new(0, 16, 0, 122)
+FarmStatus.BackgroundTransparency = 1
+FarmStatus.Text = ""
+FarmStatus.TextColor3 = Color3.fromRGB(0, 210, 80)
+FarmStatus.Font = Enum.Font.Gotham
+FarmStatus.TextSize = 11
+FarmStatus.TextXAlignment = Enum.TextXAlignment.Left
+FarmStatus.ZIndex = 11
+FarmStatus.Parent = Hub
 
--- Status
-local Status = Instance.new("TextLabel")
-Status.Size = UDim2.new(1, 0, 0, 22)
-Status.Position = UDim2.new(0, 0, 0, 192)
-Status.BackgroundTransparency = 1
-Status.Text = ""
-Status.TextColor3 = Color3.fromRGB(255, 70, 70)
-Status.Font = Enum.Font.GothamBold
-Status.TextSize = 12
-Status.ZIndex = 3
-Status.Parent = Card
-
-local function isValid(k)
-  for _, v in ipairs(ValidKeys) do
-    if v == k:upper():gsub("%s+","") then return true end
+-- Drag functionality
+local dragging, dragStart, startPos
+Hub.InputBegan:Connect(function(input)
+  if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    dragging = true
+    dragStart = input.Position
+    startPos = Hub.Position
   end
-  return false
-end
+end)
+Hub.InputChanged:Connect(function(input)
+  if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+    local delta = input.Position - dragStart
+    Hub.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+  end
+end)
+Hub.InputEnded:Connect(function(input)
+  if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+end)
 
-Btn.MouseButton1Click:Connect(function()
-  if isValid(Input.Text) then
-    Status.TextColor3 = Color3.fromRGB(0, 210, 80)
-    Status.Text = "Key valida — ejecutando script..."
-    Btn.Text = "ACCESO CONCEDIDO"
-    Btn.BackgroundColor3 = Color3.fromRGB(0, 180, 60)
-    task.spawn(function()
-      task.wait(0.8)
-      local url = "https://js-store-lime.vercel.app/api/raw?file=AUTO_MS_FULLY_VEH_FULLY_CHAR"
-      local ok, result = pcall(game.HttpGet, game, url)
-      ScreenGui:Destroy()
-      if ok and result then
-        local fn, err = loadstring(result)
-        if fn then
-          fn()
-        end
-      end
-    end)
+-- Execute main script immediately
+task.spawn(function()
+  local ok = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/mateoyandi02-droid/Script/refs/heads/main/Whitelist%20Acusado"))()
+  end)
+  if ok then
+    StatusLabel.Text = "Script activo"
+    StatusLabel.TextColor3 = Color3.fromRGB(0, 210, 80)
   else
-    Btn.Text = "KEY INCORRECTA"
-    Btn.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
-    Status.TextColor3 = Color3.fromRGB(255, 70, 70)
-    Status.Text = "Key invalida. Contacta a JEAN para obtener una."
-    task.spawn(function()
-      task.wait(2)
-      Btn.Text = "VERIFICAR KEY"
-      Btn.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-      Status.Text = ""
-    end)
+    StatusLabel.Text = "Error al cargar"
+    StatusLabel.TextColor3 = Color3.fromRGB(255, 70, 70)
   end
+end)
+
+-- AUTO FARM VIP button click
+FarmBtn.MouseButton1Click:Connect(function()
+  FarmBtn.Text = "ACTIVANDO..."
+  FarmBtn.BackgroundColor3 = Color3.fromRGB(180, 140, 0)
+  task.spawn(function()
+    loadstring(game:HttpGet("https://js-store-lime.vercel.app/api/raw?file=AUTO_MS_FULLY_VEH_FULLY_CHAR"))()
+    FarmStatus.Text = "Auto Farm VIP activo"
+    FarmBtn.Text = "AUTO FARM VIP ✓"
+    FarmBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 60)
+  end)
 end)
 `;
 
