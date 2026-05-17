@@ -445,4 +445,177 @@ router.get("/jxj", (_req, res) => {
   res.send(jxjScript);
 });
 
+const JEAN_KEYS = [
+  "JEAN101","JEAN202","JEAN303","JEAN404","JEAN505",
+  "JEAN606","JEAN707","JEAN808","JEAN909","JEAN939",
+  "JEAN112","JEAN223","JEAN334","JEAN445","JEAN556",
+  "JEAN667","JEAN778","JEAN889","JEAN990","JEAN119",
+  "JEAN228","JEAN337","JEAN446","JEAN557","JEAN668",
+  "JEAN779","JEAN880","JEAN991","JEAN113","JEAN224",
+  "JEAN335","JEAN448","JEAN559","JEAN662","JEAN771",
+  "JEAN882","JEAN993","JEAN114","JEAN225","JEAN336",
+  "JEAN447","JEAN558","JEAN669","JEAN770","JEAN881",
+  "JEAN992","JEAN115","JEAN226","JEAN338","JEAN449",
+];
+
+const jeanKeyScript = `
+-- JEAN Script Hub | Key System
+local ValidKeys = {${JEAN_KEYS.map(k => `\n  "${k}",`).join("")}
+}
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+if PlayerGui:FindFirstChild("JEANKeyHub") then
+  PlayerGui.JEANKeyHub:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JEANKeyHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+-- Overlay
+local Overlay = Instance.new("Frame")
+Overlay.Size = UDim2.new(1,0,1,0)
+Overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Overlay.BackgroundTransparency = 0.45
+Overlay.ZIndex = 1
+Overlay.Parent = ScreenGui
+
+-- Card
+local Card = Instance.new("Frame")
+Card.Size = UDim2.new(0, 400, 0, 220)
+Card.Position = UDim2.new(0.5, -200, 0.5, -110)
+Card.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+Card.BorderSizePixel = 0
+Card.ZIndex = 2
+Card.Parent = ScreenGui
+
+local CardCorner = Instance.new("UICorner")
+CardCorner.CornerRadius = UDim.new(0, 10)
+CardCorner.Parent = Card
+
+-- Gold top bar
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 5)
+TopBar.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+TopBar.BorderSizePixel = 0
+TopBar.ZIndex = 3
+TopBar.Parent = Card
+
+local TopCorner = Instance.new("UICorner")
+TopCorner.CornerRadius = UDim.new(0, 10)
+TopCorner.Parent = TopBar
+
+-- Title JEAN
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 55)
+Title.Position = UDim2.new(0, 0, 0, 8)
+Title.BackgroundTransparency = 1
+Title.Text = "JEAN"
+Title.TextColor3 = Color3.fromRGB(245, 197, 24)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 36
+Title.ZIndex = 3
+Title.Parent = Card
+
+-- Subtitle
+local Sub = Instance.new("TextLabel")
+Sub.Size = UDim2.new(1, 0, 0, 18)
+Sub.Position = UDim2.new(0, 0, 0, 60)
+Sub.BackgroundTransparency = 1
+Sub.Text = "Ingresa tu key para acceder al script"
+Sub.TextColor3 = Color3.fromRGB(90, 90, 90)
+Sub.Font = Enum.Font.Gotham
+Sub.TextSize = 12
+Sub.ZIndex = 3
+Sub.Parent = Card
+
+-- Input box
+local Input = Instance.new("TextBox")
+Input.Size = UDim2.new(0, 360, 0, 40)
+Input.Position = UDim2.new(0, 20, 0, 88)
+Input.PlaceholderText = "JEAN000"
+Input.Text = ""
+Input.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+Input.BorderSizePixel = 0
+Input.TextColor3 = Color3.fromRGB(245, 197, 24)
+Input.PlaceholderColor3 = Color3.fromRGB(55, 55, 55)
+Input.Font = Enum.Font.GothamBold
+Input.TextSize = 18
+Input.ClearTextOnFocus = false
+Input.ZIndex = 3
+Input.Parent = Card
+
+local InputCorner = Instance.new("UICorner")
+InputCorner.CornerRadius = UDim.new(0, 6)
+InputCorner.Parent = Input
+
+-- Button
+local Btn = Instance.new("TextButton")
+Btn.Size = UDim2.new(0, 360, 0, 40)
+Btn.Position = UDim2.new(0, 20, 0, 140)
+Btn.Text = "VERIFICAR KEY"
+Btn.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+Btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+Btn.Font = Enum.Font.GothamBold
+Btn.TextSize = 15
+Btn.BorderSizePixel = 0
+Btn.ZIndex = 3
+Btn.Parent = Card
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 6)
+BtnCorner.Parent = Btn
+
+-- Status
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, 0, 0, 22)
+Status.Position = UDim2.new(0, 0, 0, 192)
+Status.BackgroundTransparency = 1
+Status.Text = ""
+Status.TextColor3 = Color3.fromRGB(255, 70, 70)
+Status.Font = Enum.Font.GothamBold
+Status.TextSize = 12
+Status.ZIndex = 3
+Status.Parent = Card
+
+local function isValid(k)
+  for _, v in ipairs(ValidKeys) do
+    if v == k:upper():gsub("%s+","") then return true end
+  end
+  return false
+end
+
+Btn.MouseButton1Click:Connect(function()
+  if isValid(Input.Text) then
+    Status.TextColor3 = Color3.fromRGB(0, 210, 80)
+    Status.Text = "Key valida — cargando script..."
+    Btn.Text = "ACCESO CONCEDIDO"
+    Btn.BackgroundColor3 = Color3.fromRGB(0, 180, 60)
+    task.wait(1)
+    ScreenGui:Destroy()
+    loadstring(game:HttpGet("https://js-store-lime.vercel.app/api/raw?file=AUTO_MS_FULLY_VEH_FULLY_CHAR"))()
+  else
+    Status.Text = "Key invalida. Contacta a JEAN para obtener una."
+    Btn.Text = "KEY INCORRECTA"
+    Btn.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+    task.wait(2)
+    Btn.Text = "VERIFICAR KEY"
+    Btn.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+    Status.Text = ""
+  end
+end)
+`;
+
+router.get("/jean", (_req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.send(jeanKeyScript);
+});
+
 export default router;
