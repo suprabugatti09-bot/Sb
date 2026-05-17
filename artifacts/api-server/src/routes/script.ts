@@ -490,7 +490,7 @@ Overlay.Parent = ScreenGui
 local Card = Instance.new("Frame")
 Card.Size = UDim2.new(0, 400, 0, 220)
 Card.Position = UDim2.new(0.5, -200, 0.5, -110)
-Card.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+Card.BackgroundColor3 = Color3.fromRGB(10, 10, 18)
 Card.BorderSizePixel = 0
 Card.ZIndex = 2
 Card.Parent = ScreenGui
@@ -499,10 +499,10 @@ local CardCorner = Instance.new("UICorner")
 CardCorner.CornerRadius = UDim.new(0, 10)
 CardCorner.Parent = Card
 
--- Gold top bar
+-- Blue top bar
 local TopBar = Instance.new("Frame")
 TopBar.Size = UDim2.new(1, 0, 0, 5)
-TopBar.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+TopBar.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
 TopBar.BorderSizePixel = 0
 TopBar.ZIndex = 3
 TopBar.Parent = Card
@@ -513,11 +513,11 @@ TopCorner.Parent = TopBar
 
 -- Title JEAN
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 55)
+Title.Size = UDim2.new(1, 0, 0, 50)
 Title.Position = UDim2.new(0, 0, 0, 8)
 Title.BackgroundTransparency = 1
 Title.Text = "JEAN"
-Title.TextColor3 = Color3.fromRGB(245, 197, 24)
+Title.TextColor3 = Color3.fromRGB(30, 144, 255)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 36
 Title.ZIndex = 3
@@ -526,10 +526,10 @@ Title.Parent = Card
 -- Subtitle
 local Sub = Instance.new("TextLabel")
 Sub.Size = UDim2.new(1, 0, 0, 18)
-Sub.Position = UDim2.new(0, 0, 0, 60)
+Sub.Position = UDim2.new(0, 0, 0, 58)
 Sub.BackgroundTransparency = 1
-Sub.Text = "Ingresa tu key para acceder al script"
-Sub.TextColor3 = Color3.fromRGB(90, 90, 90)
+Sub.Text = "Script de JEAN — Ingresa tu key"
+Sub.TextColor3 = Color3.fromRGB(80, 80, 110)
 Sub.Font = Enum.Font.Gotham
 Sub.TextSize = 12
 Sub.ZIndex = 3
@@ -538,13 +538,13 @@ Sub.Parent = Card
 -- Input box
 local Input = Instance.new("TextBox")
 Input.Size = UDim2.new(0, 360, 0, 40)
-Input.Position = UDim2.new(0, 20, 0, 88)
+Input.Position = UDim2.new(0, 20, 0, 86)
 Input.PlaceholderText = "JEAN000"
 Input.Text = ""
-Input.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+Input.BackgroundColor3 = Color3.fromRGB(18, 18, 30)
 Input.BorderSizePixel = 0
-Input.TextColor3 = Color3.fromRGB(245, 197, 24)
-Input.PlaceholderColor3 = Color3.fromRGB(55, 55, 55)
+Input.TextColor3 = Color3.fromRGB(30, 144, 255)
+Input.PlaceholderColor3 = Color3.fromRGB(50, 50, 80)
 Input.Font = Enum.Font.GothamBold
 Input.TextSize = 18
 Input.ClearTextOnFocus = false
@@ -558,10 +558,10 @@ InputCorner.Parent = Input
 -- Button
 local Btn = Instance.new("TextButton")
 Btn.Size = UDim2.new(0, 360, 0, 40)
-Btn.Position = UDim2.new(0, 20, 0, 140)
+Btn.Position = UDim2.new(0, 20, 0, 138)
 Btn.Text = "VERIFICAR KEY"
-Btn.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
-Btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+Btn.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 Btn.Font = Enum.Font.GothamBold
 Btn.TextSize = 15
 Btn.BorderSizePixel = 0
@@ -594,19 +594,21 @@ end
 Btn.MouseButton1Click:Connect(function()
   if isValid(Input.Text) then
     Status.TextColor3 = Color3.fromRGB(0, 210, 80)
-    Status.Text = "Key valida — cargando script..."
+    Status.Text = "Key valida — cargando script de JEAN..."
     Btn.Text = "ACCESO CONCEDIDO"
     Btn.BackgroundColor3 = Color3.fromRGB(0, 180, 60)
-    task.wait(1)
+    task.wait(0.8)
     ScreenGui:Destroy()
-    loadstring(game:HttpGet("https://js-store-lime.vercel.app/api/raw?file=AUTO_MS_FULLY_VEH_FULLY_CHAR"))()
+    task.spawn(function()
+      loadstring(game:HttpGet("https://js-store-lime.vercel.app/api/raw?file=AUTO_MS_FULLY_VEH_FULLY_CHAR"))()
+    end)
   else
     Status.Text = "Key invalida. Contacta a JEAN para obtener una."
     Btn.Text = "KEY INCORRECTA"
     Btn.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
     task.wait(2)
     Btn.Text = "VERIFICAR KEY"
-    Btn.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+    Btn.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
     Status.Text = ""
   end
 end)
