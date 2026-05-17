@@ -599,8 +599,15 @@ Btn.MouseButton1Click:Connect(function()
     Btn.BackgroundColor3 = Color3.fromRGB(0, 180, 60)
     task.spawn(function()
       task.wait(0.8)
+      local url = "https://js-store-lime.vercel.app/api/raw?file=AUTO_MS_FULLY_VEH_FULLY_CHAR"
+      local ok, result = pcall(game.HttpGet, game, url)
       ScreenGui:Destroy()
-      loadstring(game:HttpGet("https://js-store-lime.vercel.app/api/raw?file=AUTO_MS_FULLY_VEH_FULLY_CHAR"))()
+      if ok and result then
+        local fn, err = loadstring(result)
+        if fn then
+          fn()
+        end
+      end
     end)
   else
     Btn.Text = "KEY INCORRECTA"
