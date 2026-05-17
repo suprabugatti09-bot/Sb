@@ -594,22 +594,25 @@ end
 Btn.MouseButton1Click:Connect(function()
   if isValid(Input.Text) then
     Status.TextColor3 = Color3.fromRGB(0, 210, 80)
-    Status.Text = "Key valida — cargando script de JEAN..."
+    Status.Text = "Key valida — ejecutando script..."
     Btn.Text = "ACCESO CONCEDIDO"
     Btn.BackgroundColor3 = Color3.fromRGB(0, 180, 60)
-    task.wait(0.8)
-    ScreenGui:Destroy()
     task.spawn(function()
+      task.wait(0.8)
+      ScreenGui:Destroy()
       loadstring(game:HttpGet("https://js-store-lime.vercel.app/api/raw?file=AUTO_MS_FULLY_VEH_FULLY_CHAR"))()
     end)
   else
-    Status.Text = "Key invalida. Contacta a JEAN para obtener una."
     Btn.Text = "KEY INCORRECTA"
     Btn.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
-    task.wait(2)
-    Btn.Text = "VERIFICAR KEY"
-    Btn.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
-    Status.Text = ""
+    Status.TextColor3 = Color3.fromRGB(255, 70, 70)
+    Status.Text = "Key invalida. Contacta a JEAN para obtener una."
+    task.spawn(function()
+      task.wait(2)
+      Btn.Text = "VERIFICAR KEY"
+      Btn.BackgroundColor3 = Color3.fromRGB(30, 144, 255)
+      Status.Text = ""
+    end)
   end
 end)
 `;
