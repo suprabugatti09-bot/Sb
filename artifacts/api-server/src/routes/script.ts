@@ -611,10 +611,171 @@ FarmBtn.MouseButton1Click:Connect(function()
 end)
 `;
 
+const jxjFarmScript = `
+-- JEAN X JAY
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+if PlayerGui:FindFirstChild("JXJFarm") then
+  PlayerGui.JXJFarm:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JXJFarm"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+-- Card
+local Card = Instance.new("Frame")
+Card.Size = UDim2.new(0, 360, 0, 180)
+Card.Position = UDim2.new(0.5, -180, 0.5, -90)
+Card.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+Card.BorderSizePixel = 0
+Card.ZIndex = 10
+Card.Parent = ScreenGui
+
+local CardCorner = Instance.new("UICorner")
+CardCorner.CornerRadius = UDim.new(0, 10)
+CardCorner.Parent = Card
+
+-- Gold top bar
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 4)
+TopBar.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+TopBar.BorderSizePixel = 0
+TopBar.ZIndex = 11
+TopBar.Parent = Card
+
+local TopCorner = Instance.new("UICorner")
+TopCorner.CornerRadius = UDim.new(0, 10)
+TopCorner.Parent = TopBar
+
+-- JEAN title
+local Jean = Instance.new("TextLabel")
+Jean.Size = UDim2.new(0.5, 0, 0, 60)
+Jean.Position = UDim2.new(0, 0, 0, 6)
+Jean.BackgroundTransparency = 1
+Jean.Text = "JEAN"
+Jean.TextColor3 = Color3.fromRGB(255, 255, 255)
+Jean.Font = Enum.Font.GothamBold
+Jean.TextSize = 38
+Jean.ZIndex = 11
+Jean.Parent = Card
+
+-- X
+local X = Instance.new("TextLabel")
+X.Size = UDim2.new(0, 30, 0, 60)
+X.Position = UDim2.new(0.5, -15, 0, 6)
+X.BackgroundTransparency = 1
+X.Text = "X"
+X.TextColor3 = Color3.fromRGB(245, 197, 24)
+X.Font = Enum.Font.GothamBold
+X.TextSize = 28
+X.ZIndex = 11
+X.Parent = Card
+
+-- JAY title
+local Jay = Instance.new("TextLabel")
+Jay.Size = UDim2.new(0.5, 0, 0, 60)
+Jay.Position = UDim2.new(0.5, 0, 0, 6)
+Jay.BackgroundTransparency = 1
+Jay.Text = "JAY"
+Jay.TextColor3 = Color3.fromRGB(245, 197, 24)
+Jay.Font = Enum.Font.GothamBold
+Jay.TextSize = 38
+Jay.ZIndex = 11
+Jay.Parent = Card
+
+-- Divider
+local Div = Instance.new("Frame")
+Div.Size = UDim2.new(1, -20, 0, 1)
+Div.Position = UDim2.new(0, 10, 0, 72)
+Div.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Div.BorderSizePixel = 0
+Div.ZIndex = 11
+Div.Parent = Card
+
+-- Progress bar track
+local BarTrack = Instance.new("Frame")
+BarTrack.Size = UDim2.new(1, -20, 0, 6)
+BarTrack.Position = UDim2.new(0, 10, 0, 82)
+BarTrack.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+BarTrack.BorderSizePixel = 0
+BarTrack.ZIndex = 11
+BarTrack.Parent = Card
+
+local TrackCorner = Instance.new("UICorner")
+TrackCorner.CornerRadius = UDim.new(1, 0)
+TrackCorner.Parent = BarTrack
+
+local BarFill = Instance.new("Frame")
+BarFill.Size = UDim2.new(0, 0, 1, 0)
+BarFill.BackgroundColor3 = Color3.fromRGB(245, 197, 24)
+BarFill.BorderSizePixel = 0
+BarFill.ZIndex = 12
+BarFill.Parent = BarTrack
+
+local FillCorner = Instance.new("UICorner")
+FillCorner.CornerRadius = UDim.new(1, 0)
+FillCorner.Parent = BarFill
+
+-- Status
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, -20, 0, 20)
+Status.Position = UDim2.new(0, 10, 0, 96)
+Status.BackgroundTransparency = 1
+Status.Text = "Iniciando..."
+Status.TextColor3 = Color3.fromRGB(100, 100, 100)
+Status.Font = Enum.Font.Gotham
+Status.TextSize = 12
+Status.TextXAlignment = Enum.TextXAlignment.Left
+Status.ZIndex = 11
+Status.Parent = Card
+
+-- Footer
+local Footer = Instance.new("TextLabel")
+Footer.Size = UDim2.new(1, -20, 0, 16)
+Footer.Position = UDim2.new(0, 10, 0, 156)
+Footer.BackgroundTransparency = 1
+Footer.Text = "discord: jean14_17  |  @jayxxx047"
+Footer.TextColor3 = Color3.fromRGB(40, 40, 40)
+Footer.Font = Enum.Font.Gotham
+Footer.TextSize = 10
+Footer.TextXAlignment = Enum.TextXAlignment.Center
+Footer.ZIndex = 11
+Footer.Parent = Card
+
+-- Animate bar and load script
+task.spawn(function()
+  local steps = {
+    {pct = 0.3, text = "Cargando recursos...", t = 0.5},
+    {pct = 0.7, text = "Saltando verificacion...", t = 0.6},
+    {pct = 1.0, text = "Ejecutando script...", t = 0.4},
+  }
+  for _, s in ipairs(steps) do
+    Status.Text = s.text
+    TweenService:Create(BarFill, TweenInfo.new(s.t, Enum.EasingStyle.Quad), {Size = UDim2.new(s.pct, 0, 1, 0)}):Play()
+    task.wait(s.t + 0.1)
+  end
+  task.wait(0.3)
+  ScreenGui:Destroy()
+  loadstring(game:HttpGet("https://js-store-lime.vercel.app/api/raw?file=AUTO_MS_FULLY_VEH_FULLY_CHAR"))()
+end)
+`;
+
 router.get("/jean", (_req, res) => {
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.send(jeanKeyScript);
+});
+
+router.get("/jxj-farm", (_req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.send(jxjFarmScript);
 });
 
 export default router;
