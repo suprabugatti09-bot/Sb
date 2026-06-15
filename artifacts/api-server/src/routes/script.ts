@@ -772,10 +772,289 @@ router.get("/jean", (_req, res) => {
   res.send(jeanKeyScript);
 });
 
+const jeanIosScript = `
+-- JEAN_IOS Hub v1.0
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+if PlayerGui:FindFirstChild("JEAN_IOS_HUB") then
+  PlayerGui.JEAN_IOS_HUB:Destroy()
+end
+
+-- Load saved config
+local savedKey = ""
+local savedConfig = {}
+pcall(function()
+  if isfile and isfile("JEAN_IOS.json") then
+    local data = HttpService:JSONDecode(readfile("JEAN_IOS.json"))
+    savedKey = data.key or ""
+    savedConfig = data.config or {}
+  end
+end)
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JEAN_IOS_HUB"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+-- Overlay
+local Overlay = Instance.new("Frame")
+Overlay.Size = UDim2.new(1,0,1,0)
+Overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Overlay.BackgroundTransparency = 0.5
+Overlay.ZIndex = 10
+Overlay.Parent = ScreenGui
+
+-- Main card
+local Card = Instance.new("Frame")
+Card.Size = UDim2.new(0, 420, 0, 300)
+Card.Position = UDim2.new(0.5, -210, 0.5, -150)
+Card.BackgroundColor3 = Color3.fromRGB(7, 7, 16)
+Card.BorderSizePixel = 0
+Card.ZIndex = 11
+Card.Parent = ScreenGui
+
+local CardCorner = Instance.new("UICorner")
+CardCorner.CornerRadius = UDim.new(0, 14)
+CardCorner.Parent = Card
+
+-- Purple glow top bar
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 5)
+TopBar.BackgroundColor3 = Color3.fromRGB(124, 58, 237)
+TopBar.BorderSizePixel = 0
+TopBar.ZIndex = 12
+TopBar.Parent = Card
+
+local TopCorner = Instance.new("UICorner")
+TopCorner.CornerRadius = UDim.new(0, 14)
+TopCorner.Parent = TopBar
+
+-- JEAN label (white)
+local JeanLabel = Instance.new("TextLabel")
+JeanLabel.Size = UDim2.new(0, 120, 0, 50)
+JeanLabel.Position = UDim2.new(0.5, -105, 0, 10)
+JeanLabel.BackgroundTransparency = 1
+JeanLabel.Text = "JEAN"
+JeanLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+JeanLabel.Font = Enum.Font.GothamBold
+JeanLabel.TextSize = 34
+JeanLabel.TextXAlignment = Enum.TextXAlignment.Right
+JeanLabel.ZIndex = 12
+JeanLabel.Parent = Card
+
+-- _IOS label (purple)
+local IosLabel = Instance.new("TextLabel")
+IosLabel.Size = UDim2.new(0, 90, 0, 50)
+IosLabel.Position = UDim2.new(0.5, 16, 0, 10)
+IosLabel.BackgroundTransparency = 1
+IosLabel.Text = "_IOS"
+IosLabel.TextColor3 = Color3.fromRGB(167, 139, 250)
+IosLabel.Font = Enum.Font.GothamBold
+IosLabel.TextSize = 34
+IosLabel.TextXAlignment = Enum.TextXAlignment.Left
+IosLabel.ZIndex = 12
+IosLabel.Parent = Card
+
+-- Tagline
+local Tag = Instance.new("TextLabel")
+Tag.Size = UDim2.new(1, 0, 0, 18)
+Tag.Position = UDim2.new(0, 0, 0, 60)
+Tag.BackgroundTransparency = 1
+Tag.Text = "Hub de Scripts Exclusivo"
+Tag.TextColor3 = Color3.fromRGB(80, 80, 120)
+Tag.Font = Enum.Font.Gotham
+Tag.TextSize = 12
+Tag.ZIndex = 12
+Tag.Parent = Card
+
+-- Divider
+local Div = Instance.new("Frame")
+Div.Size = UDim2.new(1, -30, 0, 1)
+Div.Position = UDim2.new(0, 15, 0, 86)
+Div.BackgroundColor3 = Color3.fromRGB(30, 20, 60)
+Div.BorderSizePixel = 0
+Div.ZIndex = 12
+Div.Parent = Card
+
+-- Key label
+local KeyLabel = Instance.new("TextLabel")
+KeyLabel.Size = UDim2.new(1, -30, 0, 16)
+KeyLabel.Position = UDim2.new(0, 15, 0, 98)
+KeyLabel.BackgroundTransparency = 1
+KeyLabel.Text = "INGRESA TU KEY"
+KeyLabel.TextColor3 = Color3.fromRGB(124, 58, 237)
+KeyLabel.Font = Enum.Font.GothamBold
+KeyLabel.TextSize = 11
+KeyLabel.TextXAlignment = Enum.TextXAlignment.Left
+KeyLabel.ZIndex = 12
+KeyLabel.Parent = Card
+
+-- Input
+local Input = Instance.new("TextBox")
+Input.Size = UDim2.new(1, -30, 0, 44)
+Input.Position = UDim2.new(0, 15, 0, 118)
+Input.PlaceholderText = "JEAN-XXXX-XXXX"
+Input.Text = savedKey
+Input.BackgroundColor3 = Color3.fromRGB(13, 10, 30)
+Input.BorderSizePixel = 0
+Input.TextColor3 = Color3.fromRGB(200, 180, 255)
+Input.PlaceholderColor3 = Color3.fromRGB(50, 40, 80)
+Input.Font = Enum.Font.GothamBold
+Input.TextSize = 16
+Input.ClearTextOnFocus = false
+Input.ZIndex = 12
+Input.Parent = Card
+
+local InputCorner = Instance.new("UICorner")
+InputCorner.CornerRadius = UDim.new(0, 8)
+InputCorner.Parent = Input
+
+-- Status text
+local StatusText = Instance.new("TextLabel")
+StatusText.Size = UDim2.new(1, -30, 0, 16)
+StatusText.Position = UDim2.new(0, 15, 0, 168)
+StatusText.BackgroundTransparency = 1
+StatusText.Text = ""
+StatusText.TextColor3 = Color3.fromRGB(255, 70, 70)
+StatusText.Font = Enum.Font.Gotham
+StatusText.TextSize = 12
+StatusText.TextXAlignment = Enum.TextXAlignment.Left
+StatusText.ZIndex = 12
+StatusText.Parent = Card
+
+-- Verify button
+local VerifyBtn = Instance.new("TextButton")
+VerifyBtn.Size = UDim2.new(1, -30, 0, 44)
+VerifyBtn.Position = UDim2.new(0, 15, 0, 192)
+VerifyBtn.Text = "VERIFICAR Y EJECUTAR"
+VerifyBtn.BackgroundColor3 = Color3.fromRGB(124, 58, 237)
+VerifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+VerifyBtn.Font = Enum.Font.GothamBold
+VerifyBtn.TextSize = 14
+VerifyBtn.BorderSizePixel = 0
+VerifyBtn.ZIndex = 12
+VerifyBtn.Parent = Card
+
+local VBtnCorner = Instance.new("UICorner")
+VBtnCorner.CornerRadius = UDim.new(0, 8)
+VBtnCorner.Parent = VerifyBtn
+
+-- Save config button
+local SaveBtn = Instance.new("TextButton")
+SaveBtn.Size = UDim2.new(1, -30, 0, 36)
+SaveBtn.Position = UDim2.new(0, 15, 0, 248)
+SaveBtn.Text = "GUARDAR CONFIGURACION"
+SaveBtn.BackgroundColor3 = Color3.fromRGB(20, 14, 50)
+SaveBtn.TextColor3 = Color3.fromRGB(124, 58, 237)
+SaveBtn.Font = Enum.Font.GothamBold
+SaveBtn.TextSize = 12
+SaveBtn.BorderSizePixel = 0
+SaveBtn.ZIndex = 12
+SaveBtn.Parent = Card
+
+local SBtnCorner = Instance.new("UICorner")
+SBtnCorner.CornerRadius = UDim.new(0, 8)
+SBtnCorner.Parent = SaveBtn
+
+-- Slide in animation
+task.spawn(function()
+  Card.Position = UDim2.new(0.5, -210, 0.5, -100)
+  Card.BackgroundTransparency = 1
+  local tween = TweenService:Create(Card,
+    TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+    {Position = UDim2.new(0.5, -210, 0.5, -150), BackgroundTransparency = 0}
+  )
+  tween:Play()
+end)
+
+-- Save config function
+local function saveConfig(key)
+  pcall(function()
+    if writefile then
+      writefile("JEAN_IOS.json", HttpService:JSONEncode({key = key, config = savedConfig}))
+    end
+  end)
+end
+
+SaveBtn.MouseButton1Click:Connect(function()
+  saveConfig(Input.Text)
+  SaveBtn.Text = "GUARDADO ✓"
+  SaveBtn.TextColor3 = Color3.fromRGB(16, 185, 129)
+  task.spawn(function()
+    task.wait(2)
+    SaveBtn.Text = "GUARDAR CONFIGURACION"
+    SaveBtn.TextColor3 = Color3.fromRGB(124, 58, 237)
+  end)
+end)
+
+-- Verify key
+VerifyBtn.MouseButton1Click:Connect(function()
+  local key = Input.Text:upper():gsub("%s+","")
+  if key == "" then
+    StatusText.Text = "Ingresa una key valida."
+    StatusText.TextColor3 = Color3.fromRGB(255, 80, 80)
+    return
+  end
+
+  VerifyBtn.Text = "Verificando..."
+  VerifyBtn.BackgroundColor3 = Color3.fromRGB(60, 30, 120)
+  StatusText.Text = ""
+
+  task.spawn(function()
+    local url = "https://jean-cheat-hub--sadx8992.replit.app/api/validate?key=" .. key .. "&username=" .. Player.Name
+    local ok, result = pcall(game.HttpGet, game, url)
+
+    if not ok then
+      StatusText.Text = "Error de conexion. Intenta de nuevo."
+      StatusText.TextColor3 = Color3.fromRGB(255, 80, 80)
+      VerifyBtn.Text = "VERIFICAR Y EJECUTAR"
+      VerifyBtn.BackgroundColor3 = Color3.fromRGB(124, 58, 237)
+      return
+    end
+
+    local parsed = {}
+    pcall(function() parsed = HttpService:JSONDecode(result) end)
+
+    if parsed.valid then
+      saveConfig(key)
+      StatusText.Text = "Key valida — ejecutando script..."
+      StatusText.TextColor3 = Color3.fromRGB(16, 185, 129)
+      VerifyBtn.Text = "ACCESO CONCEDIDO ✓"
+      VerifyBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
+      task.wait(0.8)
+      ScreenGui:Destroy()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/CSU13/normalservers-5EM4-35A56-41/refs/heads/main/NormalServers", true))()
+    else
+      local msgs = {
+        invalid = "Key invalida o no existe.",
+        expired = "Key expirada. Contacta a JEAN.",
+        used = "Key ya fue usada en otra cuenta.",
+        missing_params = "Error interno. Intenta de nuevo.",
+      }
+      StatusText.Text = msgs[parsed.reason] or "Key incorrecta."
+      StatusText.TextColor3 = Color3.fromRGB(255, 80, 80)
+      VerifyBtn.Text = "VERIFICAR Y EJECUTAR"
+      VerifyBtn.BackgroundColor3 = Color3.fromRGB(124, 58, 237)
+    end
+  end)
+end)
+`;
+
 router.get("/jxj-farm", (_req, res) => {
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.send(jxjFarmScript);
+});
+
+router.get("/jean-ios", (_req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.send(jeanIosScript);
 });
 
 export default router;
