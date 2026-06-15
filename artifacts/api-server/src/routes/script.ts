@@ -1097,6 +1097,17 @@ router.get("/jios", (_req, res) => {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
+  // Loader that busts its own cache on execution
+  const loader = `loadstring(game:HttpGet("https://jean-cheat-hub--sadx8992.replit.app/api/jios-run?t="..tostring(os.time())))()`;
+  res.send(loader);
+});
+
+router.get("/jios-run", (_req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   res.send(jeanIosScript);
 });
 
