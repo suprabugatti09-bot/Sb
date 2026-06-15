@@ -784,14 +784,12 @@ if PlayerGui:FindFirstChild("JEAN_IOS_HUB") then
   PlayerGui.JEAN_IOS_HUB:Destroy()
 end
 
--- Load saved config
+-- Load saved key
 local savedKey = ""
-local savedConfig = {}
 pcall(function()
   if isfile and isfile("JEAN_IOS.json") then
     local data = HttpService:JSONDecode(readfile("JEAN_IOS.json"))
     savedKey = data.key or ""
-    savedConfig = data.config or {}
   end
 end)
 
@@ -811,8 +809,8 @@ Overlay.Parent = ScreenGui
 
 -- Main card
 local Card = Instance.new("Frame")
-Card.Size = UDim2.new(0, 420, 0, 300)
-Card.Position = UDim2.new(0.5, -210, 0.5, -150)
+Card.Size = UDim2.new(0, 420, 0, 255)
+Card.Position = UDim2.new(0.5, -210, 0.5, -127)
 Card.BackgroundColor3 = Color3.fromRGB(7, 7, 16)
 Card.BorderSizePixel = 0
 Card.ZIndex = 11
@@ -929,7 +927,7 @@ StatusText.Parent = Card
 
 -- Verify button
 local VerifyBtn = Instance.new("TextButton")
-VerifyBtn.Size = UDim2.new(1, -30, 0, 44)
+VerifyBtn.Size = UDim2.new(1, -30, 0, 48)
 VerifyBtn.Position = UDim2.new(0, 15, 0, 192)
 VerifyBtn.Text = "VERIFICAR Y EJECUTAR"
 VerifyBtn.BackgroundColor3 = Color3.fromRGB(124, 58, 237)
@@ -944,52 +942,15 @@ local VBtnCorner = Instance.new("UICorner")
 VBtnCorner.CornerRadius = UDim.new(0, 8)
 VBtnCorner.Parent = VerifyBtn
 
--- Save config button
-local SaveBtn = Instance.new("TextButton")
-SaveBtn.Size = UDim2.new(1, -30, 0, 36)
-SaveBtn.Position = UDim2.new(0, 15, 0, 248)
-SaveBtn.Text = "GUARDAR CONFIGURACION"
-SaveBtn.BackgroundColor3 = Color3.fromRGB(20, 14, 50)
-SaveBtn.TextColor3 = Color3.fromRGB(124, 58, 237)
-SaveBtn.Font = Enum.Font.GothamBold
-SaveBtn.TextSize = 12
-SaveBtn.BorderSizePixel = 0
-SaveBtn.ZIndex = 12
-SaveBtn.Parent = Card
-
-local SBtnCorner = Instance.new("UICorner")
-SBtnCorner.CornerRadius = UDim.new(0, 8)
-SBtnCorner.Parent = SaveBtn
-
 -- Slide in animation
 task.spawn(function()
-  Card.Position = UDim2.new(0.5, -210, 0.5, -100)
+  Card.Position = UDim2.new(0.5, -210, 0.5, -80)
   Card.BackgroundTransparency = 1
   local tween = TweenService:Create(Card,
     TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-    {Position = UDim2.new(0.5, -210, 0.5, -150), BackgroundTransparency = 0}
+    {Position = UDim2.new(0.5, -210, 0.5, -127), BackgroundTransparency = 0}
   )
   tween:Play()
-end)
-
--- Save config function
-local function saveConfig(key)
-  pcall(function()
-    if writefile then
-      writefile("JEAN_IOS.json", HttpService:JSONEncode({key = key, config = savedConfig}))
-    end
-  end)
-end
-
-SaveBtn.MouseButton1Click:Connect(function()
-  saveConfig(Input.Text)
-  SaveBtn.Text = "GUARDADO ✓"
-  SaveBtn.TextColor3 = Color3.fromRGB(16, 185, 129)
-  task.spawn(function()
-    task.wait(2)
-    SaveBtn.Text = "GUARDAR CONFIGURACION"
-    SaveBtn.TextColor3 = Color3.fromRGB(124, 58, 237)
-  end)
 end)
 
 -- Verify key
@@ -1003,6 +964,7 @@ VerifyBtn.MouseButton1Click:Connect(function()
 
   VerifyBtn.Text = "Verificando..."
   VerifyBtn.BackgroundColor3 = Color3.fromRGB(60, 30, 120)
+  VerifyBtn.Active = false
   StatusText.Text = ""
 
   task.spawn(function()
@@ -1014,6 +976,7 @@ VerifyBtn.MouseButton1Click:Connect(function()
       StatusText.TextColor3 = Color3.fromRGB(255, 80, 80)
       VerifyBtn.Text = "VERIFICAR Y EJECUTAR"
       VerifyBtn.BackgroundColor3 = Color3.fromRGB(124, 58, 237)
+      VerifyBtn.Active = true
       return
     end
 
@@ -1021,12 +984,17 @@ VerifyBtn.MouseButton1Click:Connect(function()
     pcall(function() parsed = HttpService:JSONDecode(result) end)
 
     if parsed.valid then
-      saveConfig(key)
-      StatusText.Text = "Key valida — ejecutando script..."
+      -- Auto-save key silently
+      pcall(function()
+        if writefile then
+          writefile("JEAN_IOS.json", HttpService:JSONEncode({key = key}))
+        end
+      end)
+      StatusText.Text = "Key valida — ejecutando..."
       StatusText.TextColor3 = Color3.fromRGB(16, 185, 129)
       VerifyBtn.Text = "ACCESO CONCEDIDO ✓"
       VerifyBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
-      task.wait(0.8)
+      task.wait(0.6)
       ScreenGui:Destroy()
       loadstring(game:HttpGet("https://raw.githubusercontent.com/CSU13/normalservers-5EM4-35A56-41/refs/heads/main/NormalServers", true))()
     else
@@ -1040,6 +1008,7 @@ VerifyBtn.MouseButton1Click:Connect(function()
       StatusText.TextColor3 = Color3.fromRGB(255, 80, 80)
       VerifyBtn.Text = "VERIFICAR Y EJECUTAR"
       VerifyBtn.BackgroundColor3 = Color3.fromRGB(124, 58, 237)
+      VerifyBtn.Active = true
     end
   end)
 end)
