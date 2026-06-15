@@ -1085,6 +1085,9 @@ router.get("/jxj-farm", (_req, res) => {
 router.get("/jean-ios", (_req, res) => {
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   res.send(jeanIosScript);
 });
 
