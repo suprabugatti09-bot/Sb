@@ -18,6 +18,7 @@ async function seedInitialKeys() {
     if (existing.length === 0) {
       const keys = Array.from({ length: 50 }, () => ({
         key: genKey(),
+        isActive: true,
         maxUses: 1,
         note: "Initial seed key",
       }));
