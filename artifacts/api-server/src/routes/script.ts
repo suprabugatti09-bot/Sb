@@ -1375,44 +1375,78 @@ local function ExecuteHub()
     lootStatus.TextSize = 11
     lootStatus.TextXAlignment = Enum.TextXAlignment.Left
 
-    local function doLoot(deadChar)
+    local function doLoot(deadChar, deadName)
         task.spawn(function()
             pcall(function()
-                if not L_Plr.Character or not L_Plr.Character:FindFirstChild("HumanoidRootPart") then return end
+                local myChar = L_Plr.Character
+                if not myChar then return end
+                local myHRP = myChar:FindFirstChild("HumanoidRootPart")
+                local myHum = myChar:FindFirstChild("Humanoid")
+                if not myHRP or not myHum then return end
+
                 local deadHRP = deadChar:FindFirstChild("HumanoidRootPart")
-                if not deadHRP then return end
-                local lootPos = deadHRP.Position
+                local lootPos = deadHRP and deadHRP.Position or myHRP.Position
 
-                -- Teleport to dead player
-                L_Plr.Character.HumanoidRootPart.CFrame = CFrame.new(lootPos + Vector3.new(0, 3, 0))
-                task.wait(0.3)
+                lootStatus.Text = "  " .. deadName .. " murio — yendo..."
 
-                -- Pick up any Tools/dropped items in workspace near loot pos
-                local radius = 20
-                for _, obj in pairs(workspace:GetDescendants()) do
-                    if obj:IsA("Tool") and obj.Parent == workspace then
-                        local handle = obj:FindFirstChild("Handle")
-                        if handle then
-                            local dist = (handle.Position - lootPos).Magnitude
-                            if dist < radius then
-                                L_Plr.Character.HumanoidRootPart.CFrame = CFrame.new(handle.Position + Vector3.new(0, 3, 0))
-                                task.wait(0.15)
+                -- Teleport to loot zone and hold position with a CFrame loop
+                local lootDone = false
+                local holdConn = RunService.Heartbeat:Connect(function()
+                    if not lootDone and myHRP and myHRP.Parent then
+                        myHRP.CFrame = CFrame.new(lootPos + Vector3.new(0, 3, 0))
+                    end
+                end)
+
+                task.wait(0.6) -- wait for drops to spawn after death
+
+                local radius = 18
+                local looted = 0
+
+                -- Scan for 4 seconds collecting items
+                local deadline = tick() + 4
+                while tick() < deadline and lootActive do
+                    for _, obj in pairs(workspace:GetDescendants()) do
+                        if not lootActive then break end
+                        local targetPos = nil
+
+                        if obj:IsA("Tool") and obj.Parent == workspace then
+                            local handle = obj:FindFirstChild("Handle")
+                            if handle and (handle.Position - lootPos).Magnitude < radius then
+                                targetPos = handle.Position
+                            end
+                        elseif obj:IsA("BasePart") and obj.Parent == workspace then
+                            local n = obj.Name:lower()
+                            if (n:find("drop") or n:find("loot") or n:find("cash") or n:find("money") or n:find("bag") or n:find("pick")) and (obj.Position - lootPos).Magnitude < radius then
+                                targetPos = obj.Position
+                            end
+                        elseif obj:IsA("Model") and obj.Parent == workspace then
+                            local n = obj.Name:lower()
+                            local bp = obj:FindFirstChildOfClass("BasePart")
+                            if bp and (n:find("drop") or n:find("loot") or n:find("cash") or n:find("money") or n:find("bag")) and (bp.Position - lootPos).Magnitude < radius then
+                                targetPos = bp.Position
                             end
                         end
-                    end
-                    -- Also grab Parts tagged as drops (common pattern)
-                    if (obj:IsA("BasePart") or obj:IsA("Model")) and obj.Parent == workspace then
-                        local n = obj.Name:lower()
-                        if n:find("drop") or n:find("loot") or n:find("cash") or n:find("money") or n:find("bag") or n:find("item") then
-                            local pos = obj:IsA("BasePart") and obj.Position or (obj:FindFirstChildOfClass("BasePart") and obj:FindFirstChildOfClass("BasePart").Position)
-                            if pos and (pos - lootPos).Magnitude < radius then
-                                L_Plr.Character.HumanoidRootPart.CFrame = CFrame.new(pos + Vector3.new(0, 3, 0))
-                                task.wait(0.15)
-                            end
+
+                        if targetPos then
+                            holdConn:Disconnect()
+                            myHRP.CFrame = CFrame.new(targetPos + Vector3.new(0, 2, 0))
+                            looted = looted + 1
+                            lootStatus.Text = "  Looteando item #" .. looted
+                            task.wait(0.3)
+                            holdConn = RunService.Heartbeat:Connect(function()
+                                if not lootDone and myHRP and myHRP.Parent then
+                                    myHRP.CFrame = CFrame.new(lootPos + Vector3.new(0, 3, 0))
+                                end
+                            end)
                         end
                     end
+                    task.wait(0.25)
                 end
-                lootStatus.Text = "  Looteado: " .. (deadChar.Name or "?")
+
+                lootDone = true
+                holdConn:Disconnect()
+
+                lootStatus.Text = "  " .. deadName .. " — " .. looted .. " item(s) looteados"
                 task.wait(3)
                 if lootActive then lootStatus.Text = "  Esperando muertes..." end
             end)
@@ -1426,8 +1460,7 @@ local function ExecuteHub()
             if not hum then return end
             local conn = hum.Died:Connect(function()
                 if lootActive then
-                    lootStatus.Text = "  " .. plr.Name .. " murio — looteando!"
-                    doLoot(char)
+                    doLoot(char, plr.Name)
                 end
             end)
             table.insert(lootConnections, conn)
