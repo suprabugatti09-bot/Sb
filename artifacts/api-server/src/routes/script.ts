@@ -1352,70 +1352,55 @@ local function ExecuteHub()
 
     AddToggle(MiscTab, "FULL BRIGHT", _G.Misc, "FullBright")
 
-    -- [[ INFINITE MONEY ]]
+    -- [[ AUTO ROB LOOP ]]
+    local robActive = false
+    local robLoop = nil
+
     local moneyBtn = Instance.new("TextButton", MiscTab)
     moneyBtn.Size = UDim2.new(1, -5, 0, 40)
     moneyBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
     moneyBtn.TextColor3 = Color3.new(1, 1, 1)
-    moneyBtn.Text = "  💰 INFINITE MONEY"
+    moneyBtn.Text = "  💰 AUTO ROB ATM (LOOP)"
     moneyBtn.Font = Enum.Font.GothamBold
     moneyBtn.TextSize = 12
     moneyBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", moneyBtn)
 
+    local moneyStatus = Instance.new("TextLabel", MiscTab)
+    moneyStatus.Size = UDim2.new(1, -5, 0, 22)
+    moneyStatus.BackgroundTransparency = 1
+    moneyStatus.Text = ""
+    moneyStatus.TextColor3 = Color3.fromRGB(212, 175, 55)
+    moneyStatus.Font = Enum.Font.Gotham
+    moneyStatus.TextSize = 11
+    moneyStatus.TextXAlignment = Enum.TextXAlignment.Left
+    Instance.new("UICorner", moneyStatus)
+
     moneyBtn.MouseButton1Click:Connect(function()
-        _G.Misc.InfiniteMoney = not _G.Misc.InfiniteMoney
-        if _G.Misc.InfiniteMoney then
+        robActive = not robActive
+        if robActive then
             moneyBtn.BackgroundColor3 = Color3.fromRGB(212, 175, 55)
             moneyBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-            moneyLoop = task.spawn(function()
-                while _G.Misc.InfiniteMoney do
+            moneyBtn.Text = "  💰 AUTO ROB ATM — ACTIVO"
+            local ronda = 0
+            robLoop = task.spawn(function()
+                while robActive do
+                    ronda = ronda + 1
+                    moneyStatus.Text = "  Ronda #" .. ronda .. " — robando ATM..."
                     pcall(function()
-                        -- Try leaderstats cash values
-                        local ls = L_Plr:FindFirstChild("leaderstats")
-                        if ls then
-                            for _, v in pairs(ls:GetChildren()) do
-                                if v:IsA("IntValue") or v:IsA("NumberValue") then
-                                    v.Value = 2147483647
-                                end
-                            end
-                        end
-                        -- Try playerData / data folders
-                        for _, folder in pairs({"playerData","Data","Stats","PlayerStats","GameData"}) do
-                            local d = L_Plr:FindFirstChild(folder)
-                            if d then
-                                for _, v in pairs(d:GetDescendants()) do
-                                    if (v:IsA("IntValue") or v:IsA("NumberValue")) then
-                                        local n = v.Name:lower()
-                                        if n:find("cash") or n:find("money") or n:find("coin") or n:find("dollar") or n:find("buck") then
-                                            v.Value = 2147483647
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                        -- Try RemoteEvents for money
-                        local RE = game:GetService("ReplicatedStorage")
-                        for _, name in pairs({"GiveMoney","AddMoney","SetMoney","AddCash","GiveCash","Money","Cash"}) do
-                            local remote = RE:FindFirstChild(name, true)
-                            if remote and remote:IsA("RemoteEvent") then
-                                remote:FireServer(2147483647)
-                            end
-                            if remote and remote:IsA("RemoteFunction") then
-                                pcall(function() remote:InvokeServer(2147483647) end)
-                            end
-                        end
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/ivancaba29-max/ACUSADO-SCRIPT/main/atm"))()
                     end)
-                    task.wait(0.5)
+                    moneyStatus.Text = "  Ronda #" .. ronda .. " — esperando..."
+                    task.wait(12)
                 end
             end)
         else
+            robActive = false
+            if robLoop then task.cancel(robLoop); robLoop = nil end
             moneyBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
             moneyBtn.TextColor3 = Color3.new(1, 1, 1)
-            if moneyLoop then
-                task.cancel(moneyLoop)
-                moneyLoop = nil
-            end
+            moneyBtn.Text = "  💰 AUTO ROB ATM (LOOP)"
+            moneyStatus.Text = ""
         end
     end)
 
