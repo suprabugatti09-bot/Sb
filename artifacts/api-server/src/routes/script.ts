@@ -1352,55 +1352,109 @@ local function ExecuteHub()
 
     AddToggle(MiscTab, "FULL BRIGHT", _G.Misc, "FullBright")
 
-    -- [[ AUTO ROB LOOP ]]
-    local robActive = false
-    local robLoop = nil
+    -- [[ AUTO LOOT ]]
+    local lootActive = false
+    local lootConnections = {}
 
-    local moneyBtn = Instance.new("TextButton", MiscTab)
-    moneyBtn.Size = UDim2.new(1, -5, 0, 40)
-    moneyBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-    moneyBtn.TextColor3 = Color3.new(1, 1, 1)
-    moneyBtn.Text = "  💰 AUTO ROB ATM (LOOP)"
-    moneyBtn.Font = Enum.Font.GothamBold
-    moneyBtn.TextSize = 12
-    moneyBtn.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", moneyBtn)
+    local lootBtn = Instance.new("TextButton", MiscTab)
+    lootBtn.Size = UDim2.new(1, -5, 0, 40)
+    lootBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    lootBtn.TextColor3 = Color3.new(1, 1, 1)
+    lootBtn.Text = "  🎒 AUTO LOOT (jugadores muertos)"
+    lootBtn.Font = Enum.Font.GothamBold
+    lootBtn.TextSize = 12
+    lootBtn.TextXAlignment = Enum.TextXAlignment.Left
+    Instance.new("UICorner", lootBtn)
 
-    local moneyStatus = Instance.new("TextLabel", MiscTab)
-    moneyStatus.Size = UDim2.new(1, -5, 0, 22)
-    moneyStatus.BackgroundTransparency = 1
-    moneyStatus.Text = ""
-    moneyStatus.TextColor3 = Color3.fromRGB(212, 175, 55)
-    moneyStatus.Font = Enum.Font.Gotham
-    moneyStatus.TextSize = 11
-    moneyStatus.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", moneyStatus)
+    local lootStatus = Instance.new("TextLabel", MiscTab)
+    lootStatus.Size = UDim2.new(1, -5, 0, 20)
+    lootStatus.BackgroundTransparency = 1
+    lootStatus.Text = ""
+    lootStatus.TextColor3 = Color3.fromRGB(212, 175, 55)
+    lootStatus.Font = Enum.Font.Gotham
+    lootStatus.TextSize = 11
+    lootStatus.TextXAlignment = Enum.TextXAlignment.Left
 
-    moneyBtn.MouseButton1Click:Connect(function()
-        robActive = not robActive
-        if robActive then
-            moneyBtn.BackgroundColor3 = Color3.fromRGB(212, 175, 55)
-            moneyBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-            moneyBtn.Text = "  💰 AUTO ROB ATM — ACTIVO"
-            local ronda = 0
-            robLoop = task.spawn(function()
-                while robActive do
-                    ronda = ronda + 1
-                    moneyStatus.Text = "  Ronda #" .. ronda .. " — robando ATM..."
-                    pcall(function()
-                        loadstring(game:HttpGet("https://raw.githubusercontent.com/ivancaba29-max/ACUSADO-SCRIPT/main/atm"))()
-                    end)
-                    moneyStatus.Text = "  Ronda #" .. ronda .. " — esperando..."
-                    task.wait(12)
+    local function doLoot(deadChar)
+        task.spawn(function()
+            pcall(function()
+                if not L_Plr.Character or not L_Plr.Character:FindFirstChild("HumanoidRootPart") then return end
+                local deadHRP = deadChar:FindFirstChild("HumanoidRootPart")
+                if not deadHRP then return end
+                local lootPos = deadHRP.Position
+
+                -- Teleport to dead player
+                L_Plr.Character.HumanoidRootPart.CFrame = CFrame.new(lootPos + Vector3.new(0, 3, 0))
+                task.wait(0.3)
+
+                -- Pick up any Tools/dropped items in workspace near loot pos
+                local radius = 20
+                for _, obj in pairs(workspace:GetDescendants()) do
+                    if obj:IsA("Tool") and obj.Parent == workspace then
+                        local handle = obj:FindFirstChild("Handle")
+                        if handle then
+                            local dist = (handle.Position - lootPos).Magnitude
+                            if dist < radius then
+                                L_Plr.Character.HumanoidRootPart.CFrame = CFrame.new(handle.Position + Vector3.new(0, 3, 0))
+                                task.wait(0.15)
+                            end
+                        end
+                    end
+                    -- Also grab Parts tagged as drops (common pattern)
+                    if (obj:IsA("BasePart") or obj:IsA("Model")) and obj.Parent == workspace then
+                        local n = obj.Name:lower()
+                        if n:find("drop") or n:find("loot") or n:find("cash") or n:find("money") or n:find("bag") or n:find("item") then
+                            local pos = obj:IsA("BasePart") and obj.Position or (obj:FindFirstChildOfClass("BasePart") and obj:FindFirstChildOfClass("BasePart").Position)
+                            if pos and (pos - lootPos).Magnitude < radius then
+                                L_Plr.Character.HumanoidRootPart.CFrame = CFrame.new(pos + Vector3.new(0, 3, 0))
+                                task.wait(0.15)
+                            end
+                        end
+                    end
+                end
+                lootStatus.Text = "  Looteado: " .. (deadChar.Name or "?")
+                task.wait(3)
+                if lootActive then lootStatus.Text = "  Esperando muertes..." end
+            end)
+        end)
+    end
+
+    local function hookPlayer(plr)
+        if plr == L_Plr then return end
+        local function hookChar(char)
+            local hum = char:WaitForChild("Humanoid", 5)
+            if not hum then return end
+            local conn = hum.Died:Connect(function()
+                if lootActive then
+                    lootStatus.Text = "  " .. plr.Name .. " murio — looteando!"
+                    doLoot(char)
                 end
             end)
+            table.insert(lootConnections, conn)
+        end
+        if plr.Character then hookChar(plr.Character) end
+        local conn2 = plr.CharacterAdded:Connect(hookChar)
+        table.insert(lootConnections, conn2)
+    end
+
+    lootBtn.MouseButton1Click:Connect(function()
+        lootActive = not lootActive
+        if lootActive then
+            lootBtn.BackgroundColor3 = Color3.fromRGB(212, 175, 55)
+            lootBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+            lootBtn.Text = "  🎒 AUTO LOOT — ACTIVO"
+            lootStatus.Text = "  Esperando muertes..."
+            for _, plr in pairs(Players:GetPlayers()) do hookPlayer(plr) end
+            local conn3 = Players.PlayerAdded:Connect(hookPlayer)
+            table.insert(lootConnections, conn3)
         else
-            robActive = false
-            if robLoop then task.cancel(robLoop); robLoop = nil end
-            moneyBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-            moneyBtn.TextColor3 = Color3.new(1, 1, 1)
-            moneyBtn.Text = "  💰 AUTO ROB ATM (LOOP)"
-            moneyStatus.Text = ""
+            lootActive = false
+            for _, c in pairs(lootConnections) do pcall(function() c:Disconnect() end) end
+            lootConnections = {}
+            lootBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+            lootBtn.TextColor3 = Color3.new(1, 1, 1)
+            lootBtn.Text = "  🎒 AUTO LOOT (jugadores muertos)"
+            lootStatus.Text = ""
         end
     end)
 
