@@ -12,6 +12,16 @@ function genKey() {
   return `JEAN-${genPart()}-${genPart()}`;
 }
 
+// Keys fijas batch-2 (30 keys de 1 uso por cuenta)
+const BATCH2_KEYS = [
+  "JEAN-K7M2-QR49","JEAN-L3N8-WS61","JEAN-M9P4-XT83","JEAN-N1Q6-YU05","JEAN-O5R0-ZV27",
+  "JEAN-P8S3-AB50","JEAN-Q2T7-BC72","JEAN-R6U1-CD94","JEAN-S0V5-DE16","JEAN-T4W9-EF38",
+  "JEAN-U7X2-FG60","JEAN-V1Y6-GH82","JEAN-W5Z0-HI04","JEAN-X9A4-IJ26","JEAN-Y2B8-JK48",
+  "JEAN-Z6C1-KL70","JEAN-AA0D-LM92","JEAN-BB4E-MN14","JEAN-CC8F-NO36","JEAN-DD2G-OP58",
+  "JEAN-EE6H-PQ80","JEAN-FF0I-QR02","JEAN-GG4J-RS24","JEAN-HH8K-ST46","JEAN-II2L-TU68",
+  "JEAN-JJ6M-UV90","JEAN-KK0N-VW12","JEAN-LL4O-WX34","JEAN-MM8P-XY56","JEAN-NN2Q-YZ78",
+];
+
 async function seedInitialKeys() {
   try {
     const existing = await db.select().from(keysTable).limit(1);
@@ -28,7 +38,20 @@ async function seedInitialKeys() {
   } catch {}
 }
 
+async function seedBatch2Keys() {
+  try {
+    const rows = BATCH2_KEYS.map(k => ({
+      key: k,
+      isActive: true,
+      maxUses: 1,
+      note: "batch2",
+    }));
+    await db.insert(keysTable).values(rows).onConflictDoNothing();
+  } catch {}
+}
+
 seedInitialKeys();
+seedBatch2Keys();
 
 router.get("/validate", async (req, res) => {
   const { key, username } = req.query as { key: string; username: string };
