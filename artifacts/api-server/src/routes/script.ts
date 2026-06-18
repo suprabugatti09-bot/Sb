@@ -1352,22 +1352,19 @@ local function ExecuteHub()
 
     AddToggle(MiscTab, "FULL BRIGHT", _G.Misc, "FullBright")
 
-    -- [[ AUTO LOOT ]]
-    local lootActive = false
-    local lootConnections = {}
-
+    -- [[ LOOT 1 TOQUE ]]
     local lootBtn = Instance.new("TextButton", MiscTab)
     lootBtn.Size = UDim2.new(1, -5, 0, 40)
-    lootBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-    lootBtn.TextColor3 = Color3.new(1, 1, 1)
-    lootBtn.Text = "  🎒 AUTO LOOT (jugadores muertos)"
+    lootBtn.BackgroundColor3 = Color3.fromRGB(212, 175, 55)
+    lootBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    lootBtn.Text = "  🎒 LOOTEAR AHORA"
     lootBtn.Font = Enum.Font.GothamBold
-    lootBtn.TextSize = 12
+    lootBtn.TextSize = 13
     lootBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", lootBtn)
 
     local lootStatus = Instance.new("TextLabel", MiscTab)
-    lootStatus.Size = UDim2.new(1, -5, 0, 20)
+    lootStatus.Size = UDim2.new(1, -5, 0, 18)
     lootStatus.BackgroundTransparency = 1
     lootStatus.Text = ""
     lootStatus.TextColor3 = Color3.fromRGB(212, 175, 55)
@@ -1375,128 +1372,134 @@ local function ExecuteHub()
     lootStatus.TextSize = 11
     lootStatus.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Hace invisible/visible todos los parts del personaje
-    local function setInvisible(char, invisible)
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                part.Transparency = invisible and 1 or (part.Name == "Head" and 0 or 0)
-            end
-            if part:IsA("Decal") or part:IsA("SpecialMesh") then
-                pcall(function() part.Transparency = invisible and 1 or 0 end)
-            end
-            if part:IsA("Accessory") then
-                local h = part:FindFirstChildOfClass("Part") or part:FindFirstChildOfClass("MeshPart")
-                if h then h.Transparency = invisible and 1 or 0 end
-            end
-        end
-    end
-
-    local function doLoot(deadChar, deadName)
+    lootBtn.MouseButton1Click:Connect(function()
         task.spawn(function()
             pcall(function()
                 local myChar = L_Plr.Character
                 if not myChar then return end
                 local myHRP = myChar:FindFirstChild("HumanoidRootPart")
                 if not myHRP then return end
-
-                local deadHRP = deadChar:FindFirstChild("HumanoidRootPart")
-                if not deadHRP then return end
-                local lootPos = deadHRP.Position
-
-                lootStatus.Text = "  " .. deadName .. " murio — invisible..."
-
-                -- Volverse invisible
-                setInvisible(myChar, true)
-
-                -- Teleportar encima del muerto y mantener posicion
-                local lootDone = false
-                local holdConn = RunService.Heartbeat:Connect(function()
-                    if not lootDone and myHRP and myHRP.Parent then
-                        myHRP.CFrame = CFrame.new(lootPos + Vector3.new(0, 2, 0))
-                    end
-                end)
-
-                task.wait(0.4) -- esperar drops
-
-                -- Disparar todos los ProximityPrompts/ClickDetectors/Tools del area
-                local radius = 25
-                local deadline = tick() + 5
-                while tick() < deadline and lootActive do
-                    for _, obj in pairs(workspace:GetDescendants()) do
-                        if obj:IsA("ProximityPrompt") then
-                            local part = obj.Parent
-                            local p = part and (part:IsA("BasePart") and part.Position
-                                or (part:FindFirstChildOfClass("BasePart") and part:FindFirstChildOfClass("BasePart").Position))
-                            if p and (p - lootPos).Magnitude < radius then
-                                pcall(function() fireproximityprompt(obj) end)
-                            end
-                        end
-                        if obj:IsA("ClickDetector") then
-                            local part = obj.Parent
-                            local p = part and part:IsA("BasePart") and part.Position
-                            if p and (p - lootPos).Magnitude < radius then
-                                pcall(function() fireclickdetector(obj) end)
-                            end
-                        end
-                        if obj:IsA("Tool") and obj.Parent == workspace then
-                            local h = obj:FindFirstChild("Handle")
-                            if h and (h.Position - lootPos).Magnitude < radius then
-                                pcall(function() obj.Parent = L_Plr.Backpack end)
-                            end
+                local myPos = myHRP.Position
+                local radius = 30
+                local count = 0
+                for _, obj in pairs(workspace:GetDescendants()) do
+                    if obj:IsA("ProximityPrompt") then
+                        local part = obj.Parent
+                        local p = part and (part:IsA("BasePart") and part.Position
+                            or (part:FindFirstChildOfClass("BasePart") and part:FindFirstChildOfClass("BasePart").Position))
+                        if p and (p - myPos).Magnitude < radius then
+                            pcall(function() fireproximityprompt(obj) end)
+                            count = count + 1
                         end
                     end
-                    task.wait(0.3)
+                    if obj:IsA("ClickDetector") then
+                        local part = obj.Parent
+                        local p = part and part:IsA("BasePart") and part.Position
+                        if p and (p - myPos).Magnitude < radius then
+                            pcall(function() fireclickdetector(obj) end)
+                            count = count + 1
+                        end
+                    end
+                    if obj:IsA("Tool") and obj.Parent == workspace then
+                        local h = obj:FindFirstChild("Handle")
+                        if h and (h.Position - myPos).Magnitude < radius then
+                            pcall(function() obj.Parent = L_Plr.Backpack end)
+                            count = count + 1
+                        end
+                    end
                 end
-
-                lootDone = true
-                holdConn:Disconnect()
-
-                -- Volver visible
-                setInvisible(myChar, false)
-
-                lootStatus.Text = "  Loot de " .. deadName .. " completado"
-                task.wait(3)
-                if lootActive then lootStatus.Text = "  Esperando muertes..." end
+                lootStatus.Text = "  Looteado: " .. count .. " item(s)"
+                task.wait(2)
+                lootStatus.Text = ""
             end)
         end)
+    end)
+
+    -- [[ LISTA DE JUGADORES + TELEPORT ]]
+    local plrLabel = Instance.new("TextLabel", MiscTab)
+    plrLabel.Size = UDim2.new(1, -5, 0, 22)
+    plrLabel.BackgroundTransparency = 1
+    plrLabel.Text = "  👥 JUGADORES EN EL SERVER"
+    plrLabel.TextColor3 = Color3.fromRGB(212, 175, 55)
+    plrLabel.Font = Enum.Font.GothamBold
+    plrLabel.TextSize = 12
+    plrLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local plrScroll = Instance.new("ScrollingFrame", MiscTab)
+    plrScroll.Size = UDim2.new(1, -5, 0, 160)
+    plrScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    plrScroll.BorderSizePixel = 0
+    plrScroll.ScrollBarThickness = 4
+    plrScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    plrScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    Instance.new("UICorner", plrScroll)
+    local plrLayout = Instance.new("UIListLayout", plrScroll)
+    plrLayout.Padding = UDim.new(0, 3)
+    plrLayout.SortOrder = Enum.SortOrder.Name
+
+    local function buildPlayerList()
+        for _, c in pairs(plrScroll:GetChildren()) do
+            if c:IsA("Frame") then c:Destroy() end
+        end
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= L_Plr then
+                local row = Instance.new("Frame", plrScroll)
+                row.Size = UDim2.new(1, -4, 0, 34)
+                row.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+                row.BorderSizePixel = 0
+                row.Name = plr.Name
+                Instance.new("UICorner", row)
+
+                local nameL = Instance.new("TextLabel", row)
+                nameL.Size = UDim2.new(1, -70, 1, 0)
+                nameL.Position = UDim2.new(0, 8, 0, 0)
+                nameL.BackgroundTransparency = 1
+                nameL.Text = plr.Name
+                nameL.TextColor3 = Color3.new(1, 1, 1)
+                nameL.Font = Enum.Font.Gotham
+                nameL.TextSize = 12
+                nameL.TextXAlignment = Enum.TextXAlignment.Left
+
+                local tpBtn = Instance.new("TextButton", row)
+                tpBtn.Size = UDim2.new(0, 60, 0, 26)
+                tpBtn.Position = UDim2.new(1, -64, 0.5, -13)
+                tpBtn.BackgroundColor3 = Color3.fromRGB(212, 175, 55)
+                tpBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+                tpBtn.Text = "TP"
+                tpBtn.Font = Enum.Font.GothamBold
+                tpBtn.TextSize = 12
+                Instance.new("UICorner", tpBtn)
+
+                tpBtn.MouseButton1Click:Connect(function()
+                    pcall(function()
+                        local myChar = L_Plr.Character
+                        local myHRP = myChar and myChar:FindFirstChild("HumanoidRootPart")
+                        local tChar = plr.Character
+                        local tHRP = tChar and tChar:FindFirstChild("HumanoidRootPart")
+                        if myHRP and tHRP then
+                            myHRP.CFrame = tHRP.CFrame + Vector3.new(0, 3, 0)
+                        end
+                    end)
+                end)
+            end
+        end
     end
 
-    local function hookPlayer(plr)
-        if plr == L_Plr then return end
-        local function hookChar(char)
-            local hum = char:WaitForChild("Humanoid", 5)
-            if not hum then return end
-            local conn = hum.Died:Connect(function()
-                if lootActive then
-                    doLoot(char, plr.Name)
-                end
-            end)
-            table.insert(lootConnections, conn)
-        end
-        if plr.Character then hookChar(plr.Character) end
-        local conn2 = plr.CharacterAdded:Connect(hookChar)
-        table.insert(lootConnections, conn2)
-    end
+    local refreshBtn = Instance.new("TextButton", MiscTab)
+    refreshBtn.Size = UDim2.new(1, -5, 0, 28)
+    refreshBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+    refreshBtn.TextColor3 = Color3.fromRGB(212, 175, 55)
+    refreshBtn.Text = "🔄  Actualizar lista"
+    refreshBtn.Font = Enum.Font.GothamBold
+    refreshBtn.TextSize = 11
+    Instance.new("UICorner", refreshBtn)
+    refreshBtn.MouseButton1Click:Connect(buildPlayerList)
 
-    lootBtn.MouseButton1Click:Connect(function()
-        lootActive = not lootActive
-        if lootActive then
-            lootBtn.BackgroundColor3 = Color3.fromRGB(212, 175, 55)
-            lootBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-            lootBtn.Text = "  🎒 AUTO LOOT — ACTIVO"
-            lootStatus.Text = "  Esperando muertes..."
-            for _, plr in pairs(Players:GetPlayers()) do hookPlayer(plr) end
-            local conn3 = Players.PlayerAdded:Connect(hookPlayer)
-            table.insert(lootConnections, conn3)
-        else
-            lootActive = false
-            for _, c in pairs(lootConnections) do pcall(function() c:Disconnect() end) end
-            lootConnections = {}
-            lootBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-            lootBtn.TextColor3 = Color3.new(1, 1, 1)
-            lootBtn.Text = "  🎒 AUTO LOOT (jugadores muertos)"
-            lootStatus.Text = ""
-        end
+    buildPlayerList()
+    Players.PlayerAdded:Connect(buildPlayerList)
+    Players.PlayerRemoving:Connect(function()
+        task.wait(0.5)
+        buildPlayerList()
     end)
 
     local DelT = Instance.new("TextButton", MiscTab)
