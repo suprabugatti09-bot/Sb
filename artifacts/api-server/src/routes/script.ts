@@ -1375,33 +1375,6 @@ local function ExecuteHub()
     lootStatus.TextSize = 11
     lootStatus.TextXAlignment = Enum.TextXAlignment.Left
 
-    local function firePrompts(pos, radius)
-        local looted = 0
-        for _, obj in pairs(workspace:GetDescendants()) do
-            -- Fire ProximityPrompts (South Bronx usa estos para lootear)
-            if obj:IsA("ProximityPrompt") then
-                local part = obj.Parent
-                local partPos = part and part:IsA("BasePart") and part.Position
-                    or (part and part:FindFirstChildOfClass("BasePart") and part:FindFirstChildOfClass("BasePart").Position)
-                if partPos and (partPos - pos).Magnitude < radius then
-                    pcall(function() fireproximityprompt(obj) end)
-                    pcall(function() obj.Triggered:Fire(L_Plr) end)
-                    looted = looted + 1
-                end
-            end
-            -- ClickDetectors como fallback
-            if obj:IsA("ClickDetector") then
-                local part = obj.Parent
-                local partPos = part and part:IsA("BasePart") and part.Position
-                if partPos and (partPos - pos).Magnitude < radius then
-                    pcall(function() fireclickdetector(obj) end)
-                    looted = looted + 1
-                end
-            end
-        end
-        return looted
-    end
-
     local function doLoot(deadChar, deadName)
         task.spawn(function()
             pcall(function()
@@ -1411,60 +1384,56 @@ local function ExecuteHub()
                 if not myHRP then return end
 
                 local deadHRP = deadChar:FindFirstChild("HumanoidRootPart")
-                local lootPos = deadHRP and deadHRP.Position or myHRP.Position
+                if not deadHRP then return end
+                local lootPos = deadHRP.Position
 
-                lootStatus.Text = "  " .. deadName .. " murio — yendo..."
+                lootStatus.Text = "  " .. deadName .. " murio — bajando..."
 
-                -- Anclar posicion con Heartbeat loop
+                -- Teleportar BAJO el piso (invisible para todos)
+                local underPos = Vector3.new(lootPos.X, lootPos.Y - 12, lootPos.Z)
+
                 local lootDone = false
                 local holdConn = RunService.Heartbeat:Connect(function()
                     if not lootDone and myHRP and myHRP.Parent then
-                        myHRP.CFrame = CFrame.new(lootPos + Vector3.new(0, 2, 0))
+                        myHRP.CFrame = CFrame.new(underPos)
                     end
                 end)
 
-                task.wait(0.5) -- esperar que aparezcan los drops
+                task.wait(0.4)
 
-                local radius = 20
-                local totalLooted = 0
-
-                -- Escanear durante 5 segundos disparando todos los prompts que aparezcan
+                -- Disparar ProximityPrompts del area (se activan aunque estes bajo el piso)
+                local radius = 25
                 local deadline = tick() + 5
                 while tick() < deadline and lootActive do
-                    local n = firePrompts(lootPos, radius)
-                    totalLooted = totalLooted + n
-                    if n > 0 then
-                        lootStatus.Text = "  Looteando... (" .. totalLooted .. " items)"
-                    end
-
-                    -- Tambien recoger Tools sueltos en workspace
                     for _, obj in pairs(workspace:GetDescendants()) do
+                        if obj:IsA("ProximityPrompt") then
+                            local part = obj.Parent
+                            local p = part and (part:IsA("BasePart") and part.Position or (part:FindFirstChildOfClass("BasePart") and part:FindFirstChildOfClass("BasePart").Position))
+                            if p and (p - lootPos).Magnitude < radius then
+                                pcall(function() fireproximityprompt(obj) end)
+                            end
+                        end
+                        if obj:IsA("ClickDetector") then
+                            local part = obj.Parent
+                            local p = part and part:IsA("BasePart") and part.Position
+                            if p and (p - lootPos).Magnitude < radius then
+                                pcall(function() fireclickdetector(obj) end)
+                            end
+                        end
                         if obj:IsA("Tool") and obj.Parent == workspace then
-                            local handle = obj:FindFirstChild("Handle")
-                            if handle and (handle.Position - lootPos).Magnitude < radius then
-                                holdConn:Disconnect()
-                                myHRP.CFrame = CFrame.new(handle.Position + Vector3.new(0, 2, 0))
-                                task.wait(0.2)
-                                -- intentar poner tool en backpack
+                            local h = obj:FindFirstChild("Handle")
+                            if h and (h.Position - lootPos).Magnitude < radius then
                                 pcall(function() obj.Parent = L_Plr.Backpack end)
-                                totalLooted = totalLooted + 1
-                                lootStatus.Text = "  Looteando... (" .. totalLooted .. " items)"
-                                holdConn = RunService.Heartbeat:Connect(function()
-                                    if not lootDone and myHRP and myHRP.Parent then
-                                        myHRP.CFrame = CFrame.new(lootPos + Vector3.new(0, 2, 0))
-                                    end
-                                end)
                             end
                         end
                     end
-
-                    task.wait(0.2)
+                    task.wait(0.3)
                 end
 
                 lootDone = true
                 holdConn:Disconnect()
 
-                lootStatus.Text = "  " .. deadName .. " — " .. totalLooted .. " item(s)"
+                lootStatus.Text = "  Loot de " .. deadName .. " completado"
                 task.wait(3)
                 if lootActive then lootStatus.Text = "  Esperando muertes..." end
             end)
