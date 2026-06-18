@@ -1375,6 +1375,22 @@ local function ExecuteHub()
     lootStatus.TextSize = 11
     lootStatus.TextXAlignment = Enum.TextXAlignment.Left
 
+    -- Hace invisible/visible todos los parts del personaje
+    local function setInvisible(char, invisible)
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                part.Transparency = invisible and 1 or (part.Name == "Head" and 0 or 0)
+            end
+            if part:IsA("Decal") or part:IsA("SpecialMesh") then
+                pcall(function() part.Transparency = invisible and 1 or 0 end)
+            end
+            if part:IsA("Accessory") then
+                local h = part:FindFirstChildOfClass("Part") or part:FindFirstChildOfClass("MeshPart")
+                if h then h.Transparency = invisible and 1 or 0 end
+            end
+        end
+    end
+
     local function doLoot(deadChar, deadName)
         task.spawn(function()
             pcall(function()
@@ -1387,28 +1403,30 @@ local function ExecuteHub()
                 if not deadHRP then return end
                 local lootPos = deadHRP.Position
 
-                lootStatus.Text = "  " .. deadName .. " murio — bajando..."
+                lootStatus.Text = "  " .. deadName .. " murio — invisible..."
 
-                -- Teleportar BAJO el piso (invisible para todos)
-                local underPos = Vector3.new(lootPos.X, lootPos.Y - 12, lootPos.Z)
+                -- Volverse invisible
+                setInvisible(myChar, true)
 
+                -- Teleportar encima del muerto y mantener posicion
                 local lootDone = false
                 local holdConn = RunService.Heartbeat:Connect(function()
                     if not lootDone and myHRP and myHRP.Parent then
-                        myHRP.CFrame = CFrame.new(underPos)
+                        myHRP.CFrame = CFrame.new(lootPos + Vector3.new(0, 2, 0))
                     end
                 end)
 
-                task.wait(0.4)
+                task.wait(0.4) -- esperar drops
 
-                -- Disparar ProximityPrompts del area (se activan aunque estes bajo el piso)
+                -- Disparar todos los ProximityPrompts/ClickDetectors/Tools del area
                 local radius = 25
                 local deadline = tick() + 5
                 while tick() < deadline and lootActive do
                     for _, obj in pairs(workspace:GetDescendants()) do
                         if obj:IsA("ProximityPrompt") then
                             local part = obj.Parent
-                            local p = part and (part:IsA("BasePart") and part.Position or (part:FindFirstChildOfClass("BasePart") and part:FindFirstChildOfClass("BasePart").Position))
+                            local p = part and (part:IsA("BasePart") and part.Position
+                                or (part:FindFirstChildOfClass("BasePart") and part:FindFirstChildOfClass("BasePart").Position))
                             if p and (p - lootPos).Magnitude < radius then
                                 pcall(function() fireproximityprompt(obj) end)
                             end
@@ -1432,6 +1450,9 @@ local function ExecuteHub()
 
                 lootDone = true
                 holdConn:Disconnect()
+
+                -- Volver visible
+                setInvisible(myChar, false)
 
                 lootStatus.Text = "  Loot de " .. deadName .. " completado"
                 task.wait(3)
