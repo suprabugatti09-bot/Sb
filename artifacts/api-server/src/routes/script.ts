@@ -809,12 +809,21 @@ local function StartHub()
                     bv.MaxForce=Vector3.new(math.huge,math.huge,math.huge)
                     bv.P=1200; bv.Parent=hrp
                 end
-                local vy=0
-                if _G.Misc.FlyUp then vy=_G.Misc.FlyCharSpeed elseif _G.Misc.FlyDown then vy=-_G.Misc.FlyCharSpeed end
+                -- Animación de caída: el personaje se ve cayendo suave, no parado tieso en el aire
+                if hum:GetState()~=Enum.HumanoidStateType.Freefall then
+                    hum:ChangeState(Enum.HumanoidStateType.Freefall)
+                end
+                local vy
+                if _G.Misc.FlyUp then vy=_G.Misc.FlyCharSpeed
+                elseif _G.Misc.FlyDown then vy=-_G.Misc.FlyCharSpeed
+                else
+                    -- Al flotar: baja lentito con un vaivén suave (parece caída natural, no hover)
+                    vy=-2+math.sin(tick()*1.5)*1.5
+                end
                 local md=hum.MoveDirection
                 -- Suaviza el cambio de velocidad (movimiento natural, menos flags del anti-cheat)
                 local target=Vector3.new(md.X*_G.Misc.FlyCharSpeed,vy,md.Z*_G.Misc.FlyCharSpeed)
-                bv.Velocity=bv.Velocity:Lerp(target,0.25)
+                bv.Velocity=bv.Velocity:Lerp(target,0.18)
             elseif hrp then
                 local bv=hrp:FindFirstChild("JXJCF"); if bv then bv:Destroy() end
             end
