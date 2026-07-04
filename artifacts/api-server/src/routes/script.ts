@@ -436,7 +436,7 @@ _G.Hitbox_Size   = 15
 _G.Parts_Active  = { UpperTorso = false, HumanoidRootPart = false, LeftUpperArm = false, RightUpperArm = false, LeftUpperLeg = false, RightUpperLeg = false }
 _G.Visuals       = { Box = true, Names = true, Dist = true, Weapon = true, HealthBar = true, Tracers = true }
 _G.Combat        = { SilentAim = false, TriggerBot = false, RapidFire = false, NoRecoil = false }
-_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50 }
+_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false }
 local DeletedObjects = {}
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -548,6 +548,46 @@ local function SecLbl(par, txt)
     local l=Instance.new("TextLabel",par); l.Size=UDim2.new(1,0,0,22); l.BackgroundTransparency=1; l.Text=txt; l.TextColor3=Color3.fromRGB(52,199,89); l.Font=Enum.Font.GothamBold; l.TextSize=11; l.TextXAlignment=Enum.TextXAlignment.Left
 end
 
+-- ════════ FLY MOTO: helpers + botones flotantes ════════
+local LastFlySeat=nil
+local function ClearSeatMovers(s)
+    if s then
+        local bv=s:FindFirstChild("JXJFly"); if bv then bv:Destroy() end
+        local bg=s:FindFirstChild("JXJFlyG"); if bg then bg:Destroy() end
+    end
+end
+local function FlyCleanup()
+    local char=L_Plr.Character
+    if char then
+        local hum=char:FindFirstChildOfClass("Humanoid")
+        if hum and hum.SeatPart then ClearSeatMovers(hum.SeatPart) end
+    end
+    ClearSeatMovers(LastFlySeat)
+    LastFlySeat=nil
+end
+L_Plr.CharacterAdded:Connect(function()
+    _G.Misc.FlyUp=false; _G.Misc.FlyDown=false
+    ClearSeatMovers(LastFlySeat); LastFlySeat=nil
+end)
+
+local FlyBtns=Instance.new("Frame",ScreenGui)
+FlyBtns.Size=UDim2.new(0,64,0,140); FlyBtns.Position=UDim2.new(1,-78,0.5,-70)
+FlyBtns.BackgroundTransparency=1; FlyBtns.Visible=false
+local function MkFlyBtn(txt,posY,onDown,onUp)
+    local b=Instance.new("TextButton",FlyBtns)
+    b.Size=UDim2.new(0,64,0,64); b.Position=UDim2.new(0,0,0,posY)
+    b.BackgroundColor3=Color3.fromRGB(18,18,26); b.BackgroundTransparency=0.25
+    b.Text=txt; b.TextColor3=Color3.fromRGB(52,199,89); b.Font=Enum.Font.GothamBold; b.TextSize=26
+    b.BorderSizePixel=0; Instance.new("UICorner",b).CornerRadius=UDim.new(1,0)
+    local stk=Instance.new("UIStroke",b); stk.Color=Color3.fromRGB(52,199,89); stk.Thickness=1.5; stk.Transparency=0.4
+    b.MouseButton1Down:Connect(onDown)
+    b.MouseButton1Up:Connect(onUp)
+    b.MouseLeave:Connect(onUp)
+    return b
+end
+MkFlyBtn("▲",0,function() _G.Misc.FlyUp=true end,function() _G.Misc.FlyUp=false end)
+MkFlyBtn("▼",76,function() _G.Misc.FlyDown=true end,function() _G.Misc.FlyDown=false end)
+
 -- ════════ COMBAT ════════
 ValRow(CT,"Tamaño Hitbox","Tamaño del hitbox",15,function(v) _G.Hitbox_Size=v end)
 SecLbl(CT,"  HITBOX PARTS")
@@ -585,8 +625,11 @@ IosRow(MT,"Speed Hack","Aumenta tu velocidad de caminar",false,function(v) _G.Mi
 ValRow(MT,"Velocidad","Velocidad del speed hack (máx. 23)",16,function(v) _G.Misc.SpeedVal=math.min(v,23) end)
 IosRow(MT,"Full Bright","Ilumina todo el mapa",false,function(v) _G.Misc.FullBright=v end)
 SecLbl(MT,"  FLY EN MOTO")
-IosRow(MT,"Fly en Moto","Volar montado en moto (VehicleSeat)",false,function(v) _G.Misc.FlyMoto=v end)
-ValRow(MT,"Vel. Moto","Velocidad de ascenso en moto",50,function(v) _G.Misc.FlyMotoSpeed=v end)
+IosRow(MT,"Fly en Moto","Volar en moto con botones subir/bajar",false,function(v)
+    _G.Misc.FlyMoto=v; FlyBtns.Visible=v
+    if not v then _G.Misc.FlyUp=false; _G.Misc.FlyDown=false; FlyCleanup() end
+end)
+ValRow(MT,"Vel. Moto","Velocidad de subida/bajada",50,function(v) _G.Misc.FlyMotoSpeed=v end)
 SecLbl(MT,"  HERRAMIENTAS")
 ActBtn(MT,"🖱️  Click Delete Tool",Color3.fromRGB(34,160,60),function()
     local T=Instance.new("Tool"); T.Name="Click Delete"; T.RequiresHandle=false; T.Parent=L_Plr.Backpack
@@ -598,18 +641,11 @@ end)
 
 -- ════════ HELPERS POST-KEY (solo arrancan tras validar key) ════════
 local function FindMySeat()
-    -- Busca VehicleSeat en los welds del HRP del jugador (sin escanear workspace)
+    -- Humanoid.SeatPart es la forma correcta de saber en qué asiento estás
     local char=L_Plr.Character
     if not char then return nil end
-    local hrp=char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return nil end
-    for _,w in pairs(hrp:GetChildren()) do
-        if (w:IsA("Weld") or w:IsA("Motor6D")) then
-            local p0,p1=w.Part0,w.Part1
-            if p0 and p0:IsA("VehicleSeat") then return p0 end
-            if p1 and p1:IsA("VehicleSeat") then return p1 end
-        end
-    end
+    local hum=char:FindFirstChildOfClass("Humanoid")
+    if hum and hum.SeatPart then return hum.SeatPart end
     return nil
 end
 
@@ -672,29 +708,43 @@ local function StartHub()
                 end
             end
         end
-        -- Fly en moto: detecta el asiento desde el HRP (sin GetDescendants)
+        -- Fly en moto: asiento via Humanoid.SeatPart + BodyVelocity/BodyGyro (sin temblor)
         if _G.Misc.FlyMoto then
             local seat=FindMySeat()
-            if seat then
+            if not seat then
+                -- Se bajó de la moto: limpia fuerzas del asiento anterior
+                if LastFlySeat then ClearSeatMovers(LastFlySeat); LastFlySeat=nil end
+                _G.Misc.FlyUp=false; _G.Misc.FlyDown=false
+            else
+                if LastFlySeat and LastFlySeat~=seat then ClearSeatMovers(LastFlySeat) end
+                LastFlySeat=seat
                 local bv=seat:FindFirstChild("JXJFly")
                 if not bv then
                     bv=Instance.new("BodyVelocity"); bv.Name="JXJFly"
-                    bv.MaxForce=Vector3.new(0,math.huge,0); bv.P=5000; bv.Parent=seat
+                    bv.MaxForce=Vector3.new(math.huge,math.huge,math.huge)
+                    bv.P=9000; bv.Parent=seat
                 end
-                bv.Velocity=Vector3.new(0,_G.Misc.FlyMotoSpeed,0)
-            end
-        else
-            -- Limpia solo cuando se desactiva (no cada frame)
-            if L_Plr.Character then
-                local hrp=L_Plr.Character:FindFirstChild("HumanoidRootPart")
-                if hrp then
-                    for _,w in pairs(hrp:GetChildren()) do
-                        if w:IsA("Weld") or w:IsA("Motor6D") then
-                            local s=w.Part0 or w.Part1
-                            if s then local bv=s:FindFirstChild("JXJFly"); if bv then bv:Destroy() end end
-                        end
-                    end
+                local bg=seat:FindFirstChild("JXJFlyG")
+                if not bg then
+                    bg=Instance.new("BodyGyro"); bg.Name="JXJFlyG"
+                    bg.MaxTorque=Vector3.new(math.huge,math.huge,math.huge)
+                    bg.P=9000; bg.D=500; bg.Parent=seat
                 end
+                -- Mantiene la moto derecha mirando hacia la cámara (sin voltearse ni temblar)
+                local camLook=Camera.CFrame.LookVector
+                local flat=Vector3.new(camLook.X,0,camLook.Z)
+                if flat.Magnitude>0.01 then
+                    bg.CFrame=CFrame.new(seat.Position, seat.Position+flat.Unit)
+                end
+                -- Vertical: botones ▲/▼ · Horizontal: acelerador de la moto
+                local vy=0
+                if _G.Misc.FlyUp then vy=_G.Misc.FlyMotoSpeed elseif _G.Misc.FlyDown then vy=-_G.Misc.FlyMotoSpeed end
+                local horiz=Vector3.new(0,0,0)
+                local thr=seat:IsA("VehicleSeat") and seat.Throttle or 0
+                if thr~=0 and flat.Magnitude>0.01 then
+                    horiz=flat.Unit*(_G.Misc.FlyMotoSpeed*thr)
+                end
+                bv.Velocity=Vector3.new(horiz.X,vy,horiz.Z)
             end
         end
     end)
