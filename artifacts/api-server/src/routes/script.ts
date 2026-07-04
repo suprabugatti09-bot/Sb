@@ -700,23 +700,46 @@ local function StartHub()
     end)
 end
 
+-- ════════ HTTP wrapper (compatible con todos los executors) ════════
+local function httpGet(url)
+    -- Prueba request() nativa del executor (Synapse, KRNL, Fluxus, etc.)
+    if request then
+        local ok,r=pcall(request,{Url=url,Method="GET"})
+        if ok and r and r.Body then return r.Body end
+    end
+    if syn and syn.request then
+        local ok,r=pcall(syn.request,{Url=url,Method="GET"})
+        if ok and r and r.Body then return r.Body end
+    end
+    if http and http.request then
+        local ok,r=pcall(http.request,{Url=url,Method="GET"})
+        if ok and r then return r.body or r.Body end
+    end
+    if http_request then
+        local ok,r=pcall(http_request,{Url=url,Method="GET"})
+        if ok and r and r.Body then return r.Body end
+    end
+    -- Fallback: HttpService del juego
+    return HttpService:GetAsync(url,true)
+end
+
 -- ════════ KEY VALIDATION ════════
 KBtn.MouseButton1Click:Connect(function()
     local key=KIn.Text:gsub("%s+",""):upper()
     if key=="" then KSt.Text="Escribe tu key primero."; return end
     KBtn.Text="Verificando..."; KBtn.BackgroundColor3=Color3.fromRGB(50,50,65); KSt.Text=""
-    local ok,res=pcall(function()
-        return HttpService:GetAsync("https://${host}/api/validate?key="..HttpService:UrlEncode(key).."&username="..HttpService:UrlEncode(L_Plr.Name))
-    end)
-    if not ok then KSt.Text="Error de conexión."; KBtn.Text="ENTRAR"; KBtn.BackgroundColor3=Color3.fromRGB(52,199,89); return end
-    local data=HttpService:JSONDecode(res)
-    if data and data.valid then
+    local url="https://${host}/api/validate?key="..HttpService:UrlEncode(key).."&username="..HttpService:UrlEncode(L_Plr.Name)
+    local ok,res=pcall(httpGet,url)
+    if not ok or not res then KSt.Text="Error de conexión."; KBtn.Text="ENTRAR"; KBtn.BackgroundColor3=Color3.fromRGB(52,199,89); return end
+    local ok2,data=pcall(function() return HttpService:JSONDecode(res) end)
+    if not ok2 or not data then KSt.Text="Error de conexión."; KBtn.Text="ENTRAR"; KBtn.BackgroundColor3=Color3.fromRGB(52,199,89); return end
+    if data.valid then
         KSt.TextColor3=Color3.fromRGB(52,199,89); KSt.Text="✓ Acceso concedido"
         KBtn.Text="✓ OK"; task.wait(0.7); KF:Destroy()
         SetTab("Combat"); MF.Visible=true
-        StartHub() -- ESP + Heartbeat arrancan AQUÍ, no antes
+        StartHub()
     else
-        local r=data and data.reason or ""
+        local r=data.reason or ""
         KSt.Text=r=="used" and "Key usada por otra cuenta." or r=="expired" and "Key expirada." or "Key inválida. Contacta @jean14_17."
         KBtn.Text="ENTRAR"; KBtn.BackgroundColor3=Color3.fromRGB(52,199,89)
     end
