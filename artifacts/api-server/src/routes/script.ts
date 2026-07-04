@@ -412,8 +412,8 @@ VerBtn.MouseButton1Click:Connect(function()
 end)
 `;
 
-router.get("/acusado", (req, res) => {
-  const host = req.headers.host || "jean-cheat-hub--sadx8992.replit.app";
+router.get("/acusado", (_req, res) => {
+  const host = (process.env.REPLIT_DOMAINS ?? "").split(",")[0].trim() || "jean-cheat-hub--sadx8992.replit.app";
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Cache-Control", "no-store");
   res.send(acusadoScript(host));
@@ -723,8 +723,8 @@ KBtn.MouseButton1Click:Connect(function()
 end)
 `;
 
-router.get("/jios", (req, res) => {
-  const host = req.headers.host || "jean-cheat-hub--sadx8992.replit.app";
+router.get("/jios", (_req, res) => {
+  const host = (process.env.REPLIT_DOMAINS ?? "").split(",")[0].trim() || "jean-cheat-hub--sadx8992.replit.app";
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Cache-Control", "no-store");
   res.send(jiosScript(host));
