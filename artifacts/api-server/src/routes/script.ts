@@ -827,14 +827,17 @@ local function StartHub()
                     local wob=math.sin(tick()*1.2)*0.12
                     bg.CFrame=CFrame.new(hrp.Position,hrp.Position+flat.Unit)*CFrame.Angles(-math.rad(75)+wob,0,wob)
                 end
+                local md=hum.MoveDirection
                 local vy
                 if _G.Misc.FlyUp then vy=_G.Misc.FlyCharSpeed
                 elseif _G.Misc.FlyDown then vy=-_G.Misc.FlyCharSpeed
+                elseif md.Magnitude>0.05 then
+                    -- Moviéndote: sube/baja según hacia dónde mira la cámara
+                    vy=camLook.Y*_G.Misc.FlyCharSpeed
                 else
                     -- Al flotar: baja lentito con un vaivén suave (parece caída natural, no hover)
                     vy=-2+math.sin(tick()*1.5)*1.5
                 end
-                local md=hum.MoveDirection
                 -- Suaviza el cambio de velocidad (movimiento natural, menos flags del anti-cheat)
                 local target=Vector3.new(md.X*_G.Misc.FlyCharSpeed,vy,md.Z*_G.Misc.FlyCharSpeed)
                 bv.Velocity=bv.Velocity:Lerp(target,0.18)
