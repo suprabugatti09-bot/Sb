@@ -633,9 +633,6 @@ IosRow(CT,"Pierna Izq.","Hitbox pierna izq.",false,function(v) _G.Parts_Active.L
 IosRow(CT,"Pierna Der.","Hitbox pierna der.",false,function(v) _G.Parts_Active.RightUpperLeg=v end)
 SecLbl(CT,"  COMBAT")
 IosRow(CT,"Silent Aim","Aim silencioso automático",false,function(v) _G.Combat.SilentAim=v end)
-IosRow(CT,"Trigger Bot","Disparo automático al apuntar",false,function(v) _G.Combat.TriggerBot=v end)
-IosRow(CT,"Rapid Fire","Aumenta cadencia de disparo",false,function(v) _G.Combat.RapidFire=v end)
-IosRow(CT,"No Recoil","Elimina el retroceso",false,function(v) _G.Combat.NoRecoil=v end)
 
 -- ════════ VISUALS ════════
 SecLbl(VT,"  ESP")
