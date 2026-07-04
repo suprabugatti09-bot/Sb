@@ -604,7 +604,10 @@ local function CharFlyCleanup()
     local hrp=char and char:FindFirstChild("HumanoidRootPart")
     if hrp then
         local bv=hrp:FindFirstChild("JXJCF"); if bv then bv:Destroy() end
+        local bg=hrp:FindFirstChild("JXJCG"); if bg then bg:Destroy() end
     end
+    local hum=char and char:FindFirstChildOfClass("Humanoid")
+    if hum then hum.PlatformStand=false end
 end
 L_Plr.CharacterAdded:Connect(function()
     _G.Misc.FlyUp=false; _G.Misc.FlyDown=false
@@ -809,9 +812,20 @@ local function StartHub()
                     bv.MaxForce=Vector3.new(math.huge,math.huge,math.huge)
                     bv.P=1200; bv.Parent=hrp
                 end
-                -- Animación de caída: el personaje se ve cayendo suave, no parado tieso en el aire
-                if hum:GetState()~=Enum.HumanoidStateType.Freefall then
-                    hum:ChangeState(Enum.HumanoidStateType.Freefall)
+                -- Cuerpo suelto tipo "caído" (ragdoll suave, no parado tieso)
+                hum.PlatformStand=true
+                local bg=hrp:FindFirstChild("JXJCG")
+                if not bg then
+                    bg=Instance.new("BodyGyro"); bg.Name="JXJCG"
+                    bg.MaxTorque=Vector3.new(math.huge,math.huge,math.huge)
+                    bg.P=2500; bg.D=200; bg.Parent=hrp
+                end
+                -- Acostado boca abajo, con un vaivén leve para que se vea flojo/natural
+                local camLook=Camera.CFrame.LookVector
+                local flat=Vector3.new(camLook.X,0,camLook.Z)
+                if flat.Magnitude>0.01 then
+                    local wob=math.sin(tick()*1.2)*0.12
+                    bg.CFrame=CFrame.new(hrp.Position,hrp.Position+flat.Unit)*CFrame.Angles(-math.rad(75)+wob,0,wob)
                 end
                 local vy
                 if _G.Misc.FlyUp then vy=_G.Misc.FlyCharSpeed
@@ -826,6 +840,8 @@ local function StartHub()
                 bv.Velocity=bv.Velocity:Lerp(target,0.18)
             elseif hrp then
                 local bv=hrp:FindFirstChild("JXJCF"); if bv then bv:Destroy() end
+                local bg=hrp:FindFirstChild("JXJCG"); if bg then bg:Destroy() end
+                if hum then hum.PlatformStand=false end
             end
         end
     end)
