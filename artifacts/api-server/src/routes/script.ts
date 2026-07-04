@@ -596,67 +596,109 @@ ActBtn(MT,"🔄  Reset Map",Color3.fromRGB(180,40,40),function()
     for _,v in pairs(DeletedObjects) do if v.o then v.o.Parent=v.p end end; DeletedObjects={}
 end)
 
--- ════════ ESP ════════
-local function CreateESP(plr)
-    local Box=Drawing.new("Square"); Box.Thickness=1; Box.Filled=false; Box.Color=Color3.fromRGB(52,199,89); Box.Visible=false
-    local Nm=Drawing.new("Text"); Nm.Size=13; Nm.Center=true; Nm.Outline=true; Nm.Color=Color3.new(1,1,1); Nm.Visible=false
-    local Ds=Drawing.new("Text"); Ds.Size=13; Ds.Center=true; Ds.Outline=true; Ds.Color=Color3.new(1,1,1); Ds.Visible=false
-    local Wp=Drawing.new("Text"); Wp.Size=13; Wp.Center=true; Wp.Outline=true; Wp.Color=Color3.fromRGB(52,199,89); Wp.Visible=false
-    local Ln=Drawing.new("Line"); Ln.Thickness=1; Ln.Color=Color3.fromRGB(52,199,89); Ln.Visible=false
-    local HB=Drawing.new("Square"); HB.Thickness=1; HB.Filled=true; HB.Visible=false
-    RunService.RenderStepped:Connect(function()
-        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr~=L_Plr then
-            local HRP=plr.Character.HumanoidRootPart; local Hum=plr.Character.Humanoid
-            local Pos,OnScr=Camera:WorldToViewportPoint(HRP.Position)
-            if OnScr then
-                local S=Camera:WorldToViewportPoint(HRP.Position-Vector3.new(0,3,0)).Y-Camera:WorldToViewportPoint(HRP.Position+Vector3.new(0,2.6,0)).Y
-                local BS=Vector2.new(S/1.5,S); local BP=Vector2.new(Pos.X-BS.X/2,Pos.Y-BS.Y/2)
-                Box.Visible=_G.Visuals.Box; Box.Size=BS; Box.Position=BP
-                Nm.Visible=_G.Visuals.Names; Nm.Text=plr.Name; Nm.Position=Vector2.new(Pos.X,BP.Y-15)
-                local myH=L_Plr.Character and L_Plr.Character:FindFirstChild("HumanoidRootPart")
-                Ds.Visible=_G.Visuals.Dist; Ds.Text="["..((myH and math.floor((myH.Position-HRP.Position).Magnitude)) or 0).."m]"; Ds.Position=Vector2.new(Pos.X,BP.Y+BS.Y+5)
-                local t=plr.Character:FindFirstChildOfClass("Tool"); Wp.Visible=_G.Visuals.Weapon; Wp.Text=t and t.Name or "Hands"; Wp.Position=Vector2.new(Pos.X,BP.Y+BS.Y+18)
-                Ln.Visible=_G.Visuals.Tracers; Ln.From=Vector2.new(Camera.ViewportSize.X/2,0); Ln.To=Vector2.new(Pos.X,BP.Y)
-                HB.Visible=_G.Visuals.HealthBar; HB.Size=Vector2.new(2,(Hum.Health/Hum.MaxHealth)*BS.Y); HB.Position=Vector2.new(BP.X-5,BP.Y+(BS.Y-HB.Size.Y)); HB.Color=Color3.fromHSV(Hum.Health/Hum.MaxHealth*0.3,1,1)
-            else Box.Visible=false;Nm.Visible=false;Ds.Visible=false;Wp.Visible=false;Ln.Visible=false;HB.Visible=false end
-        else Box.Visible=false;Nm.Visible=false;Ds.Visible=false;Wp.Visible=false;Ln.Visible=false;HB.Visible=false end
-    end)
-end
-for _,p in pairs(Players:GetPlayers()) do CreateESP(p) end
-Players.PlayerAdded:Connect(CreateESP)
-
--- ════════ CORE LOOP ════════
-RunService.Heartbeat:Connect(function()
-    if _G.Misc.Speed_On and L_Plr.Character and L_Plr.Character:FindFirstChild("Humanoid") then
-        L_Plr.Character.Humanoid.WalkSpeed=_G.Misc.SpeedVal
+-- ════════ HELPERS POST-KEY (solo arrancan tras validar key) ════════
+local function FindMySeat()
+    -- Busca VehicleSeat en los welds del HRP del jugador (sin escanear workspace)
+    local char=L_Plr.Character
+    if not char then return nil end
+    local hrp=char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return nil end
+    for _,w in pairs(hrp:GetChildren()) do
+        if (w:IsA("Weld") or w:IsA("Motor6D")) then
+            local p0,p1=w.Part0,w.Part1
+            if p0 and p0:IsA("VehicleSeat") then return p0 end
+            if p1 and p1:IsA("VehicleSeat") then return p1 end
+        end
     end
-    if _G.Misc.FullBright then game:GetService("Lighting").Brightness=10; game:GetService("Lighting").ClockTime=14 end
-    for _,p in pairs(Players:GetPlayers()) do
-        if p~=L_Plr and p.Character then
-            for n,act in pairs(_G.Parts_Active) do
-                local part=p.Character:FindFirstChild(n)
-                if part and part:IsA("BasePart") and act then
-                    part.Size=Vector3.new(_G.Hitbox_Size,_G.Hitbox_Size,_G.Hitbox_Size)
-                    part.CanCollide=false; part.Massless=true; part.Transparency=1
+    return nil
+end
+
+local function StartHub()
+    -- ESP — solo corre después de la key
+    local function CreateESP(plr)
+        local Box=Drawing.new("Square"); Box.Thickness=1; Box.Filled=false; Box.Color=Color3.fromRGB(52,199,89); Box.Visible=false
+        local Nm=Drawing.new("Text"); Nm.Size=13; Nm.Center=true; Nm.Outline=true; Nm.Color=Color3.new(1,1,1); Nm.Visible=false
+        local Ds=Drawing.new("Text"); Ds.Size=13; Ds.Center=true; Ds.Outline=true; Ds.Color=Color3.new(1,1,1); Ds.Visible=false
+        local Wp=Drawing.new("Text"); Wp.Size=13; Wp.Center=true; Wp.Outline=true; Wp.Color=Color3.fromRGB(52,199,89); Wp.Visible=false
+        local Ln=Drawing.new("Line"); Ln.Thickness=1; Ln.Color=Color3.fromRGB(52,199,89); Ln.Visible=false
+        local HB=Drawing.new("Square"); HB.Thickness=1; HB.Filled=true; HB.Visible=false
+        RunService.RenderStepped:Connect(function()
+            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr~=L_Plr then
+                local HRP=plr.Character.HumanoidRootPart; local Hum=plr.Character.Humanoid
+                local Pos,OnScr=Camera:WorldToViewportPoint(HRP.Position)
+                if OnScr then
+                    local S=Camera:WorldToViewportPoint(HRP.Position-Vector3.new(0,3,0)).Y-Camera:WorldToViewportPoint(HRP.Position+Vector3.new(0,2.6,0)).Y
+                    local BS=Vector2.new(S/1.5,S); local BP=Vector2.new(Pos.X-BS.X/2,Pos.Y-BS.Y/2)
+                    Box.Visible=_G.Visuals.Box; Box.Size=BS; Box.Position=BP
+                    Nm.Visible=_G.Visuals.Names; Nm.Text=plr.Name; Nm.Position=Vector2.new(Pos.X,BP.Y-15)
+                    local myH=L_Plr.Character and L_Plr.Character:FindFirstChild("HumanoidRootPart")
+                    Ds.Visible=_G.Visuals.Dist; Ds.Text="["..((myH and math.floor((myH.Position-HRP.Position).Magnitude)) or 0).."m]"; Ds.Position=Vector2.new(Pos.X,BP.Y+BS.Y+5)
+                    local t=plr.Character:FindFirstChildOfClass("Tool"); Wp.Visible=_G.Visuals.Weapon; Wp.Text=t and t.Name or "Hands"; Wp.Position=Vector2.new(Pos.X,BP.Y+BS.Y+18)
+                    Ln.Visible=_G.Visuals.Tracers; Ln.From=Vector2.new(Camera.ViewportSize.X/2,0); Ln.To=Vector2.new(Pos.X,BP.Y)
+                    HB.Visible=_G.Visuals.HealthBar; HB.Size=Vector2.new(2,(Hum.Health/Hum.MaxHealth)*BS.Y); HB.Position=Vector2.new(BP.X-5,BP.Y+(BS.Y-HB.Size.Y)); HB.Color=Color3.fromHSV(Hum.Health/Hum.MaxHealth*0.3,1,1)
+                else Box.Visible=false;Nm.Visible=false;Ds.Visible=false;Wp.Visible=false;Ln.Visible=false;HB.Visible=false end
+            else Box.Visible=false;Nm.Visible=false;Ds.Visible=false;Wp.Visible=false;Ln.Visible=false;HB.Visible=false end
+        end)
+    end
+    for _,p in pairs(Players:GetPlayers()) do if p~=L_Plr then CreateESP(p) end end
+    Players.PlayerAdded:Connect(CreateESP)
+
+    -- Core loop — solo corre después de la key
+    local hbTick=0
+    RunService.Heartbeat:Connect(function()
+        -- Speed hack
+        if _G.Misc.Speed_On and L_Plr.Character and L_Plr.Character:FindFirstChild("Humanoid") then
+            L_Plr.Character.Humanoid.WalkSpeed=_G.Misc.SpeedVal
+        end
+        -- Full bright
+        if _G.Misc.FullBright then
+            game:GetService("Lighting").Brightness=10
+            game:GetService("Lighting").ClockTime=14
+        end
+        -- Hitbox (solo cada 3 frames para reducir carga)
+        hbTick=hbTick+1
+        if hbTick%3==0 then
+            for _,p in pairs(Players:GetPlayers()) do
+                if p~=L_Plr and p.Character then
+                    for n,act in pairs(_G.Parts_Active) do
+                        if act then
+                            local part=p.Character:FindFirstChild(n)
+                            if part and part:IsA("BasePart") then
+                                part.Size=Vector3.new(_G.Hitbox_Size,_G.Hitbox_Size,_G.Hitbox_Size)
+                                part.CanCollide=false; part.Massless=true; part.Transparency=1
+                            end
+                        end
+                    end
                 end
             end
         end
-    end
-    -- Fly en moto
-    if _G.Misc.FlyMoto then
-        for _,obj in pairs(workspace:GetDescendants()) do
-            if obj:IsA("VehicleSeat") and obj.Occupant and obj.Occupant.Parent==L_Plr.Character then
-                local bv=obj:FindFirstChild("JXJFly") or Instance.new("BodyVelocity",obj)
-                bv.Name="JXJFly"; bv.MaxForce=Vector3.new(0,math.huge,0); bv.P=5000
+        -- Fly en moto: detecta el asiento desde el HRP (sin GetDescendants)
+        if _G.Misc.FlyMoto then
+            local seat=FindMySeat()
+            if seat then
+                local bv=seat:FindFirstChild("JXJFly")
+                if not bv then
+                    bv=Instance.new("BodyVelocity"); bv.Name="JXJFly"
+                    bv.MaxForce=Vector3.new(0,math.huge,0); bv.P=5000; bv.Parent=seat
+                end
                 bv.Velocity=Vector3.new(0,_G.Misc.FlyMotoSpeed,0)
             end
+        else
+            -- Limpia solo cuando se desactiva (no cada frame)
+            if L_Plr.Character then
+                local hrp=L_Plr.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    for _,w in pairs(hrp:GetChildren()) do
+                        if w:IsA("Weld") or w:IsA("Motor6D") then
+                            local s=w.Part0 or w.Part1
+                            if s then local bv=s:FindFirstChild("JXJFly"); if bv then bv:Destroy() end end
+                        end
+                    end
+                end
+            end
         end
-    else
-        for _,obj in pairs(workspace:GetDescendants()) do
-            if obj.Name=="JXJFly" then pcall(function() obj:Destroy() end) end
-        end
-    end
-end)
+    end)
+end
 
 -- ════════ KEY VALIDATION ════════
 KBtn.MouseButton1Click:Connect(function()
@@ -672,6 +714,7 @@ KBtn.MouseButton1Click:Connect(function()
         KSt.TextColor3=Color3.fromRGB(52,199,89); KSt.Text="✓ Acceso concedido"
         KBtn.Text="✓ OK"; task.wait(0.7); KF:Destroy()
         SetTab("Combat"); MF.Visible=true
+        StartHub() -- ESP + Heartbeat arrancan AQUÍ, no antes
     else
         local r=data and data.reason or ""
         KSt.Text=r=="used" and "Key usada por otra cuenta." or r=="expired" and "Key expirada." or "Key inválida. Contacta @jean14_17."
