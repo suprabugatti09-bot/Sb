@@ -435,7 +435,7 @@ local Mouse        = L_Plr:GetMouse()
 
 _G.Hitbox_Size   = 15
 _G.Parts_Active  = { UpperTorso = false, HumanoidRootPart = false, LeftUpperArm = false, RightUpperArm = false, LeftUpperLeg = false, RightUpperLeg = false }
-_G.Visuals       = { Box = true, Names = true, Dist = true, Weapon = true, HealthBar = true, Tracers = true }
+_G.Visuals       = { Box = false, Names = false, Dist = false, Weapon = false, HealthBar = false, Tracers = false }
 _G.Combat        = { SilentAim = false, TriggerBot = false, RapidFire = false, NoRecoil = false }
 _G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false }
 local DeletedObjects = {}
@@ -639,12 +639,12 @@ IosRow(CT,"No Recoil","Elimina el retroceso",false,function(v) _G.Combat.NoRecoi
 
 -- ════════ VISUALS ════════
 SecLbl(VT,"  ESP")
-IosRow(VT,"Box ESP","Caja alrededor de jugadores",true,function(v) _G.Visuals.Box=v end)
-IosRow(VT,"Names","Nombre sobre jugadores",true,function(v) _G.Visuals.Names=v end)
-IosRow(VT,"Distance","Distancia al jugador",true,function(v) _G.Visuals.Dist=v end)
-IosRow(VT,"Weapon ESP","Arma del jugador",true,function(v) _G.Visuals.Weapon=v end)
-IosRow(VT,"Health Bar","Barra de vida del jugador",true,function(v) _G.Visuals.HealthBar=v end)
-IosRow(VT,"Tracers","Líneas hacia jugadores",true,function(v) _G.Visuals.Tracers=v end)
+IosRow(VT,"Box ESP","Caja alrededor de jugadores",false,function(v) _G.Visuals.Box=v end)
+IosRow(VT,"Names","Nombre sobre jugadores",false,function(v) _G.Visuals.Names=v end)
+IosRow(VT,"Distance","Distancia al jugador",false,function(v) _G.Visuals.Dist=v end)
+IosRow(VT,"Weapon ESP","Arma del jugador",false,function(v) _G.Visuals.Weapon=v end)
+IosRow(VT,"Health Bar","Barra de vida del jugador",false,function(v) _G.Visuals.HealthBar=v end)
+IosRow(VT,"Tracers","Líneas hacia jugadores",false,function(v) _G.Visuals.Tracers=v end)
 
 -- ════════ FARM ════════
 SecLbl(FT,"  AUTO FARM")
