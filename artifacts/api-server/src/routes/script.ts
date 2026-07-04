@@ -429,6 +429,7 @@ local L_Plr        = Players.LocalPlayer
 local RunService   = game:GetService("RunService")
 local HttpService  = game:GetService("HttpService")
 local TweenService = game:GetService("TweenService")
+local UIS          = game:GetService("UserInputService")
 local Camera       = workspace.CurrentCamera
 local Mouse        = L_Plr:GetMouse()
 
@@ -539,6 +540,39 @@ local function ValRow(par, title, desc, def, cb)
     inp.FocusLost:Connect(function() local v=tonumber(inp.Text) or def; inp.Text=tostring(v); if cb then cb(v) end end)
 end
 
+local function SliderRow(par, title, desc, minV, maxV, def, cb)
+    local row=Instance.new("Frame",par); row.Size=UDim2.new(1,0,0,74); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0; Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
+    local tl=Instance.new("TextLabel",row); tl.Size=UDim2.new(1,-80,0,22); tl.Position=UDim2.new(0,14,0,7); tl.BackgroundTransparency=1; tl.Text=title; tl.TextColor3=Color3.new(1,1,1); tl.Font=Enum.Font.GothamBold; tl.TextSize=13; tl.TextXAlignment=Enum.TextXAlignment.Left
+    local sl=Instance.new("TextLabel",row); sl.Size=UDim2.new(1,-80,0,16); sl.Position=UDim2.new(0,14,0,26); sl.BackgroundTransparency=1; sl.Text=desc; sl.TextColor3=Color3.fromRGB(85,85,100); sl.Font=Enum.Font.Gotham; sl.TextSize=11; sl.TextXAlignment=Enum.TextXAlignment.Left
+    local vl=Instance.new("TextLabel",row); vl.Size=UDim2.new(0,50,0,22); vl.Position=UDim2.new(1,-60,0,7); vl.BackgroundTransparency=1; vl.Text=tostring(def); vl.TextColor3=Color3.fromRGB(52,199,89); vl.Font=Enum.Font.GothamBold; vl.TextSize=14; vl.TextXAlignment=Enum.TextXAlignment.Right
+    local track=Instance.new("Frame",row); track.Size=UDim2.new(1,-28,0,6); track.Position=UDim2.new(0,14,0,54); track.BackgroundColor3=Color3.fromRGB(40,40,54); track.BorderSizePixel=0; Instance.new("UICorner",track).CornerRadius=UDim.new(1,0)
+    local fill=Instance.new("Frame",track); fill.Size=UDim2.new((def-minV)/(maxV-minV),0,1,0); fill.BackgroundColor3=Color3.fromRGB(52,199,89); fill.BorderSizePixel=0; Instance.new("UICorner",fill).CornerRadius=UDim.new(1,0)
+    local knob=Instance.new("Frame",track); knob.Size=UDim2.new(0,18,0,18); knob.Position=UDim2.new((def-minV)/(maxV-minV),-9,0.5,-9); knob.BackgroundColor3=Color3.new(1,1,1); knob.BorderSizePixel=0; knob.ZIndex=2; Instance.new("UICorner",knob).CornerRadius=UDim.new(1,0)
+    local hit=Instance.new("TextButton",row); hit.Size=UDim2.new(1,-20,0,34); hit.Position=UDim2.new(0,10,0,40); hit.BackgroundTransparency=1; hit.Text=""
+    local dragging=false
+    local function SetFromX(x)
+        local rel=math.clamp((x-track.AbsolutePosition.X)/math.max(track.AbsoluteSize.X,1),0,1)
+        local v=math.floor(minV+(maxV-minV)*rel+0.5)
+        fill.Size=UDim2.new(rel,0,1,0); knob.Position=UDim2.new(rel,-9,0.5,-9); vl.Text=tostring(v)
+        if cb then cb(v) end
+    end
+    hit.InputBegan:Connect(function(io)
+        if io.UserInputType==Enum.UserInputType.MouseButton1 or io.UserInputType==Enum.UserInputType.Touch then
+            dragging=true; SetFromX(io.Position.X)
+        end
+    end)
+    UIS.InputChanged:Connect(function(io)
+        if dragging and (io.UserInputType==Enum.UserInputType.MouseMovement or io.UserInputType==Enum.UserInputType.Touch) then
+            SetFromX(io.Position.X)
+        end
+    end)
+    UIS.InputEnded:Connect(function(io)
+        if io.UserInputType==Enum.UserInputType.MouseButton1 or io.UserInputType==Enum.UserInputType.Touch then
+            dragging=false
+        end
+    end)
+end
+
 local function ActBtn(par, lbl, col, cb)
     local b=Instance.new("TextButton",par); b.Size=UDim2.new(1,0,0,46); b.BackgroundColor3=col or Color3.fromRGB(52,199,89); b.TextColor3=col and Color3.new(1,1,1) or Color3.fromRGB(0,0,0); b.Text=lbl; b.Font=Enum.Font.GothamBold; b.TextSize=13; b.BorderSizePixel=0; Instance.new("UICorner",b).CornerRadius=UDim.new(0,10)
     b.MouseButton1Click:Connect(cb)
@@ -629,7 +663,7 @@ IosRow(MT,"Fly en Moto","Volar en moto con botones subir/bajar",false,function(v
     _G.Misc.FlyMoto=v; FlyBtns.Visible=v
     if not v then _G.Misc.FlyUp=false; _G.Misc.FlyDown=false; FlyCleanup() end
 end)
-ValRow(MT,"Vel. Moto","Velocidad de subida/bajada",50,function(v) _G.Misc.FlyMotoSpeed=v end)
+SliderRow(MT,"Vel. Moto","Desliza la barrita para ajustar",10,150,50,function(v) _G.Misc.FlyMotoSpeed=v end)
 SecLbl(MT,"  HERRAMIENTAS")
 ActBtn(MT,"🖱️  Click Delete Tool",Color3.fromRGB(34,160,60),function()
     local T=Instance.new("Tool"); T.Name="Click Delete"; T.RequiresHandle=false; T.Parent=L_Plr.Backpack
