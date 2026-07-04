@@ -437,7 +437,7 @@ _G.Hitbox_Size   = 15
 _G.Parts_Active  = { UpperTorso = false, HumanoidRootPart = false, LeftUpperArm = false, RightUpperArm = false, LeftUpperLeg = false, RightUpperLeg = false }
 _G.Visuals       = { Box = false, Names = false, Dist = false, Weapon = false, HealthBar = false, Tracers = false }
 _G.Combat        = { SilentAim = false, TriggerBot = false, RapidFire = false, NoRecoil = false }
-_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false }
+_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false, FlyChar = false, FlyCharSpeed = 40 }
 local DeletedObjects = {}
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -599,6 +599,13 @@ local function FlyCleanup()
     ClearSeatMovers(LastFlySeat)
     LastFlySeat=nil
 end
+local function CharFlyCleanup()
+    local char=L_Plr.Character
+    local hrp=char and char:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        local bv=hrp:FindFirstChild("JXJCF"); if bv then bv:Destroy() end
+    end
+end
 L_Plr.CharacterAdded:Connect(function()
     _G.Misc.FlyUp=false; _G.Misc.FlyDown=false
     ClearSeatMovers(LastFlySeat); LastFlySeat=nil
@@ -657,10 +664,22 @@ ValRow(MT,"Velocidad","Velocidad del speed hack (máx. 23)",16,function(v) _G.Mi
 IosRow(MT,"Full Bright","Ilumina todo el mapa",false,function(v) _G.Misc.FullBright=v end)
 SecLbl(MT,"  FLY EN MOTO")
 IosRow(MT,"Fly en Moto","Volar en moto con botones subir/bajar",false,function(v)
-    _G.Misc.FlyMoto=v; FlyBtns.Visible=v
-    if not v then _G.Misc.FlyUp=false; _G.Misc.FlyDown=false; FlyCleanup() end
+    _G.Misc.FlyMoto=v; FlyBtns.Visible=v or _G.Misc.FlyChar
+    if not v then
+        if not _G.Misc.FlyChar then _G.Misc.FlyUp=false; _G.Misc.FlyDown=false end
+        FlyCleanup()
+    end
 end)
 SliderRow(MT,"Vel. Moto","Desliza la barrita para ajustar",10,300,50,function(v) _G.Misc.FlyMotoSpeed=v end)
+SecLbl(MT,"  FLY PERSONAJE")
+IosRow(MT,"Fly Personaje","Vuela con tu personaje (▲/▼ + joystick)",false,function(v)
+    _G.Misc.FlyChar=v; FlyBtns.Visible=v or _G.Misc.FlyMoto
+    if not v then
+        if not _G.Misc.FlyMoto then _G.Misc.FlyUp=false; _G.Misc.FlyDown=false end
+        CharFlyCleanup()
+    end
+end)
+SliderRow(MT,"Vel. Personaje","Baja = menos detectable",10,120,40,function(v) _G.Misc.FlyCharSpeed=v end)
 SecLbl(MT,"  HERRAMIENTAS")
 ActBtn(MT,"🖱️  Click Delete Tool",Color3.fromRGB(34,160,60),function()
     local T=Instance.new("Tool"); T.Name="Click Delete"; T.RequiresHandle=false; T.Parent=L_Plr.Backpack
@@ -776,6 +795,28 @@ local function StartHub()
                     horiz=flat.Unit*(_G.Misc.FlyMotoSpeed*thr)
                 end
                 bv.Velocity=Vector3.new(horiz.X,vy,horiz.Z)
+            end
+        end
+        -- Fly personaje: física suave (sin teleports de CFrame = menos detectable)
+        if _G.Misc.FlyChar then
+            local char=L_Plr.Character
+            local hrp=char and char:FindFirstChild("HumanoidRootPart")
+            local hum=char and char:FindFirstChildOfClass("Humanoid")
+            if hrp and hum and not hum.SeatPart then
+                local bv=hrp:FindFirstChild("JXJCF")
+                if not bv then
+                    bv=Instance.new("BodyVelocity"); bv.Name="JXJCF"
+                    bv.MaxForce=Vector3.new(math.huge,math.huge,math.huge)
+                    bv.P=1200; bv.Parent=hrp
+                end
+                local vy=0
+                if _G.Misc.FlyUp then vy=_G.Misc.FlyCharSpeed elseif _G.Misc.FlyDown then vy=-_G.Misc.FlyCharSpeed end
+                local md=hum.MoveDirection
+                -- Suaviza el cambio de velocidad (movimiento natural, menos flags del anti-cheat)
+                local target=Vector3.new(md.X*_G.Misc.FlyCharSpeed,vy,md.Z*_G.Misc.FlyCharSpeed)
+                bv.Velocity=bv.Velocity:Lerp(target,0.25)
+            elseif hrp then
+                local bv=hrp:FindFirstChild("JXJCF"); if bv then bv:Destroy() end
             end
         end
     end)
