@@ -582,7 +582,7 @@ local fn=Instance.new("TextLabel",FT); fn.Size=UDim2.new(1,0,0,28); fn.Backgroun
 -- ════════ MISC ════════
 SecLbl(MT,"  MOVIMIENTO")
 IosRow(MT,"Speed Hack","Aumenta tu velocidad de caminar",false,function(v) _G.Misc.Speed_On=v end)
-ValRow(MT,"Velocidad","Velocidad del speed hack",16,function(v) _G.Misc.SpeedVal=v end)
+ValRow(MT,"Velocidad","Velocidad del speed hack (máx. 23)",16,function(v) _G.Misc.SpeedVal=math.min(v,23) end)
 IosRow(MT,"Full Bright","Ilumina todo el mapa",false,function(v) _G.Misc.FullBright=v end)
 SecLbl(MT,"  FLY EN MOTO")
 IosRow(MT,"Fly en Moto","Volar montado en moto (VehicleSeat)",false,function(v) _G.Misc.FlyMoto=v end)
@@ -648,7 +648,7 @@ local function StartHub()
     RunService.Heartbeat:Connect(function()
         -- Speed hack
         if _G.Misc.Speed_On and L_Plr.Character and L_Plr.Character:FindFirstChild("Humanoid") then
-            L_Plr.Character.Humanoid.WalkSpeed=_G.Misc.SpeedVal
+            L_Plr.Character.Humanoid.WalkSpeed=math.min(_G.Misc.SpeedVal,23)
         end
         -- Full bright
         if _G.Misc.FullBright then
