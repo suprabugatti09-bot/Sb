@@ -3,7 +3,7 @@ import { db, keysTable } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 
 const router = Router();
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "JEAN2024";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "jean010912@$";
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 function genPart(len = 4) {
