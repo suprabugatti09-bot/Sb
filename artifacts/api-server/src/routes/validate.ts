@@ -38,6 +38,13 @@ async function seedInitialKeys() {
   } catch {}
 }
 
+const BATCH3_KEYS = [
+  "JEAN-RR4A-PL93","JEAN-SS8B-QM15","JEAN-TT2C-RN37","JEAN-UU6D-SO59","JEAN-VV0E-TP81",
+  "JEAN-WW4F-UQ03","JEAN-XX8G-VR25","JEAN-YY2H-WS47","JEAN-ZZ6I-XT69","JEAN-AQ0J-YU91",
+  "JEAN-BR4K-ZV13","JEAN-CS8L-AW35","JEAN-DT2M-BX57","JEAN-EU6N-CY79","JEAN-FV0O-DZ01",
+  "JEAN-GW4P-EA23","JEAN-HX8Q-FB45","JEAN-IY2R-GC67","JEAN-JZ6S-HD89","JEAN-KA0T-IE01",
+];
+
 async function seedBatch2Keys() {
   try {
     const rows = BATCH2_KEYS.map(k => ({
@@ -50,8 +57,21 @@ async function seedBatch2Keys() {
   } catch {}
 }
 
+async function seedBatch3Keys() {
+  try {
+    const rows = BATCH3_KEYS.map(k => ({
+      key: k,
+      isActive: true,
+      maxUses: 1,
+      note: "batch3",
+    }));
+    await db.insert(keysTable).values(rows).onConflictDoNothing();
+  } catch {}
+}
+
 seedInitialKeys();
 seedBatch2Keys();
+seedBatch3Keys();
 
 router.get("/validate", async (req, res) => {
   const { key, username } = req.query as { key: string; username: string };
