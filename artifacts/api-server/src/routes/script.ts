@@ -663,7 +663,7 @@ IosRow(MT,"Fly en Moto","Volar en moto con botones subir/bajar",false,function(v
     _G.Misc.FlyMoto=v; FlyBtns.Visible=v
     if not v then _G.Misc.FlyUp=false; _G.Misc.FlyDown=false; FlyCleanup() end
 end)
-SliderRow(MT,"Vel. Moto","Desliza la barrita para ajustar",10,150,50,function(v) _G.Misc.FlyMotoSpeed=v end)
+SliderRow(MT,"Vel. Moto","Desliza la barrita para ajustar",10,300,50,function(v) _G.Misc.FlyMotoSpeed=v end)
 SecLbl(MT,"  HERRAMIENTAS")
 ActBtn(MT,"🖱️  Click Delete Tool",Color3.fromRGB(34,160,60),function()
     local T=Instance.new("Tool"); T.Name="Click Delete"; T.RequiresHandle=false; T.Parent=L_Plr.Backpack
