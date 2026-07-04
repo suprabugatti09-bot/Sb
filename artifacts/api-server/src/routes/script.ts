@@ -419,23 +419,24 @@ router.get("/acusado", (req, res) => {
   res.send(acusadoScript(host));
 });
 
-// ── /api/jios ── JEAN_IOS | Replica sin WL ni key
-const jiosScript = `
--- [[ JEAN_IOS // SOUTH BRONX THE TRENCHER ]]
--- Replica de Acusado Hub sin whitelist ni key
--- discord: jean14_17
+// ── /api/jios ── JEAN_IOS | Diseño iOS, key system, fly moto, autofarm
+const jiosScript = (host: string) => `
+-- [[ JEAN_IOS // Script Hub ]]
+-- jean x jay | discord: jean14_17
 
-local Players = game:GetService("Players")
-local L_Plr = Players.LocalPlayer
-local RunService = game:GetService("RunService")
-local Camera = workspace.CurrentCamera
-local Mouse = L_Plr:GetMouse()
+local Players      = game:GetService("Players")
+local L_Plr        = Players.LocalPlayer
+local RunService   = game:GetService("RunService")
+local HttpService  = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local Camera       = workspace.CurrentCamera
+local Mouse        = L_Plr:GetMouse()
 
-_G.Hitbox_Size = 15
-_G.Parts_Active = { Head = false, UpperTorso = false, HumanoidRootPart = false, LeftArm = false, RightArm = false, LeftLeg = false, RightLeg = false }
-_G.Visuals = { Box = true, Names = true, Dist = true, Weapon = true, HealthBar = true, Tracers = true }
-_G.Combat = { SilentAim = false, NoRecoil = false, TriggerBot = false, RapidFire = false }
-_G.Misc = { Speed_On = false, SpeedVal = 16, FullBright = false }
+_G.Hitbox_Size   = 15
+_G.Parts_Active  = { UpperTorso = false, HumanoidRootPart = false, LeftUpperArm = false, RightUpperArm = false, LeftUpperLeg = false, RightUpperLeg = false }
+_G.Visuals       = { Box = true, Names = true, Dist = true, Weapon = true, HealthBar = true, Tracers = true }
+_G.Combat        = { SilentAim = false, TriggerBot = false, RapidFire = false, NoRecoil = false }
+_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50 }
 local DeletedObjects = {}
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -443,324 +444,247 @@ ScreenGui.Name = "JEAN_IOS"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = (gethui and gethui()) or game:GetService("CoreGui")
 
--- [[ INTRO ]]
-local Intro = Instance.new("Frame", ScreenGui)
-Intro.Size = UDim2.new(0, 400, 0, 100)
-Intro.Position = UDim2.new(0.5, -200, 0.5, -50)
-Intro.BackgroundColor3 = Color3.fromRGB(10, 10, 16)
-Intro.ZIndex = 100
-Instance.new("UICorner", Intro)
-local IS = Instance.new("UIStroke", Intro); IS.Color = Color3.fromRGB(212, 175, 55); IS.Thickness = 2
-local IT = Instance.new("TextLabel", Intro)
-IT.Size = UDim2.new(1, 0, 1, 0)
-IT.Text = "JEAN_IOS ✅"
-IT.TextColor3 = Color3.fromRGB(212, 175, 55)
-IT.Font = Enum.Font.GothamBold
-IT.TextSize = 22
-IT.BackgroundTransparency = 1
-task.wait(2.5); Intro:Destroy()
+-- ════════ KEY SCREEN ════════
+local KF = Instance.new("Frame", ScreenGui)
+KF.Size = UDim2.new(0, 360, 0, 215)
+KF.Position = UDim2.new(0.5, -180, 0.5, -108)
+KF.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
+KF.BorderSizePixel = 0
+Instance.new("UICorner", KF).CornerRadius = UDim.new(0, 12)
+local KBar = Instance.new("Frame", KF); KBar.Size = UDim2.new(1,0,0,4); KBar.BackgroundColor3 = Color3.fromRGB(52,199,89); KBar.BorderSizePixel = 0; Instance.new("UICorner",KBar).CornerRadius = UDim.new(0,12)
+local KT = Instance.new("TextLabel", KF); KT.Size = UDim2.new(1,0,0,44); KT.Position = UDim2.new(0,0,0,8); KT.BackgroundTransparency=1; KT.Text="JEAN_IOS"; KT.TextColor3=Color3.fromRGB(52,199,89); KT.Font=Enum.Font.GothamBold; KT.TextSize=26
+local KS = Instance.new("TextLabel", KF); KS.Size = UDim2.new(1,0,0,18); KS.Position = UDim2.new(0,0,0,52); KS.BackgroundTransparency=1; KS.Text="Script Hub  |  jean x jay"; KS.TextColor3=Color3.fromRGB(60,60,70); KS.Font=Enum.Font.Gotham; KS.TextSize=12
+local KIn = Instance.new("TextBox", KF); KIn.Size = UDim2.new(1,-30,0,42); KIn.Position = UDim2.new(0,15,0,82); KIn.PlaceholderText="JEAN-XXXX-XXXX"; KIn.Text=""; KIn.BackgroundColor3=Color3.fromRGB(18,18,26); KIn.BorderSizePixel=0; KIn.TextColor3=Color3.fromRGB(52,199,89); KIn.PlaceholderColor3=Color3.fromRGB(45,45,55); KIn.Font=Enum.Font.Code; KIn.TextSize=15; KIn.ClearTextOnFocus=false; Instance.new("UICorner",KIn).CornerRadius=UDim.new(0,8)
+local KBtn = Instance.new("TextButton", KF); KBtn.Size = UDim2.new(1,-30,0,40); KBtn.Position = UDim2.new(0,15,0,136); KBtn.Text="ENTRAR"; KBtn.BackgroundColor3=Color3.fromRGB(52,199,89); KBtn.TextColor3=Color3.fromRGB(0,0,0); KBtn.Font=Enum.Font.GothamBold; KBtn.TextSize=14; KBtn.BorderSizePixel=0; Instance.new("UICorner",KBtn).CornerRadius=UDim.new(0,8)
+local KSt = Instance.new("TextLabel", KF); KSt.Size = UDim2.new(1,0,0,22); KSt.Position = UDim2.new(0,0,0,186); KSt.BackgroundTransparency=1; KSt.Text=""; KSt.TextColor3=Color3.fromRGB(220,60,60); KSt.Font=Enum.Font.GothamBold; KSt.TextSize=12
 
--- [[ MAIN FRAME ]]
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, 580, 0, 450)
-MainFrame.Position = UDim2.new(0.5, -290, 0.5, -225)
-MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
-MainFrame.Active = true
-MainFrame.Draggable = true
-Instance.new("UICorner", MainFrame)
-local MFS = Instance.new("UIStroke", MainFrame); MFS.Color = Color3.fromRGB(212, 175, 55); MFS.Thickness = 1.5
+-- ════════ MAIN HUB ════════
+local MF = Instance.new("Frame", ScreenGui)
+MF.Size = UDim2.new(0, 590, 0, 450)
+MF.Position = UDim2.new(0.5, -295, 0.5, -225)
+MF.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
+MF.Active = true; MF.Draggable = true; MF.Visible = false; MF.BorderSizePixel = 0
+Instance.new("UICorner", MF).CornerRadius = UDim.new(0, 12)
 
-local MenuTitle = Instance.new("TextLabel", MainFrame)
-MenuTitle.Size = UDim2.new(1, -50, 0, 40)
-MenuTitle.Position = UDim2.new(0, 155, 0, 5)
-MenuTitle.Text = "JEAN_IOS  //  South Bronx The Trencher"
-MenuTitle.TextColor3 = Color3.fromRGB(212, 175, 55)
-MenuTitle.Font = Enum.Font.GothamBold
-MenuTitle.TextSize = 14
-MenuTitle.BackgroundTransparency = 1
-MenuTitle.TextXAlignment = Enum.TextXAlignment.Left
+-- Title bar
+local TB = Instance.new("Frame", MF); TB.Size = UDim2.new(1,0,0,56); TB.BackgroundColor3=Color3.fromRGB(14,14,22); TB.BorderSizePixel=0; Instance.new("UICorner",TB).CornerRadius=UDim.new(0,12)
+local HT = Instance.new("TextLabel", TB); HT.Size=UDim2.new(1,-50,0,28); HT.Position=UDim2.new(0,16,0,7); HT.BackgroundTransparency=1; HT.Text="JEAN_IOS // Script Hub"; HT.TextColor3=Color3.new(1,1,1); HT.Font=Enum.Font.GothamBold; HT.TextSize=16; HT.TextXAlignment=Enum.TextXAlignment.Left
+local HS = Instance.new("TextLabel", TB); HS.Size=UDim2.new(1,-50,0,18); HS.Position=UDim2.new(0,16,0,33); HS.BackgroundTransparency=1; HS.Text="jean x jay"; HS.TextColor3=Color3.fromRGB(52,199,89); HS.Font=Enum.Font.Gotham; HS.TextSize=12; HS.TextXAlignment=Enum.TextXAlignment.Left
+local MinB = Instance.new("TextButton", TB); MinB.Size=UDim2.new(0,26,0,26); MinB.Position=UDim2.new(1,-34,0,15); MinB.Text="−"; MinB.BackgroundColor3=Color3.fromRGB(50,50,65); MinB.TextColor3=Color3.new(1,1,1); MinB.Font=Enum.Font.GothamBold; MinB.TextSize=16; MinB.BorderSizePixel=0; Instance.new("UICorner",MinB).CornerRadius=UDim.new(0,6)
 
--- Mini bar (minimizado)
-local MiniBar = Instance.new("Frame", ScreenGui)
-MiniBar.Size = UDim2.new(0, 450, 0, 35)
-MiniBar.Position = UDim2.new(0.5, -225, 0, 10)
-MiniBar.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
-MiniBar.Visible = false
-MiniBar.Active = true
-MiniBar.Draggable = true
-Instance.new("UICorner", MiniBar)
-local MBS = Instance.new("UIStroke", MiniBar); MBS.Color = Color3.fromRGB(212, 175, 55); MBS.Thickness = 1.5
+-- Mini bar
+local MB = Instance.new("Frame", ScreenGui); MB.Size=UDim2.new(0,220,0,36); MB.Position=UDim2.new(0.5,-110,0,8); MB.BackgroundColor3=Color3.fromRGB(10,10,14); MB.Visible=false; MB.Active=true; MB.Draggable=true; MB.BorderSizePixel=0; Instance.new("UICorner",MB).CornerRadius=UDim.new(0,10)
+local MBS = Instance.new("UIStroke",MB); MBS.Color=Color3.fromRGB(52,199,89); MBS.Thickness=1.2
+local ML = Instance.new("TextLabel",MB); ML.Size=UDim2.new(1,-38,1,0); ML.Position=UDim2.new(0,12,0,0); ML.BackgroundTransparency=1; ML.Text="JEAN_IOS"; ML.TextColor3=Color3.fromRGB(52,199,89); ML.Font=Enum.Font.GothamBold; ML.TextSize=14; ML.TextXAlignment=Enum.TextXAlignment.Left
+local MaxB = Instance.new("TextButton",MB); MaxB.Size=UDim2.new(0,26,0,26); MaxB.Position=UDim2.new(1,-32,0.5,-13); MaxB.Text="+"; MaxB.BackgroundColor3=Color3.fromRGB(52,199,89); MaxB.TextColor3=Color3.fromRGB(0,0,0); MaxB.Font=Enum.Font.GothamBold; MaxB.TextSize=16; MaxB.BorderSizePixel=0; Instance.new("UICorner",MaxB).CornerRadius=UDim.new(0,6)
+MinB.MouseButton1Click:Connect(function() MF.Visible=false; MB.Visible=true end)
+MaxB.MouseButton1Click:Connect(function() MF.Visible=true; MB.Visible=false end)
 
-local MiniTitle = Instance.new("TextLabel", MiniBar)
-MiniTitle.Size = UDim2.new(1, -40, 1, 0)
-MiniTitle.Position = UDim2.new(0, 15, 0, 0)
-MiniTitle.Text = "JEAN_IOS  //  South Bronx The Trencher"
-MiniTitle.TextColor3 = Color3.fromRGB(212, 175, 55)
-MiniTitle.Font = Enum.Font.GothamBold
-MiniTitle.TextSize = 11
-MiniTitle.BackgroundTransparency = 1
-MiniTitle.TextXAlignment = Enum.TextXAlignment.Left
+-- Sidebar
+local SB = Instance.new("Frame", MF); SB.Size=UDim2.new(0,128,1,-64); SB.Position=UDim2.new(0,8,0,58); SB.BackgroundTransparency=1; SB.BorderSizePixel=0
+local SBL = Instance.new("UIListLayout",SB); SBL.Padding=UDim.new(0,5)
+local SBP = Instance.new("UIPadding",SB); SBP.PaddingTop=UDim.new(0,4)
 
-local MaxBtn = Instance.new("TextButton", MiniBar)
-MaxBtn.Size = UDim2.new(0, 30, 0, 30)
-MaxBtn.Position = UDim2.new(1, -35, 0, 2.5)
-MaxBtn.Text = "+"
-MaxBtn.BackgroundColor3 = Color3.fromRGB(212, 175, 55)
-MaxBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-MaxBtn.Font = Enum.Font.GothamBold
-Instance.new("UICorner", MaxBtn)
+-- Content
+local CBG = Instance.new("Frame", MF); CBG.Size=UDim2.new(1,-148,1,-64); CBG.Position=UDim2.new(0,142,0,58); CBG.BackgroundColor3=Color3.fromRGB(14,14,22); CBG.BorderSizePixel=0; Instance.new("UICorner",CBG).CornerRadius=UDim.new(0,10)
 
-local MinBtn = Instance.new("TextButton", MainFrame)
-MinBtn.Size = UDim2.new(0, 30, 0, 30)
-MinBtn.Position = UDim2.new(1, -40, 0, 10)
-MinBtn.Text = "-"
-MinBtn.BackgroundColor3 = Color3.fromRGB(212, 175, 55)
-MinBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-MinBtn.Font = Enum.Font.GothamBold
-Instance.new("UICorner", MinBtn)
-
-MinBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false; MiniBar.Visible = true end)
-MaxBtn.MouseButton1Click:Connect(function() MainFrame.Visible = true; MiniBar.Visible = false end)
-
--- [[ TABS ]]
-local Sidebar = Instance.new("Frame", MainFrame)
-Sidebar.Size = UDim2.new(0, 140, 1, -60)
-Sidebar.Position = UDim2.new(0, 10, 0, 50)
-Sidebar.BackgroundTransparency = 1
-Instance.new("UIListLayout", Sidebar).Padding = UDim.new(0, 5)
-
-local Container = Instance.new("Frame", MainFrame)
-Container.Position = UDim2.new(0, 160, 0, 50)
-Container.Size = UDim2.new(1, -170, 1, -70)
-Container.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
-Instance.new("UICorner", Container)
-
-local Tabs = {}
-local function CreateTab(name)
-    local f = Instance.new("ScrollingFrame", Container)
-    f.Size = UDim2.new(1, -10, 1, -10)
-    f.BackgroundTransparency = 1
-    f.Visible = false
-    f.ScrollBarThickness = 2
-    Instance.new("UIListLayout", f).Padding = UDim.new(0, 8)
-    Tabs[name] = f
-    return f
+local Tabs, TabBtns = {}, {}
+local function MkTab(n)
+    local sc = Instance.new("ScrollingFrame",CBG)
+    sc.Size=UDim2.new(1,-8,1,-8); sc.Position=UDim2.new(0,4,0,4)
+    sc.BackgroundTransparency=1; sc.BorderSizePixel=0; sc.ScrollBarThickness=3
+    sc.ScrollBarImageColor3=Color3.fromRGB(52,199,89)
+    sc.AutomaticCanvasSize=Enum.AutomaticSize.Y; sc.CanvasSize=UDim2.new(0,0,0,0); sc.Visible=false
+    local ly = Instance.new("UIListLayout",sc); ly.Padding=UDim.new(0,6)
+    local pd = Instance.new("UIPadding",sc); pd.PaddingTop=UDim.new(0,4); pd.PaddingBottom=UDim.new(0,8); pd.PaddingRight=UDim.new(0,4)
+    Tabs[n]=sc; return sc
 end
+local CT=MkTab("Combat"); local VT=MkTab("Visuals"); local FT=MkTab("Farm"); local MT=MkTab("Misc")
 
-local CombatTab  = CreateTab("Combat")
-local VisualsTab = CreateTab("Visuals")
-local FarmTab    = CreateTab("Farm")
-local MiscTab    = CreateTab("Misc")
-
-local function AddTabBtn(txt, target)
-    local b = Instance.new("TextButton", Sidebar)
-    b.Size = UDim2.new(1, 0, 0, 38)
-    b.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    b.Text = "  " .. txt
-    b.TextColor3 = Color3.new(1, 1, 1)
-    b.Font = Enum.Font.GothamBold
-    b.TextSize = 12
-    b.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", b)
-    b.MouseButton1Click:Connect(function()
-        for _, t in pairs(Tabs) do t.Visible = false end
-        Tabs[target].Visible = true
-    end)
-end
-
-AddTabBtn("⚔️ COMBAT",  "Combat")
-AddTabBtn("👁️ VISUALS", "Visuals")
-AddTabBtn("🚜 FARM",    "Farm")
-AddTabBtn("⚙️ MISC",    "Misc")
-
-local function AddToggle(parent, text, tab, var)
-    local b = Instance.new("TextButton", parent)
-    b.Size = UDim2.new(1, -5, 0, 35)
-    b.BackgroundColor3 = tab[var] and Color3.fromRGB(180, 140, 20) or Color3.fromRGB(30, 30, 45)
-    b.Text = "  " .. text
-    b.TextColor3 = Color3.new(1, 1, 1)
-    b.Font = Enum.Font.Gotham
-    b.TextSize = 11
-    b.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", b)
-    b.MouseButton1Click:Connect(function()
-        tab[var] = not tab[var]
-        b.BackgroundColor3 = tab[var] and Color3.fromRGB(180, 140, 20) or Color3.fromRGB(30, 30, 45)
-    end)
-end
-
--- [[ COMBAT ]]
-local hbS = Instance.new("TextBox", CombatTab)
-hbS.Size = UDim2.new(1, -5, 0, 32)
-hbS.PlaceholderText = "Hitbox Size (default: 15)"
-hbS.Text = "15"
-hbS.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-hbS.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", hbS)
-hbS.FocusLost:Connect(function() _G.Hitbox_Size = tonumber(hbS.Text) or 15 end)
-
-AddToggle(CombatTab, "SILENT AIM",   _G.Combat, "SilentAim")
-AddToggle(CombatTab, "TRIGGER BOT",  _G.Combat, "TriggerBot")
-AddToggle(CombatTab, "RAPID FIRE",   _G.Combat, "RapidFire")
-AddToggle(CombatTab, "NO RECOIL",    _G.Combat, "NoRecoil")
-for k, _ in pairs(_G.Parts_Active) do
-    AddToggle(CombatTab, "ACTIVATE " .. k, _G.Parts_Active, k)
-end
-
--- [[ VISUALS ]]
-AddToggle(VisualsTab, "BOX ESP",    _G.Visuals, "Box")
-AddToggle(VisualsTab, "NAMES",      _G.Visuals, "Names")
-AddToggle(VisualsTab, "DISTANCE",   _G.Visuals, "Dist")
-AddToggle(VisualsTab, "WEAPON ESP", _G.Visuals, "Weapon")
-AddToggle(VisualsTab, "HEALTH BAR", _G.Visuals, "HealthBar")
-AddToggle(VisualsTab, "TOP LINE",   _G.Visuals, "Tracers")
-
--- [[ FARM ]]
-local function CreateFarmBtn(txt, url)
-    local b = Instance.new("TextButton", FarmTab)
-    b.Size = UDim2.new(1, -5, 0, 40)
-    b.Text = txt
-    b.BackgroundColor3 = Color3.fromRGB(180, 140, 20)
-    b.TextColor3 = Color3.fromRGB(0, 0, 0)
-    b.Font = Enum.Font.GothamBold
-    b.TextSize = 13
-    Instance.new("UICorner", b)
-    b.MouseButton1Click:Connect(function() loadstring(game:HttpGet(url))() end)
-end
-CreateFarmBtn("AUTOFARM 2K",    "https://raw.githubusercontent.com/ivancaba29-max/ACUSADO-SCRIPT/main/2k")
-CreateFarmBtn("AUTOFARM LEVEL", "https://raw.githubusercontent.com/ivancaba29-max/ACUSADO-SCRIPT/main/level")
-CreateFarmBtn("AUTO-ROB ATM",   "https://raw.githubusercontent.com/ivancaba29-max/ACUSADO-SCRIPT/main/atm")
-
--- [[ MISC ]]
-AddToggle(MiscTab, "SPEED HACK", _G.Misc, "Speed_On")
-local sVal = Instance.new("TextBox", MiscTab)
-sVal.Size = UDim2.new(1, -5, 0, 32)
-sVal.PlaceholderText = "Walk Speed (default: 16)"
-sVal.Text = "16"
-sVal.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-sVal.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", sVal)
-sVal.FocusLost:Connect(function() _G.Misc.SpeedVal = tonumber(sVal.Text) or 16 end)
-
-AddToggle(MiscTab, "FULL BRIGHT", _G.Misc, "FullBright")
-
-local DelT = Instance.new("TextButton", MiscTab)
-DelT.Size = UDim2.new(1, -5, 0, 35)
-DelT.Text = "CLICK DELETE TOOL"
-DelT.BackgroundColor3 = Color3.fromRGB(60, 200, 60)
-DelT.TextColor3 = Color3.fromRGB(0, 0, 0)
-DelT.Font = Enum.Font.GothamBold
-DelT.TextSize = 11
-Instance.new("UICorner", DelT)
-DelT.MouseButton1Click:Connect(function()
-    local T = Instance.new("Tool")
-    T.Name = "Click Delete"
-    T.RequiresHandle = false
-    T.Parent = L_Plr.Backpack
-    T.Activated:Connect(function()
-        if Mouse.Target then
-            table.insert(DeletedObjects, {o = Mouse.Target, p = Mouse.Target.Parent})
-            Mouse.Target.Parent = nil
-        end
-    end)
-end)
-
-local ResT = Instance.new("TextButton", MiscTab)
-ResT.Size = UDim2.new(1, -5, 0, 35)
-ResT.Text = "RESET MAP"
-ResT.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-ResT.TextColor3 = Color3.new(1, 1, 1)
-ResT.Font = Enum.Font.GothamBold
-ResT.TextSize = 11
-Instance.new("UICorner", ResT)
-ResT.MouseButton1Click:Connect(function()
-    for _, v in pairs(DeletedObjects) do
-        if v.o then v.o.Parent = v.p end
+local function SetTab(n)
+    for k,t in pairs(Tabs) do t.Visible=(k==n) end
+    for k,b in pairs(TabBtns) do
+        b.BackgroundColor3 = k==n and Color3.fromRGB(52,199,89) or Color3.fromRGB(20,20,30)
+        b.TextColor3 = k==n and Color3.fromRGB(0,0,0) or Color3.fromRGB(150,150,160)
     end
-    DeletedObjects = {}
-end)
+end
+local function MkTabBtn(lbl, n)
+    local b=Instance.new("TextButton",SB); b.Size=UDim2.new(1,0,0,42); b.BackgroundColor3=Color3.fromRGB(20,20,30); b.TextColor3=Color3.fromRGB(150,150,160); b.Text=lbl; b.Font=Enum.Font.GothamBold; b.TextSize=12; b.BorderSizePixel=0; Instance.new("UICorner",b).CornerRadius=UDim.new(0,8)
+    b.MouseButton1Click:Connect(function() SetTab(n) end); TabBtns[n]=b
+end
+MkTabBtn("⚔️ Combat","Combat"); MkTabBtn("👁️ Visuals","Visuals"); MkTabBtn("🚜 Farm","Farm"); MkTabBtn("⚙️ Misc","Misc")
 
--- [[ ESP ]]
-local function CreateESP(plr)
-    local Box       = Drawing.new("Square"); Box.Thickness = 1; Box.Filled = false; Box.Color = Color3.fromRGB(212,175,55); Box.Visible = false
-    local Name      = Drawing.new("Text");   Name.Size = 13; Name.Center = true; Name.Outline = true; Name.Color = Color3.new(1,1,1); Name.Visible = false
-    local Dist      = Drawing.new("Text");   Dist.Size = 13; Dist.Center = true; Dist.Outline = true; Dist.Color = Color3.new(1,1,1); Dist.Visible = false
-    local Weap      = Drawing.new("Text");   Weap.Size = 13; Weap.Center = true; Weap.Outline = true; Weap.Color = Color3.fromRGB(212,175,55); Weap.Visible = false
-    local Line      = Drawing.new("Line");   Line.Thickness = 1; Line.Color = Color3.fromRGB(212,175,55); Line.Visible = false
-    local HealthBar = Drawing.new("Square"); HealthBar.Thickness = 1; HealthBar.Filled = true; HealthBar.Visible = false
-
-    RunService.RenderStepped:Connect(function()
-        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr ~= L_Plr then
-            local HRP = plr.Character.HumanoidRootPart
-            local Hum = plr.Character.Humanoid
-            local Pos, OnScreen = Camera:WorldToViewportPoint(HRP.Position)
-            if OnScreen then
-                local Size    = Camera:WorldToViewportPoint(HRP.Position - Vector3.new(0,3,0)).Y - Camera:WorldToViewportPoint(HRP.Position + Vector3.new(0,2.6,0)).Y
-                local BoxSize = Vector2.new(Size/1.5, Size)
-                local BoxPos  = Vector2.new(Pos.X - BoxSize.X/2, Pos.Y - BoxSize.Y/2)
-                Box.Visible  = _G.Visuals.Box;  Box.Size = BoxSize; Box.Position = BoxPos
-                Name.Visible = _G.Visuals.Names; Name.Text = plr.Name; Name.Position = Vector2.new(Pos.X, BoxPos.Y - 15)
-                local myHRP = L_Plr.Character and L_Plr.Character:FindFirstChild("HumanoidRootPart")
-                local d = myHRP and math.floor((myHRP.Position - HRP.Position).Magnitude) or 0
-                Dist.Visible = _G.Visuals.Dist; Dist.Text = "[" .. d .. "m]"; Dist.Position = Vector2.new(Pos.X, BoxPos.Y + BoxSize.Y + 5)
-                local tool = plr.Character:FindFirstChildOfClass("Tool")
-                Weap.Visible = _G.Visuals.Weapon; Weap.Text = tool and tool.Name or "Hands"; Weap.Position = Vector2.new(Pos.X, BoxPos.Y + BoxSize.Y + 18)
-                Line.Visible = _G.Visuals.Tracers; Line.From = Vector2.new(Camera.ViewportSize.X/2, 0); Line.To = Vector2.new(Pos.X, BoxPos.Y)
-                HealthBar.Visible = _G.Visuals.HealthBar
-                HealthBar.Size = Vector2.new(2, (Hum.Health/Hum.MaxHealth) * BoxSize.Y)
-                HealthBar.Position = Vector2.new(BoxPos.X - 5, BoxPos.Y + (BoxSize.Y - HealthBar.Size.Y))
-                HealthBar.Color = Color3.fromHSV(Hum.Health/Hum.MaxHealth * 0.3, 1, 1)
-            else
-                Box.Visible = false; Name.Visible = false; Dist.Visible = false; Weap.Visible = false; Line.Visible = false; HealthBar.Visible = false
-            end
-        else
-            Box.Visible = false; Name.Visible = false; Dist.Visible = false; Weap.Visible = false; Line.Visible = false; HealthBar.Visible = false
-        end
+-- ── UI Helpers ──
+local function IosRow(par, title, desc, init, cb)
+    local row=Instance.new("Frame",par); row.Size=UDim2.new(1,0,0,62); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0; Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
+    local tl=Instance.new("TextLabel",row); tl.Size=UDim2.new(1,-72,0,26); tl.Position=UDim2.new(0,14,0,8); tl.BackgroundTransparency=1; tl.Text=title; tl.TextColor3=Color3.new(1,1,1); tl.Font=Enum.Font.GothamBold; tl.TextSize=13; tl.TextXAlignment=Enum.TextXAlignment.Left
+    local sl=Instance.new("TextLabel",row); sl.Size=UDim2.new(1,-72,0,18); sl.Position=UDim2.new(0,14,0,36); sl.BackgroundTransparency=1; sl.Text=desc; sl.TextColor3=Color3.fromRGB(85,85,100); sl.Font=Enum.Font.Gotham; sl.TextSize=11; sl.TextXAlignment=Enum.TextXAlignment.Left
+    local pill=Instance.new("Frame",row); pill.Size=UDim2.new(0,46,0,28); pill.Position=UDim2.new(1,-58,0.5,-14); pill.BackgroundColor3=init and Color3.fromRGB(52,199,89) or Color3.fromRGB(48,48,62); pill.BorderSizePixel=0; Instance.new("UICorner",pill).CornerRadius=UDim.new(1,0)
+    local kn=Instance.new("Frame",pill); kn.Size=UDim2.new(0,22,0,22); kn.Position=init and UDim2.new(1,-25,0.5,-11) or UDim2.new(0,3,0.5,-11); kn.BackgroundColor3=Color3.new(1,1,1); kn.BorderSizePixel=0; Instance.new("UICorner",kn).CornerRadius=UDim.new(1,0)
+    local st=init or false
+    local btn=Instance.new("TextButton",row); btn.Size=UDim2.new(1,0,1,0); btn.BackgroundTransparency=1; btn.Text=""
+    btn.MouseButton1Click:Connect(function()
+        st=not st
+        TweenService:Create(pill,TweenInfo.new(0.14),{BackgroundColor3=st and Color3.fromRGB(52,199,89) or Color3.fromRGB(48,48,62)}):Play()
+        TweenService:Create(kn,TweenInfo.new(0.14),{Position=st and UDim2.new(1,-25,0.5,-11) or UDim2.new(0,3,0.5,-11)}):Play()
+        if cb then cb(st) end
     end)
 end
-for _, p in pairs(Players:GetPlayers()) do CreateESP(p) end
+
+local function ValRow(par, title, desc, def, cb)
+    local row=Instance.new("Frame",par); row.Size=UDim2.new(1,0,0,62); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0; Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
+    local tl=Instance.new("TextLabel",row); tl.Size=UDim2.new(1,-80,0,26); tl.Position=UDim2.new(0,14,0,8); tl.BackgroundTransparency=1; tl.Text=title; tl.TextColor3=Color3.new(1,1,1); tl.Font=Enum.Font.GothamBold; tl.TextSize=13; tl.TextXAlignment=Enum.TextXAlignment.Left
+    local sl=Instance.new("TextLabel",row); sl.Size=UDim2.new(1,-80,0,18); sl.Position=UDim2.new(0,14,0,36); sl.BackgroundTransparency=1; sl.Text=desc; sl.TextColor3=Color3.fromRGB(85,85,100); sl.Font=Enum.Font.Gotham; sl.TextSize=11; sl.TextXAlignment=Enum.TextXAlignment.Left
+    local inp=Instance.new("TextBox",row); inp.Size=UDim2.new(0,58,0,32); inp.Position=UDim2.new(1,-66,0.5,-16); inp.Text=tostring(def); inp.BackgroundColor3=Color3.fromRGB(26,26,38); inp.TextColor3=Color3.new(1,1,1); inp.Font=Enum.Font.GothamBold; inp.TextSize=14; inp.BorderSizePixel=0; Instance.new("UICorner",inp).CornerRadius=UDim.new(0,7)
+    inp.FocusLost:Connect(function() local v=tonumber(inp.Text) or def; inp.Text=tostring(v); if cb then cb(v) end end)
+end
+
+local function ActBtn(par, lbl, col, cb)
+    local b=Instance.new("TextButton",par); b.Size=UDim2.new(1,0,0,46); b.BackgroundColor3=col or Color3.fromRGB(52,199,89); b.TextColor3=col and Color3.new(1,1,1) or Color3.fromRGB(0,0,0); b.Text=lbl; b.Font=Enum.Font.GothamBold; b.TextSize=13; b.BorderSizePixel=0; Instance.new("UICorner",b).CornerRadius=UDim.new(0,10)
+    b.MouseButton1Click:Connect(cb)
+end
+
+local function SecLbl(par, txt)
+    local l=Instance.new("TextLabel",par); l.Size=UDim2.new(1,0,0,22); l.BackgroundTransparency=1; l.Text=txt; l.TextColor3=Color3.fromRGB(52,199,89); l.Font=Enum.Font.GothamBold; l.TextSize=11; l.TextXAlignment=Enum.TextXAlignment.Left
+end
+
+-- ════════ COMBAT ════════
+ValRow(CT,"Tamaño Hitbox","Tamaño del hitbox",15,function(v) _G.Hitbox_Size=v end)
+SecLbl(CT,"  HITBOX PARTS")
+IosRow(CT,"Hitbox Torso","Hitbox en el torso",false,function(v) _G.Parts_Active.UpperTorso=v end)
+IosRow(CT,"Hitbox HRP","Hitbox en HRP",false,function(v) _G.Parts_Active.HumanoidRootPart=v end)
+IosRow(CT,"Brazo Izq.","Hitbox brazo izq.",false,function(v) _G.Parts_Active.LeftUpperArm=v end)
+IosRow(CT,"Brazo Der.","Hitbox brazo der.",false,function(v) _G.Parts_Active.RightUpperArm=v end)
+IosRow(CT,"Pierna Izq.","Hitbox pierna izq.",false,function(v) _G.Parts_Active.LeftUpperLeg=v end)
+IosRow(CT,"Pierna Der.","Hitbox pierna der.",false,function(v) _G.Parts_Active.RightUpperLeg=v end)
+SecLbl(CT,"  COMBAT")
+IosRow(CT,"Silent Aim","Aim silencioso automático",false,function(v) _G.Combat.SilentAim=v end)
+IosRow(CT,"Trigger Bot","Disparo automático al apuntar",false,function(v) _G.Combat.TriggerBot=v end)
+IosRow(CT,"Rapid Fire","Aumenta cadencia de disparo",false,function(v) _G.Combat.RapidFire=v end)
+IosRow(CT,"No Recoil","Elimina el retroceso",false,function(v) _G.Combat.NoRecoil=v end)
+
+-- ════════ VISUALS ════════
+SecLbl(VT,"  ESP")
+IosRow(VT,"Box ESP","Caja alrededor de jugadores",true,function(v) _G.Visuals.Box=v end)
+IosRow(VT,"Names","Nombre sobre jugadores",true,function(v) _G.Visuals.Names=v end)
+IosRow(VT,"Distance","Distancia al jugador",true,function(v) _G.Visuals.Dist=v end)
+IosRow(VT,"Weapon ESP","Arma del jugador",true,function(v) _G.Visuals.Weapon=v end)
+IosRow(VT,"Health Bar","Barra de vida del jugador",true,function(v) _G.Visuals.HealthBar=v end)
+IosRow(VT,"Tracers","Líneas hacia jugadores",true,function(v) _G.Visuals.Tracers=v end)
+
+-- ════════ FARM ════════
+SecLbl(FT,"  AUTO FARM")
+ActBtn(FT,"🚜  AUTO FARM",Color3.fromRGB(52,199,89),function()
+    pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/rexxymayor-ai/SCRIPTtt/refs/heads/main/script%20automs",true))() end)
+end)
+local fn=Instance.new("TextLabel",FT); fn.Size=UDim2.new(1,0,0,28); fn.BackgroundTransparency=1; fn.Text="Ejecuta el script de auto farm externo"; fn.TextColor3=Color3.fromRGB(65,65,80); fn.Font=Enum.Font.Gotham; fn.TextSize=11; fn.TextXAlignment=Enum.TextXAlignment.Left
+
+-- ════════ MISC ════════
+SecLbl(MT,"  MOVIMIENTO")
+IosRow(MT,"Speed Hack","Aumenta tu velocidad de caminar",false,function(v) _G.Misc.Speed_On=v end)
+ValRow(MT,"Velocidad","Velocidad del speed hack",16,function(v) _G.Misc.SpeedVal=v end)
+IosRow(MT,"Full Bright","Ilumina todo el mapa",false,function(v) _G.Misc.FullBright=v end)
+SecLbl(MT,"  FLY EN MOTO")
+IosRow(MT,"Fly en Moto","Volar montado en moto (VehicleSeat)",false,function(v) _G.Misc.FlyMoto=v end)
+ValRow(MT,"Vel. Moto","Velocidad de ascenso en moto",50,function(v) _G.Misc.FlyMotoSpeed=v end)
+SecLbl(MT,"  HERRAMIENTAS")
+ActBtn(MT,"🖱️  Click Delete Tool",Color3.fromRGB(34,160,60),function()
+    local T=Instance.new("Tool"); T.Name="Click Delete"; T.RequiresHandle=false; T.Parent=L_Plr.Backpack
+    T.Activated:Connect(function() if Mouse.Target then table.insert(DeletedObjects,{o=Mouse.Target,p=Mouse.Target.Parent}); Mouse.Target.Parent=nil end end)
+end)
+ActBtn(MT,"🔄  Reset Map",Color3.fromRGB(180,40,40),function()
+    for _,v in pairs(DeletedObjects) do if v.o then v.o.Parent=v.p end end; DeletedObjects={}
+end)
+
+-- ════════ ESP ════════
+local function CreateESP(plr)
+    local Box=Drawing.new("Square"); Box.Thickness=1; Box.Filled=false; Box.Color=Color3.fromRGB(52,199,89); Box.Visible=false
+    local Nm=Drawing.new("Text"); Nm.Size=13; Nm.Center=true; Nm.Outline=true; Nm.Color=Color3.new(1,1,1); Nm.Visible=false
+    local Ds=Drawing.new("Text"); Ds.Size=13; Ds.Center=true; Ds.Outline=true; Ds.Color=Color3.new(1,1,1); Ds.Visible=false
+    local Wp=Drawing.new("Text"); Wp.Size=13; Wp.Center=true; Wp.Outline=true; Wp.Color=Color3.fromRGB(52,199,89); Wp.Visible=false
+    local Ln=Drawing.new("Line"); Ln.Thickness=1; Ln.Color=Color3.fromRGB(52,199,89); Ln.Visible=false
+    local HB=Drawing.new("Square"); HB.Thickness=1; HB.Filled=true; HB.Visible=false
+    RunService.RenderStepped:Connect(function()
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr~=L_Plr then
+            local HRP=plr.Character.HumanoidRootPart; local Hum=plr.Character.Humanoid
+            local Pos,OnScr=Camera:WorldToViewportPoint(HRP.Position)
+            if OnScr then
+                local S=Camera:WorldToViewportPoint(HRP.Position-Vector3.new(0,3,0)).Y-Camera:WorldToViewportPoint(HRP.Position+Vector3.new(0,2.6,0)).Y
+                local BS=Vector2.new(S/1.5,S); local BP=Vector2.new(Pos.X-BS.X/2,Pos.Y-BS.Y/2)
+                Box.Visible=_G.Visuals.Box; Box.Size=BS; Box.Position=BP
+                Nm.Visible=_G.Visuals.Names; Nm.Text=plr.Name; Nm.Position=Vector2.new(Pos.X,BP.Y-15)
+                local myH=L_Plr.Character and L_Plr.Character:FindFirstChild("HumanoidRootPart")
+                Ds.Visible=_G.Visuals.Dist; Ds.Text="["..((myH and math.floor((myH.Position-HRP.Position).Magnitude)) or 0).."m]"; Ds.Position=Vector2.new(Pos.X,BP.Y+BS.Y+5)
+                local t=plr.Character:FindFirstChildOfClass("Tool"); Wp.Visible=_G.Visuals.Weapon; Wp.Text=t and t.Name or "Hands"; Wp.Position=Vector2.new(Pos.X,BP.Y+BS.Y+18)
+                Ln.Visible=_G.Visuals.Tracers; Ln.From=Vector2.new(Camera.ViewportSize.X/2,0); Ln.To=Vector2.new(Pos.X,BP.Y)
+                HB.Visible=_G.Visuals.HealthBar; HB.Size=Vector2.new(2,(Hum.Health/Hum.MaxHealth)*BS.Y); HB.Position=Vector2.new(BP.X-5,BP.Y+(BS.Y-HB.Size.Y)); HB.Color=Color3.fromHSV(Hum.Health/Hum.MaxHealth*0.3,1,1)
+            else Box.Visible=false;Nm.Visible=false;Ds.Visible=false;Wp.Visible=false;Ln.Visible=false;HB.Visible=false end
+        else Box.Visible=false;Nm.Visible=false;Ds.Visible=false;Wp.Visible=false;Ln.Visible=false;HB.Visible=false end
+    end)
+end
+for _,p in pairs(Players:GetPlayers()) do CreateESP(p) end
 Players.PlayerAdded:Connect(CreateESP)
 
--- [[ CORE LOGIC ]]
+-- ════════ CORE LOOP ════════
 RunService.Heartbeat:Connect(function()
     if _G.Misc.Speed_On and L_Plr.Character and L_Plr.Character:FindFirstChild("Humanoid") then
-        L_Plr.Character.Humanoid.WalkSpeed = _G.Misc.SpeedVal
+        L_Plr.Character.Humanoid.WalkSpeed=_G.Misc.SpeedVal
     end
-    if _G.Misc.FullBright then
-        game:GetService("Lighting").Brightness = 10
-        game:GetService("Lighting").ClockTime = 14
-    end
-    for _, p in pairs(Players:GetPlayers()) do
-        if p ~= L_Plr and p.Character then
-            for n, act in pairs(_G.Parts_Active) do
-                local part = p.Character:FindFirstChild(n)
-                if part and part:IsA("BasePart") then
-                    if act then
-                        part.Size = Vector3.new(_G.Hitbox_Size, _G.Hitbox_Size, _G.Hitbox_Size)
-                        part.CanCollide = false
-                        part.Massless = true
-                        part.Transparency = 1
-                    else
-                        if part.Transparency == 1 then
-                            part.Size = n == "Head" and Vector3.new(2,1,1) or Vector3.new(2,2,1)
-                            part.Transparency = 0
-                            part.CanCollide = true
-                        end
-                    end
+    if _G.Misc.FullBright then game:GetService("Lighting").Brightness=10; game:GetService("Lighting").ClockTime=14 end
+    for _,p in pairs(Players:GetPlayers()) do
+        if p~=L_Plr and p.Character then
+            for n,act in pairs(_G.Parts_Active) do
+                local part=p.Character:FindFirstChild(n)
+                if part and part:IsA("BasePart") and act then
+                    part.Size=Vector3.new(_G.Hitbox_Size,_G.Hitbox_Size,_G.Hitbox_Size)
+                    part.CanCollide=false; part.Massless=true; part.Transparency=1
                 end
             end
         end
     end
+    -- Fly en moto
+    if _G.Misc.FlyMoto then
+        for _,obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("VehicleSeat") and obj.Occupant and obj.Occupant.Parent==L_Plr.Character then
+                local bv=obj:FindFirstChild("JXJFly") or Instance.new("BodyVelocity",obj)
+                bv.Name="JXJFly"; bv.MaxForce=Vector3.new(0,math.huge,0); bv.P=5000
+                bv.Velocity=Vector3.new(0,_G.Misc.FlyMotoSpeed,0)
+            end
+        end
+    else
+        for _,obj in pairs(workspace:GetDescendants()) do
+            if obj.Name=="JXJFly" then pcall(function() obj:Destroy() end) end
+        end
+    end
 end)
 
--- Mostrar tab Combat por defecto
-Tabs.Combat.Visible = true
+-- ════════ KEY VALIDATION ════════
+KBtn.MouseButton1Click:Connect(function()
+    local key=KIn.Text:gsub("%s+",""):upper()
+    if key=="" then KSt.Text="Escribe tu key primero."; return end
+    KBtn.Text="Verificando..."; KBtn.BackgroundColor3=Color3.fromRGB(50,50,65); KSt.Text=""
+    local ok,res=pcall(function()
+        return HttpService:GetAsync("https://${host}/api/validate?key="..HttpService:UrlEncode(key).."&username="..HttpService:UrlEncode(L_Plr.Name))
+    end)
+    if not ok then KSt.Text="Error de conexión."; KBtn.Text="ENTRAR"; KBtn.BackgroundColor3=Color3.fromRGB(52,199,89); return end
+    local data=HttpService:JSONDecode(res)
+    if data and data.valid then
+        KSt.TextColor3=Color3.fromRGB(52,199,89); KSt.Text="✓ Acceso concedido"
+        KBtn.Text="✓ OK"; task.wait(0.7); KF:Destroy()
+        SetTab("Combat"); MF.Visible=true
+    else
+        local r=data and data.reason or ""
+        KSt.Text=r=="used" and "Key usada por otra cuenta." or r=="expired" and "Key expirada." or "Key inválida. Contacta @jean14_17."
+        KBtn.Text="ENTRAR"; KBtn.BackgroundColor3=Color3.fromRGB(52,199,89)
+    end
+end)
 `;
 
-router.get("/jios", (_req, res) => {
+router.get("/jios", (req, res) => {
+  const host = req.headers.host || "jean-cheat-hub--sadx8992.replit.app";
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Cache-Control", "no-store");
-  res.send(jiosScript);
+  res.send(jiosScript(host));
 });
 
 export default router;
