@@ -867,28 +867,11 @@ local function StartHub()
             for _,p in pairs(Players:GetPlayers()) do
                 if p~=L_Plr and p.Character then
                     for n,act in pairs(_G.Parts_Active) do
-                        -- Separa la pieza real de la caja invisible (las dos se llaman igual)
-                        local real,hb=nil,nil
-                        for _,c in pairs(p.Character:GetChildren()) do
-                            if c.Name==n and c:IsA("BasePart") then
-                                if c:GetAttribute("JXJHB") then hb=c else real=c end
-                            end
-                        end
-                        if real then
-                            if act then
-                                -- Caja invisible con el MISMO nombre que la pieza: los disparos cuentan
-                                if not hb then
-                                    hb=Instance.new("Part"); hb.Name=n
-                                    hb:SetAttribute("JXJHB",true)
-                                    hb.Transparency=1; hb.CanCollide=false; hb.Massless=true
-                                    hb.CanQuery=true; hb.CanTouch=true
-                                    hb.CFrame=real.CFrame; hb.Parent=p.Character
-                                    local w=Instance.new("WeldConstraint")
-                                    w.Part0=real; w.Part1=hb; w.Parent=hb
-                                end
-                                hb.Size=Vector3.new(_G.Hitbox_Size,_G.Hitbox_Size,_G.Hitbox_Size)
-                            elseif hb then
-                                hb:Destroy()
+                        if act then
+                            local part=p.Character:FindFirstChild(n)
+                            if part and part:IsA("BasePart") then
+                                part.Size=Vector3.new(_G.Hitbox_Size,_G.Hitbox_Size,_G.Hitbox_Size)
+                                part.CanCollide=false; part.Massless=true; part.Transparency=1
                             end
                         end
                     end
@@ -1011,6 +994,89 @@ local function httpGet(url)
     return HttpService:GetAsync(url,true)
 end
 
+-- ════════ LUGARES GUARDADOS (tab Teleport) ════════
+local function TPToPos(pos)
+    local char=L_Plr.Character
+    local hrp=char and char:FindFirstChild("HumanoidRootPart")
+    local hum=char and char:FindFirstChildOfClass("Humanoid")
+    if not hrp then return end
+    local dest=CFrame.new(pos+Vector3.new(0,4,0))
+    if hum and hum.SeatPart then
+        local model=hum.SeatPart:FindFirstAncestorOfClass("Model")
+        if model then pcall(function() model:PivotTo(dest) end)
+        else hum.SeatPart.CFrame=dest end
+    else
+        hrp.CFrame=dest
+    end
+end
+local RebuildPlaces
+local function SetupLugares(isAdmin,key)
+    SecLbl(TT,"  LUGARES GUARDADOS")
+    if isAdmin then
+        local row=Instance.new("Frame",TT); row.Size=UDim2.new(1,0,0,52); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0; Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
+        local inp=Instance.new("TextBox",row); inp.Size=UDim2.new(1,-124,0,34); inp.Position=UDim2.new(0,10,0.5,-17); inp.PlaceholderText="Nombre del lugar"; inp.Text=""; inp.BackgroundColor3=Color3.fromRGB(26,26,38); inp.TextColor3=Color3.new(1,1,1); inp.PlaceholderColor3=Color3.fromRGB(90,90,105); inp.Font=Enum.Font.Gotham; inp.TextSize=12; inp.BorderSizePixel=0; Instance.new("UICorner",inp).CornerRadius=UDim.new(0,7)
+        local sv=Instance.new("TextButton",row); sv.Size=UDim2.new(0,100,0,34); sv.Position=UDim2.new(1,-110,0.5,-17); sv.BackgroundColor3=Color3.fromRGB(52,199,89); sv.TextColor3=Color3.new(0,0,0); sv.Text="💾 Guardar"; sv.Font=Enum.Font.GothamBold; sv.TextSize=12; sv.BorderSizePixel=0; Instance.new("UICorner",sv).CornerRadius=UDim.new(0,8)
+        sv.MouseButton1Click:Connect(function()
+            local nm=inp.Text:gsub("^%s+",""):gsub("%s+$","")
+            local char=L_Plr.Character
+            local hrp=char and char:FindFirstChild("HumanoidRootPart")
+            if nm=="" or not hrp then return end
+            local pos=hrp.Position
+            sv.Text="..."
+            local url="https://${host}/api/locations/save?key="..HttpService:UrlEncode(key).."&name="..HttpService:UrlEncode(nm).."&x="..math.floor(pos.X+0.5).."&y="..math.floor(pos.Y+0.5).."&z="..math.floor(pos.Z+0.5).."&username="..HttpService:UrlEncode(L_Plr.Name)
+            local ok=pcall(httpGet,url)
+            sv.Text=ok and "✓ Listo" or "✕ Error"
+            if ok then inp.Text="" end
+            task.wait(0.9); sv.Text="💾 Guardar"
+            if RebuildPlaces then RebuildPlaces(isAdmin,key) end
+        end)
+    end
+    local PlacesFrame=Instance.new("Frame",TT)
+    PlacesFrame.Size=UDim2.new(1,0,0,0); PlacesFrame.AutomaticSize=Enum.AutomaticSize.Y
+    PlacesFrame.BackgroundTransparency=1
+    local pfLy=Instance.new("UIListLayout",PlacesFrame); pfLy.Padding=UDim.new(0,6)
+    RebuildPlaces=function(adm,k)
+        for _,c in pairs(PlacesFrame:GetChildren()) do
+            if c:IsA("Frame") then c:Destroy() end
+        end
+        local ok,res=pcall(httpGet,"https://${host}/api/locations")
+        if not ok or not res then return end
+        local ok2,data=pcall(function() return HttpService:JSONDecode(res) end)
+        if not ok2 or not data or not data.locations then return end
+        for _,loc in pairs(data.locations) do
+            local row=Instance.new("Frame",PlacesFrame)
+            row.Size=UDim2.new(1,0,0,48); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0
+            Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
+            local nm=Instance.new("TextLabel",row)
+            nm.Size=UDim2.new(1,adm and -130 or -76,1,0); nm.Position=UDim2.new(0,14,0,0); nm.BackgroundTransparency=1
+            nm.Text="📍 "..tostring(loc.name); nm.TextColor3=Color3.new(1,1,1)
+            nm.Font=Enum.Font.GothamBold; nm.TextSize=12; nm.TextXAlignment=Enum.TextXAlignment.Left
+            nm.TextTruncate=Enum.TextTruncate.AtEnd
+            local tp=Instance.new("TextButton",row)
+            tp.Size=UDim2.new(0,52,0,32); tp.Position=UDim2.new(1,adm and -116 or -62,0.5,-16)
+            tp.BackgroundColor3=Color3.fromRGB(52,199,89); tp.TextColor3=Color3.new(0,0,0)
+            tp.Text="TP"; tp.Font=Enum.Font.GothamBold; tp.TextSize=12; tp.BorderSizePixel=0
+            Instance.new("UICorner",tp).CornerRadius=UDim.new(0,8)
+            tp.MouseButton1Click:Connect(function()
+                TPToPos(Vector3.new(tonumber(loc.x) or 0,tonumber(loc.y) or 0,tonumber(loc.z) or 0))
+            end)
+            if adm then
+                local del=Instance.new("TextButton",row)
+                del.Size=UDim2.new(0,44,0,32); del.Position=UDim2.new(1,-56,0.5,-16)
+                del.BackgroundColor3=Color3.fromRGB(180,40,40); del.TextColor3=Color3.new(1,1,1)
+                del.Text="✕"; del.Font=Enum.Font.GothamBold; del.TextSize=13; del.BorderSizePixel=0
+                Instance.new("UICorner",del).CornerRadius=UDim.new(0,8)
+                del.MouseButton1Click:Connect(function()
+                    pcall(httpGet,"https://${host}/api/locations/delete?key="..HttpService:UrlEncode(k).."&id="..tostring(loc.id))
+                    RebuildPlaces(adm,k)
+                end)
+            end
+        end
+    end
+    ActBtn(TT,"🔄  Refrescar Lugares",Color3.fromRGB(34,160,60),function() RebuildPlaces(isAdmin,key) end)
+    task.spawn(function() RebuildPlaces(isAdmin,key) end)
+end
+
 -- ════════ KEY VALIDATION ════════
 KBtn.MouseButton1Click:Connect(function()
     local key=KIn.Text:gsub("%s+",""):upper()
@@ -1025,6 +1091,7 @@ KBtn.MouseButton1Click:Connect(function()
         KSt.TextColor3=Color3.fromRGB(52,199,89); KSt.Text="✓ Acceso concedido"
         KBtn.Text="✓ OK"; task.wait(0.7); KF:Destroy()
         SetTab("Combat"); MF.Visible=true
+        SetupLugares(data.admin==true,key)
         StartHub()
     else
         local r=data.reason or ""
