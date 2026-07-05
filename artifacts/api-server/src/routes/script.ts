@@ -462,6 +462,8 @@ local TR={
     ["Pierna Der."]="Right Leg",
     ["Hitbox pierna der."]="Right leg hitbox",
     ["Aim silencioso automático"]="Automatic silent aim",
+    ["Rapid Fire"]="Rapid Fire",
+    ["Dispara súper rápido con el arma"]="Fires super fast with your weapon",
     ["Caja alrededor de jugadores"]="Box around players",
     ["Nombre sobre jugadores"]="Name above players",
     ["Distancia al jugador"]="Distance to player",
@@ -750,6 +752,19 @@ IosRow(CT,"Pierna Izq.","Hitbox pierna izq.",false,function(v) _G.Parts_Active.L
 IosRow(CT,"Pierna Der.","Hitbox pierna der.",false,function(v) _G.Parts_Active.RightUpperLeg=v end)
 SecLbl(CT,"  COMBAT")
 IosRow(CT,"Silent Aim","Aim silencioso automático",false,function(v) _G.Combat.SilentAim=v end)
+IosRow(CT,"Rapid Fire","Dispara súper rápido con el arma",false,function(v) _G.Combat.RapidFire=v end)
+task.spawn(function()
+    while true do
+        if _G.Combat.RapidFire then
+            local char=L_Plr.Character
+            local tool=char and char:FindFirstChildOfClass("Tool")
+            if tool then pcall(function() tool:Activate() end) end
+            task.wait(0.05)
+        else
+            task.wait(0.15)
+        end
+    end
+end)
 
 -- ════════ VISUALS ════════
 SecLbl(VT,"  ESP")
