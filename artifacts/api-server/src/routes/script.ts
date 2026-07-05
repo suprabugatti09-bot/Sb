@@ -437,7 +437,7 @@ _G.Hitbox_Size   = 15
 _G.Parts_Active  = { UpperTorso = false, HumanoidRootPart = false, LeftUpperArm = false, RightUpperArm = false, LeftUpperLeg = false, RightUpperLeg = false }
 _G.Visuals       = { Box = false, Names = false, Dist = false, Weapon = false, HealthBar = false, Tracers = false }
 _G.Combat        = { SilentAim = false, TriggerBot = false, RapidFire = false, NoRecoil = false }
-_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false, FlyChar = false, FlyCharSpeed = 40 }
+_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false, FlyChar = false, FlyCharSpeed = 19 }
 local DeletedObjects = {}
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -686,7 +686,6 @@ IosRow(MT,"Fly Personaje","Vuela con tu personaje (▲/▼ + joystick)",false,fu
         CharFlyCleanup()
     end
 end)
-SliderRow(MT,"Vel. Personaje","Baja = menos detectable",10,120,40,function(v) _G.Misc.FlyCharSpeed=v end)
 SecLbl(MT,"  HERRAMIENTAS")
 ActBtn(MT,"🖱️  Click Delete Tool",Color3.fromRGB(34,160,60),function()
     local T=Instance.new("Tool"); T.Name="Click Delete"; T.RequiresHandle=false; T.Parent=L_Plr.Backpack
