@@ -485,10 +485,12 @@ local TR={
     ["  HERRAMIENTAS"]="  TOOLS",
     ["🏍️  TP a Mi Moto"]="🏍️  TP to My Bike",
     ["✕ No encontré TU moto"]="✕ Couldn't find YOUR bike",
-    ["  JUGADORES"]="  PLAYERS",
+    ["  ESPECTEAR"]="  SPECTATE",
+    ["  TP JUGADORES"]="  TP PLAYERS",
+    ["👁️ Espectear"]="👁️ Spectate",
     ["⏹️  Dejar de Espectear"]="⏹️  Stop Spectating",
     ["🔄  Refrescar Lista"]="🔄  Refresh List",
-    ["  LUGARES GUARDADOS"]="  SAVED PLACES",
+    ["  TP PARTES DEL MAPA"]="  TP MAP PARTS",
     ["Nombre del lugar"]="Place name",
     ["💾 Guardar"]="💾 Save",
     ["✓ Listo"]="✓ Done",
@@ -603,6 +605,7 @@ local function MkTab(n)
     Tabs[n]=sc; return sc
 end
 local CT=MkTab("Combat"); local VT=MkTab("Visuals"); local FT=MkTab("Farm"); local MT=MkTab("Misc"); local TT=MkTab("Teleport")
+do local ttLy=TT:FindFirstChildOfClass("UIListLayout"); if ttLy then ttLy.SortOrder=Enum.SortOrder.LayoutOrder end end
 
 local function SetTab(n)
     for k,t in pairs(Tabs) do t.Visible=(k==n) end
@@ -683,6 +686,7 @@ end
 
 local function SecLbl(par, txt)
     local l=Instance.new("TextLabel",par); l.Size=UDim2.new(1,0,0,22); l.BackgroundTransparency=1; l.Text=txt; l.TextColor3=Color3.fromRGB(52,199,89); l.Font=Enum.Font.GothamBold; l.TextSize=11; l.TextXAlignment=Enum.TextXAlignment.Left
+    return l
 end
 
 -- ════════ FLY MOTO: helpers + botones flotantes ════════
@@ -884,28 +888,54 @@ local function TPToPlayer(target)
     end
     return true
 end
-SecLbl(TT,"  JUGADORES")
-ActBtn(TT,"⏹️  Dejar de Espectear",Color3.fromRGB(180,40,40),function() StopSpectate() end)
-local PlrListFrame=Instance.new("Frame",TT)
+-- ════════ ESPECTEAR ════════
+local specHdr=SecLbl(TT,T("  ESPECTEAR")); specHdr.LayoutOrder=20
+local stopBtn=ActBtn(TT,"⏹️  Dejar de Espectear",Color3.fromRGB(180,40,40),function() StopSpectate() end); stopBtn.LayoutOrder=21
+local SpecListFrame=Instance.new("Frame",TT); SpecListFrame.LayoutOrder=22
+SpecListFrame.Size=UDim2.new(1,0,0,0); SpecListFrame.AutomaticSize=Enum.AutomaticSize.Y
+SpecListFrame.BackgroundTransparency=1
+local slLy=Instance.new("UIListLayout",SpecListFrame); slLy.Padding=UDim.new(0,6)
+-- ════════ TP JUGADORES ════════
+local tpHdr=SecLbl(TT,T("  TP JUGADORES")); tpHdr.LayoutOrder=30
+local PlrListFrame=Instance.new("Frame",TT); PlrListFrame.LayoutOrder=31
 PlrListFrame.Size=UDim2.new(1,0,0,0); PlrListFrame.AutomaticSize=Enum.AutomaticSize.Y
 PlrListFrame.BackgroundTransparency=1
 local plLy=Instance.new("UIListLayout",PlrListFrame); plLy.Padding=UDim.new(0,6)
 local function RebuildPlrList()
+    for _,c in pairs(SpecListFrame:GetChildren()) do
+        if c:IsA("Frame") then c:Destroy() end
+    end
     for _,c in pairs(PlrListFrame:GetChildren()) do
         if c:IsA("Frame") then c:Destroy() end
     end
     for _,p in pairs(Players:GetPlayers()) do
         if p~=L_Plr then
-            local row=Instance.new("Frame",PlrListFrame)
-            row.Size=UDim2.new(1,0,0,52); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0
-            Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
-            local nm=Instance.new("TextLabel",row)
-            nm.Size=UDim2.new(1,-130,1,0); nm.Position=UDim2.new(0,14,0,0); nm.BackgroundTransparency=1
-            nm.Text=p.DisplayName.." (@"..p.Name..")"; nm.TextColor3=Color3.new(1,1,1)
-            nm.Font=Enum.Font.GothamBold; nm.TextSize=12; nm.TextXAlignment=Enum.TextXAlignment.Left
-            nm.TextTruncate=Enum.TextTruncate.AtEnd
-            local tp=Instance.new("TextButton",row)
-            tp.Size=UDim2.new(0,52,0,34); tp.Position=UDim2.new(1,-116,0.5,-17)
+            -- Fila de ESPECTEAR
+            local srow=Instance.new("Frame",SpecListFrame)
+            srow.Size=UDim2.new(1,0,0,48); srow.BackgroundColor3=Color3.fromRGB(18,18,26); srow.BorderSizePixel=0
+            Instance.new("UICorner",srow).CornerRadius=UDim.new(0,10)
+            local snm=Instance.new("TextLabel",srow)
+            snm.Size=UDim2.new(1,-116,1,0); snm.Position=UDim2.new(0,14,0,0); snm.BackgroundTransparency=1
+            snm.Text=p.DisplayName.." (@"..p.Name..")"; snm.TextColor3=Color3.new(1,1,1)
+            snm.Font=Enum.Font.GothamBold; snm.TextSize=12; snm.TextXAlignment=Enum.TextXAlignment.Left
+            snm.TextTruncate=Enum.TextTruncate.AtEnd
+            local sp=Instance.new("TextButton",srow)
+            sp.Size=UDim2.new(0,96,0,32); sp.Position=UDim2.new(1,-104,0.5,-16)
+            sp.BackgroundColor3=Color3.fromRGB(90,60,200); sp.TextColor3=Color3.new(1,1,1)
+            sp.Text=T("👁️ Espectear"); sp.Font=Enum.Font.GothamBold; sp.TextSize=12; sp.BorderSizePixel=0
+            Instance.new("UICorner",sp).CornerRadius=UDim.new(0,8)
+            sp.MouseButton1Click:Connect(function() SpectatePlayer(p) end)
+            -- Fila de TP JUGADORES
+            local trow=Instance.new("Frame",PlrListFrame)
+            trow.Size=UDim2.new(1,0,0,48); trow.BackgroundColor3=Color3.fromRGB(18,18,26); trow.BorderSizePixel=0
+            Instance.new("UICorner",trow).CornerRadius=UDim.new(0,10)
+            local tnm=Instance.new("TextLabel",trow)
+            tnm.Size=UDim2.new(1,-80,1,0); tnm.Position=UDim2.new(0,14,0,0); tnm.BackgroundTransparency=1
+            tnm.Text=p.DisplayName.." (@"..p.Name..")"; tnm.TextColor3=Color3.new(1,1,1)
+            tnm.Font=Enum.Font.GothamBold; tnm.TextSize=12; tnm.TextXAlignment=Enum.TextXAlignment.Left
+            tnm.TextTruncate=Enum.TextTruncate.AtEnd
+            local tp=Instance.new("TextButton",trow)
+            tp.Size=UDim2.new(0,60,0,32); tp.Position=UDim2.new(1,-68,0.5,-16)
             tp.BackgroundColor3=Color3.fromRGB(52,199,89); tp.TextColor3=Color3.new(0,0,0)
             tp.Text="TP"; tp.Font=Enum.Font.GothamBold; tp.TextSize=12; tp.BorderSizePixel=0
             Instance.new("UICorner",tp).CornerRadius=UDim.new(0,8)
@@ -917,16 +947,10 @@ local function RebuildPlrList()
                     tp.Text="TP"; tp.BackgroundColor3=Color3.fromRGB(52,199,89); tp.TextColor3=Color3.new(0,0,0)
                 end
             end)
-            local sp=Instance.new("TextButton",row)
-            sp.Size=UDim2.new(0,52,0,34); sp.Position=UDim2.new(1,-58,0.5,-17)
-            sp.BackgroundColor3=Color3.fromRGB(90,60,200); sp.TextColor3=Color3.new(1,1,1)
-            sp.Text="👁️"; sp.Font=Enum.Font.GothamBold; sp.TextSize=14; sp.BorderSizePixel=0
-            Instance.new("UICorner",sp).CornerRadius=UDim.new(0,8)
-            sp.MouseButton1Click:Connect(function() SpectatePlayer(p) end)
         end
     end
 end
-ActBtn(TT,"🔄  Refrescar Lista",Color3.fromRGB(34,160,60),function() RebuildPlrList() end)
+local refreshBtn=ActBtn(TT,"🔄  Refrescar Lista",Color3.fromRGB(34,160,60),function() RebuildPlrList() end); refreshBtn.LayoutOrder=32
 RebuildPlrList()
 Players.PlayerAdded:Connect(function() task.wait(0.5) RebuildPlrList() end)
 Players.PlayerRemoving:Connect(function(p)
@@ -1212,9 +1236,9 @@ local function TPToPos(pos)
 end
 local RebuildPlaces
 local function SetupLugares(isAdmin,key)
-    SecLbl(TT,T("  LUGARES GUARDADOS"))
+    local placesHdr=SecLbl(TT,T("  TP PARTES DEL MAPA")); placesHdr.LayoutOrder=10
     if isAdmin then
-        local row=Instance.new("Frame",TT); row.Size=UDim2.new(1,0,0,52); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0; Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
+        local row=Instance.new("Frame",TT); row.LayoutOrder=11; row.Size=UDim2.new(1,0,0,52); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0; Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
         local inp=Instance.new("TextBox",row); inp.Size=UDim2.new(1,-124,0,34); inp.Position=UDim2.new(0,10,0.5,-17); inp.PlaceholderText=T("Nombre del lugar"); inp.Text=""; inp.BackgroundColor3=Color3.fromRGB(26,26,38); inp.TextColor3=Color3.new(1,1,1); inp.PlaceholderColor3=Color3.fromRGB(90,90,105); inp.Font=Enum.Font.Gotham; inp.TextSize=12; inp.BorderSizePixel=0; Instance.new("UICorner",inp).CornerRadius=UDim.new(0,7)
         local sv=Instance.new("TextButton",row); sv.Size=UDim2.new(0,100,0,34); sv.Position=UDim2.new(1,-110,0.5,-17); sv.BackgroundColor3=Color3.fromRGB(52,199,89); sv.TextColor3=Color3.new(0,0,0); sv.Text=T("💾 Guardar"); sv.Font=Enum.Font.GothamBold; sv.TextSize=12; sv.BorderSizePixel=0; Instance.new("UICorner",sv).CornerRadius=UDim.new(0,8)
         sv.MouseButton1Click:Connect(function()
@@ -1232,7 +1256,7 @@ local function SetupLugares(isAdmin,key)
             if RebuildPlaces then RebuildPlaces(isAdmin,key) end
         end)
     end
-    local PlacesFrame=Instance.new("Frame",TT)
+    local PlacesFrame=Instance.new("Frame",TT); PlacesFrame.LayoutOrder=12
     PlacesFrame.Size=UDim2.new(1,0,0,0); PlacesFrame.AutomaticSize=Enum.AutomaticSize.Y
     PlacesFrame.BackgroundTransparency=1
     local pfLy=Instance.new("UIListLayout",PlacesFrame); pfLy.Padding=UDim.new(0,6)
@@ -1280,7 +1304,7 @@ local function SetupLugares(isAdmin,key)
             end
         end
     end
-    ActBtn(TT,T("🔄  Refrescar Lugares"),Color3.fromRGB(34,160,60),function() RebuildPlaces(isAdmin,key) end)
+    local refPlaces=ActBtn(TT,T("🔄  Refrescar Lugares"),Color3.fromRGB(34,160,60),function() RebuildPlaces(isAdmin,key) end); refPlaces.LayoutOrder=13
     task.spawn(function() RebuildPlaces(isAdmin,key) end)
 end
 
