@@ -753,11 +753,22 @@ local function StartHub()
             for _,p in pairs(Players:GetPlayers()) do
                 if p~=L_Plr and p.Character then
                     for n,act in pairs(_G.Parts_Active) do
-                        if act then
-                            local part=p.Character:FindFirstChild(n)
-                            if part and part:IsA("BasePart") then
-                                part.Size=Vector3.new(_G.Hitbox_Size,_G.Hitbox_Size,_G.Hitbox_Size)
-                                part.CanCollide=false; part.Massless=true; part.Transparency=1
+                        local part=p.Character:FindFirstChild(n)
+                        if part and part:IsA("BasePart") then
+                            local hb=part:FindFirstChild("JXJHB")
+                            if act then
+                                -- Caja invisible pegada a la parte: el cuerpo se ve normal
+                                if not hb then
+                                    hb=Instance.new("Part"); hb.Name="JXJHB"
+                                    hb.Transparency=1; hb.CanCollide=false; hb.Massless=true
+                                    hb.CanQuery=true; hb.CanTouch=true
+                                    hb.CFrame=part.CFrame; hb.Parent=part
+                                    local w=Instance.new("WeldConstraint")
+                                    w.Part0=part; w.Part1=hb; w.Parent=hb
+                                end
+                                hb.Size=Vector3.new(_G.Hitbox_Size,_G.Hitbox_Size,_G.Hitbox_Size)
+                            elseif hb then
+                                hb:Destroy()
                             end
                         end
                     end
