@@ -812,11 +812,11 @@ local function StartHub()
                     bv.MaxForce=Vector3.new(math.huge,math.huge,math.huge)
                     bv.P=1200; bv.Parent=hrp
                 end
-                -- Sin gyro: el cuerpo queda suelto en caída libre, como en el video
+                -- Cuerpo blando: sin gyro y con PlatformStand el cuerpo se dobla solo y cuelga flojo
                 local bg=hrp:FindFirstChild("JXJCG"); if bg then bg:Destroy() end
-                hum.PlatformStand=false
-                if hum:GetState()~=Enum.HumanoidStateType.Freefall then
-                    hum:ChangeState(Enum.HumanoidStateType.Freefall)
+                hum.PlatformStand=true
+                if hum:GetState()~=Enum.HumanoidStateType.Physics then
+                    hum:ChangeState(Enum.HumanoidStateType.Physics)
                 end
                 local camLook=Camera.CFrame.LookVector
                 local md=hum.MoveDirection
