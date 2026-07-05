@@ -812,22 +812,24 @@ local function StartHub()
                     bv.MaxForce=Vector3.new(math.huge,math.huge,math.huge)
                     bv.P=1200; bv.Parent=hrp
                 end
-                -- Cuerpo suelto tipo "caído" (ragdoll suave, no parado tieso)
-                hum.PlatformStand=true
                 local bg=hrp:FindFirstChild("JXJCG")
                 if not bg then
                     bg=Instance.new("BodyGyro"); bg.Name="JXJCG"
                     bg.MaxTorque=Vector3.new(math.huge,math.huge,math.huge)
-                    bg.P=2500; bg.D=200; bg.Parent=hrp
+                    bg.P=3000; bg.D=250; bg.Parent=hrp
                 end
-                -- Acostado boca abajo, con un vaivén leve para que se vea flojo/natural
                 local camLook=Camera.CFrame.LookVector
                 local flat=Vector3.new(camLook.X,0,camLook.Z)
-                if flat.Magnitude>0.01 then
-                    local wob=math.sin(tick()*1.2)*0.12
-                    bg.CFrame=CFrame.new(hrp.Position,hrp.Position+flat.Unit)*CFrame.Angles(-math.rad(75)+wob,0,wob)
-                end
                 local md=hum.MoveDirection
+                if flat.Magnitude>0.01 then
+                    if md.Magnitude>0.05 then
+                        -- Moviéndote: se inclina hacia adelante (deslizándose, como en el video)
+                        bg.CFrame=CFrame.new(hrp.Position,hrp.Position+flat.Unit)*CFrame.Angles(-math.rad(38),0,0)
+                    else
+                        -- Quieto: parado normal mirando hacia la cámara
+                        bg.CFrame=CFrame.new(hrp.Position,hrp.Position+flat.Unit)
+                    end
+                end
                 local vy
                 if _G.Misc.FlyUp then vy=_G.Misc.FlyCharSpeed
                 elseif _G.Misc.FlyDown then vy=-_G.Misc.FlyCharSpeed
