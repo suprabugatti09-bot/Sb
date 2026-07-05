@@ -605,9 +605,13 @@ local function CharFlyCleanup()
     if hrp then
         local bv=hrp:FindFirstChild("JXJCF"); if bv then bv:Destroy() end
         local bg=hrp:FindFirstChild("JXJCG"); if bg then bg:Destroy() end
+        local av=hrp:FindFirstChild("JXJCAV"); if av then av:Destroy() end
     end
     local hum=char and char:FindFirstChildOfClass("Humanoid")
-    if hum then hum.PlatformStand=false end
+    if hum then
+        hum.PlatformStand=false
+        hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+    end
 end
 L_Plr.CharacterAdded:Connect(function()
     _G.Misc.FlyUp=false; _G.Misc.FlyDown=false
@@ -818,6 +822,14 @@ local function StartHub()
                 if hum:GetState()~=Enum.HumanoidStateType.Physics then
                     hum:ChangeState(Enum.HumanoidStateType.Physics)
                 end
+                -- Freno de giro: evita que dé vueltas en el aire pero deja el cuerpo flojo
+                local av=hrp:FindFirstChild("JXJCAV")
+                if not av then
+                    av=Instance.new("BodyAngularVelocity"); av.Name="JXJCAV"
+                    av.AngularVelocity=Vector3.new(0,0,0)
+                    av.MaxTorque=Vector3.new(3000,3000,3000)
+                    av.P=1200; av.Parent=hrp
+                end
                 local camLook=Camera.CFrame.LookVector
                 local md=hum.MoveDirection
                 local vy
@@ -836,7 +848,11 @@ local function StartHub()
             elseif hrp then
                 local bv=hrp:FindFirstChild("JXJCF"); if bv then bv:Destroy() end
                 local bg=hrp:FindFirstChild("JXJCG"); if bg then bg:Destroy() end
-                if hum then hum.PlatformStand=false end
+                local av=hrp:FindFirstChild("JXJCAV"); if av then av:Destroy() end
+                if hum then
+                    hum.PlatformStand=false
+                    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                end
             end
         end
     end)
