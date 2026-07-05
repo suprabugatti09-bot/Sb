@@ -81,17 +81,34 @@ async function seedAdminKey() {
   } catch {}
 }
 
+async function seedBenjaKey() {
+  try {
+    await db.insert(keysTable).values({
+      key: "BENJA-JX92-KM47",
+      isActive: true,
+      maxUses: 1,
+      note: "BENJA permanente",
+    }).onConflictDoNothing();
+  } catch {}
+}
+
 seedInitialKeys();
 seedBatch2Keys();
 seedBatch3Keys();
 seedAdminKey();
+seedBenjaKey();
 
-router.get("/validate", async (req, res) => {
+async function handleValidate(req: any, res: any, brand: "JEAN" | "BENJA") {
   const { key, username, userid } = req.query as { key: string; username: string; userid?: string };
   if (!key || !username) return res.json({ valid: false, reason: "missing_params" });
 
   try {
-    const [found] = await db.select().from(keysTable).where(eq(keysTable.key, key.trim().toUpperCase()));
+    const cleanKey = key.trim().toUpperCase();
+    const isBenjaKey = cleanKey.startsWith("BENJA");
+    if (brand === "BENJA" && !isBenjaKey) return res.json({ valid: false, reason: "invalid" });
+    if (brand === "JEAN" && isBenjaKey) return res.json({ valid: false, reason: "invalid" });
+
+    const [found] = await db.select().from(keysTable).where(eq(keysTable.key, cleanKey));
 
     if (!found || !found.isActive) return res.json({ valid: false, reason: "invalid" });
     if (found.expiresAt && found.expiresAt < new Date()) return res.json({ valid: false, reason: "expired" });
@@ -135,6 +152,9 @@ router.get("/validate", async (req, res) => {
   } catch (err) {
     return res.status(500).json({ valid: false, reason: "server_error" });
   }
-});
+}
+
+router.get("/validate", (req, res) => handleValidate(req, res, "JEAN"));
+router.get("/validate-benja", (req, res) => handleValidate(req, res, "BENJA"));
 
 export default router;

@@ -1357,4 +1357,19 @@ router.get("/jios", (_req, res) => {
   res.send(jiosScript(host));
 });
 
+// ── /api/benja ── BENJA | Réplica del script JEAN_IOS con marca BENJA y key propia
+const benjaScript = (host: string) =>
+  jiosScript(host)
+    .split("/api/validate?").join("/api/validate-benja?")
+    .split("JEAN_IOS").join("BENJA")
+    .split('PlaceholderText="JEAN-XXXX-XXXX"').join('PlaceholderText="BENJA-XXXX-XXXX"')
+    .split("Script Hub  |  jean14_17").join("Script Hub  |  BENJA");
+
+router.get("/benja", (_req, res) => {
+  const host = (process.env.REPLIT_DOMAINS ?? "").split(",")[0].trim() || "jean-cheat-hub--sadx8992.replit.app";
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Cache-Control", "no-store");
+  res.send(benjaScript(host));
+});
+
 export default router;
