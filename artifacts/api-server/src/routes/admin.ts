@@ -60,57 +60,90 @@ const ADMIN_HTML = `<!DOCTYPE html>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>JEAN Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',sans-serif;background:#0a0a0f;color:#e0e0e0;min-height:100vh}
-:root{--gold:#f5c518;--purple:#7c3aed;--green:#10b981;--red:#ef4444;--card:#111118;--border:#1e1e2e}
-.login{display:flex;align-items:center;justify-content:center;min-height:100vh}
-.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;width:360px;text-align:center}
-.login-box h1{color:var(--gold);font-size:28px;font-weight:800;letter-spacing:2px;margin-bottom:4px}
-.login-box p{color:#555;font-size:13px;margin-bottom:28px}
-.login-box input{width:100%;background:#0a0a0f;border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:12px}
-.login-box input:focus{border-color:var(--purple)}
-.btn{width:100%;background:var(--gold);color:#000;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:12px;cursor:pointer;letter-spacing:1px}
-.btn:hover{opacity:.9}
-.btn-sm{padding:6px 14px;font-size:12px;border-radius:6px;border:none;cursor:pointer;font-weight:600}
-.btn-red{background:var(--red);color:#fff}.btn-green{background:var(--green);color:#fff}
-.btn-purple{background:var(--purple);color:#fff}.btn-gray{background:#2a2a3a;color:#aaa}
+:root{--gold:#f5c518;--gold2:#ffdd57;--purple:#8b5cf6;--purple2:#a78bfa;--green:#22d3a5;--red:#ff5470;--bg:#07070c;--card:rgba(20,20,32,.72);--border:rgba(255,255,255,.07);--txt:#e7e7f0;--muted:#7a7a92}
+html,body{min-height:100%}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--txt);background:var(--bg);min-height:100vh;position:relative;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:0;background:
+  radial-gradient(650px circle at 12% 8%,rgba(139,92,246,.18),transparent 55%),
+  radial-gradient(600px circle at 88% 0%,rgba(245,197,24,.12),transparent 50%),
+  radial-gradient(700px circle at 50% 120%,rgba(34,211,165,.10),transparent 55%);pointer-events:none}
+.login,.panel{position:relative;z-index:1}
+::selection{background:rgba(139,92,246,.4)}
+/* LOGIN */
+.login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--card);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--border);border-radius:22px;padding:44px 38px;width:100%;max-width:380px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.03) inset;animation:pop .5s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.logo-badge{width:72px;height:72px;margin:0 auto 18px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;color:#0a0a0f;background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 12px 30px -8px rgba(245,197,24,.6)}
+.login-box h1{font-family:'Space Grotesk',sans-serif;background:linear-gradient(135deg,#fff,var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-size:26px;font-weight:700;letter-spacing:3px;margin-bottom:6px}
+.login-box p{color:var(--muted);font-size:13px;margin-bottom:26px}
+.login-box input{width:100%;background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:#fff;font-size:14px;outline:none;margin-bottom:14px;transition:.2s}
+.login-box input:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(139,92,246,.15)}
+/* BUTTONS */
+.btn{width:100%;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#0a0a0f;font-weight:700;font-size:14px;border:none;border-radius:12px;padding:14px;cursor:pointer;letter-spacing:1px;transition:.2s;box-shadow:0 10px 26px -10px rgba(245,197,24,.7)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 16px 34px -10px rgba(245,197,24,.8)}
+.btn:active{transform:translateY(0)}
+.btn-sm{padding:8px 16px;font-size:12px;border-radius:9px;border:none;cursor:pointer;font-weight:600;transition:.18s;color:#fff}
+.btn-sm:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.btn-red{background:linear-gradient(135deg,#ff6b84,var(--red))}
+.btn-green{background:linear-gradient(135deg,#3ee7bb,var(--green));color:#062018}
+.btn-purple{background:linear-gradient(135deg,var(--purple2),var(--purple))}
+.btn-gray{background:rgba(255,255,255,.08);color:#c5c5d6}
 .hidden{display:none}
-.panel{max-width:1100px;margin:0 auto;padding:24px 16px}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-header h1{color:var(--gold);font-size:22px;font-weight:800;letter-spacing:2px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
-.stat-n{font-size:28px;font-weight:800;color:var(--gold)}
-.stat-l{font-size:11px;color:#555;margin-top:4px;text-transform:uppercase;letter-spacing:1px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
-.card h2{font-size:14px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
-.form-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
-.form-group{display:flex;flex-direction:column;gap:6px;flex:1;min-width:120px}
-.form-group label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px}
-.form-group input,.form-group select{background:#0a0a0f;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-size:13px;outline:none}
-.form-group input:focus,.form-group select:focus{border-color:var(--purple)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:10px 12px;color:#555;font-size:11px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)}
-td{padding:10px 12px;border-bottom:1px solid #0f0f1a;vertical-align:middle}
-tr:hover td{background:#12121a}
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.badge-green{background:#0d2b1e;color:var(--green)}
-.badge-red{background:#2b0d0d;color:var(--red)}
-.badge-gray{background:#1a1a2a;color:#666}
-.key-text{font-family:monospace;color:var(--gold);font-size:12px}
-.copy-btn{background:none;border:1px solid #2a2a3a;color:#666;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px}
-.copy-btn:hover{border-color:var(--gold);color:var(--gold)}
-.error-msg{color:var(--red);font-size:12px;margin-top:8px}
-.success-msg{color:var(--green);font-size:12px;margin-top:8px}
-@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}.form-row{flex-direction:column}}
+/* PANEL */
+.panel{max-width:1140px;margin:0 auto;padding:30px 18px 60px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand .mini{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;color:#0a0a0f;background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 8px 22px -8px rgba(245,197,24,.6)}
+header h1{font-family:'Space Grotesk',sans-serif;color:#fff;font-size:20px;font-weight:700;letter-spacing:2px}
+header h1 span{color:var(--gold)}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat{position:relative;background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:18px;padding:20px;overflow:hidden;transition:.25s}
+.stat:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.14)}
+.stat::after{content:"";position:absolute;top:-40%;right:-20%;width:120px;height:120px;border-radius:50%;background:var(--glow,rgba(245,197,24,.16));filter:blur(24px)}
+.stat .ico{font-size:20px;margin-bottom:10px}
+.stat-n{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;line-height:1;color:#fff}
+.stat-l{font-size:11px;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.stat.g{--glow:rgba(245,197,24,.18)} .stat.b{--glow:rgba(34,211,165,.18)} .stat.p{--glow:rgba(139,92,246,.2)} .stat.r{--glow:rgba(255,84,112,.18)}
+/* CARDS */
+.card{background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:18px;padding:26px;margin-bottom:22px;box-shadow:0 20px 50px -30px rgba(0,0,0,.8)}
+.card h2{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#cfcfe0;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:20px}
+.card h2 .dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 0 10px var(--gold)}
+.form-row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.form-group{display:flex;flex-direction:column;gap:7px;flex:1;min-width:120px}
+.form-group label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.form-group input,.form-group select{background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:11px;padding:11px 13px;color:#fff;font-size:13px;outline:none;transition:.2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(139,92,246,.15)}
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+th{text-align:left;padding:12px 14px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);font-weight:600}
+td{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tbody tr{transition:.15s}
+tbody tr:hover td,tr:hover td{background:rgba(255,255,255,.03)}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid transparent}
+.badge-green{background:rgba(34,211,165,.12);color:var(--green);border-color:rgba(34,211,165,.25)}
+.badge-red{background:rgba(255,84,112,.12);color:var(--red);border-color:rgba(255,84,112,.25)}
+.badge-gray{background:rgba(255,255,255,.06);color:var(--muted);border-color:rgba(255,255,255,.1)}
+.key-text{font-family:'JetBrains Mono',monospace;color:var(--gold2);font-size:12.5px;font-weight:700;letter-spacing:.5px}
+.copy-btn{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:7px;cursor:pointer;font-size:11px;margin-left:6px;transition:.18s}
+.copy-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.08)}
+.error-msg{color:var(--red);font-size:13px;margin-top:12px;font-weight:600}
+.success-msg{color:var(--green);font-size:13px;margin-top:12px;font-weight:600}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}.form-row{flex-direction:column;align-items:stretch}.panel{padding:20px 12px 50px}}
 </style>
 </head>
 <body>
 
 <div class="login" id="loginScreen">
   <div class="login-box">
-    <h1>JEAN</h1>
+    <div class="logo-badge">JX</div>
+    <h1>JEAN X JAY</h1>
     <p>Panel de Administración</p>
     <input type="password" id="passInput" placeholder="Contraseña admin" onkeydown="if(event.key==='Enter')login()"/>
     <button class="btn" onclick="login()">ENTRAR</button>
@@ -120,19 +153,22 @@ tr:hover td{background:#12121a}
 
 <div class="panel hidden" id="mainPanel">
   <header>
-    <h1>JEAN ✦ ADMIN</h1>
+    <div class="brand">
+      <div class="mini">JX</div>
+      <h1>JEAN <span>&#10022; ADMIN</span></h1>
+    </div>
     <button class="btn-sm btn-gray" onclick="logout()">Cerrar sesión</button>
   </header>
 
   <div class="stats">
-    <div class="stat"><div class="stat-n" id="sTotal">—</div><div class="stat-l">Total Keys</div></div>
-    <div class="stat"><div class="stat-n" id="sActive">—</div><div class="stat-l">Activas</div></div>
-    <div class="stat"><div class="stat-n" id="sUsed">—</div><div class="stat-l">Usadas</div></div>
-    <div class="stat"><div class="stat-n" id="sExpired">—</div><div class="stat-l">Expiradas</div></div>
+    <div class="stat g"><div class="ico">&#128273;</div><div class="stat-n" id="sTotal">—</div><div class="stat-l">Total Keys</div></div>
+    <div class="stat b"><div class="ico">&#9989;</div><div class="stat-n" id="sActive">—</div><div class="stat-l">Activas</div></div>
+    <div class="stat p"><div class="ico">&#128100;</div><div class="stat-n" id="sUsed">—</div><div class="stat-l">Usadas</div></div>
+    <div class="stat r"><div class="ico">&#9203;</div><div class="stat-n" id="sExpired">—</div><div class="stat-l">Expiradas</div></div>
   </div>
 
   <div class="card">
-    <h2>Crear Keys Nuevas</h2>
+    <h2><span class="dot"></span>Crear Keys Nuevas</h2>
     <div class="form-row">
       <div class="form-group">
         <label>Cantidad</label>
@@ -172,13 +208,15 @@ tr:hover td{background:#12121a}
   </div>
 
   <div class="card">
-    <h2>Keys — <span id="keyCount">cargando...</span></h2>
-    <table>
-      <thead><tr>
-        <th>Key</th><th>Estado</th><th>Usos</th><th>Expira</th><th>Nota</th><th>Acciones</th>
-      </tr></thead>
-      <tbody id="keysBody"></tbody>
-    </table>
+    <h2><span class="dot"></span>Keys — <span id="keyCount">cargando...</span></h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Key</th><th>Estado</th><th>Usos</th><th>Expira</th><th>Nota</th><th>Acciones</th>
+        </tr></thead>
+        <tbody id="keysBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
