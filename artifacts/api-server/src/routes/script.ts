@@ -500,7 +500,7 @@ local function MkTab(n)
     local pd = Instance.new("UIPadding",sc); pd.PaddingTop=UDim.new(0,4); pd.PaddingBottom=UDim.new(0,8); pd.PaddingRight=UDim.new(0,4)
     Tabs[n]=sc; return sc
 end
-local CT=MkTab("Combat"); local VT=MkTab("Visuals"); local FT=MkTab("Farm"); local MT=MkTab("Misc")
+local CT=MkTab("Combat"); local VT=MkTab("Visuals"); local FT=MkTab("Farm"); local MT=MkTab("Misc"); local TT=MkTab("Teleport")
 
 local function SetTab(n)
     for k,t in pairs(Tabs) do t.Visible=(k==n) end
@@ -513,7 +513,7 @@ local function MkTabBtn(lbl, n)
     local b=Instance.new("TextButton",SB); b.Size=UDim2.new(1,0,0,42); b.BackgroundColor3=Color3.fromRGB(20,20,30); b.TextColor3=Color3.fromRGB(150,150,160); b.Text=lbl; b.Font=Enum.Font.GothamBold; b.TextSize=12; b.BorderSizePixel=0; Instance.new("UICorner",b).CornerRadius=UDim.new(0,8)
     b.MouseButton1Click:Connect(function() SetTab(n) end); TabBtns[n]=b
 end
-MkTabBtn("⚔️ Combat","Combat"); MkTabBtn("👁️ Visuals","Visuals"); MkTabBtn("🚜 Farm","Farm"); MkTabBtn("⚙️ Misc","Misc")
+MkTabBtn("⚔️ Combat","Combat"); MkTabBtn("👁️ Visuals","Visuals"); MkTabBtn("🚜 Farm","Farm"); MkTabBtn("⚙️ Misc","Misc"); MkTabBtn("🧭 Teleport","Teleport")
 
 -- ── UI Helpers ──
 local function IosRow(par, title, desc, init, cb)
@@ -725,6 +725,83 @@ ActBtn(MT,"🖱️  Click Delete Tool",Color3.fromRGB(34,160,60),function()
 end)
 ActBtn(MT,"🔄  Reset Map",Color3.fromRGB(180,40,40),function()
     for _,v in pairs(DeletedObjects) do if v.o then v.o.Parent=v.p end end; DeletedObjects={}
+end)
+
+-- ════════ TAB TELEPORT: TP a jugadores + Espectear ════════
+local Spectating=nil
+local function StopSpectate()
+    Spectating=nil
+    local char=L_Plr.Character
+    local hum=char and char:FindFirstChildOfClass("Humanoid")
+    if hum then Camera.CameraSubject=hum end
+end
+local function SpectatePlayer(target)
+    local tchar=target.Character
+    local thum=tchar and tchar:FindFirstChildOfClass("Humanoid")
+    if thum then Camera.CameraSubject=thum; Spectating=target end
+end
+local function TPToPlayer(target)
+    local tchar=target.Character
+    local thrp=tchar and tchar:FindFirstChild("HumanoidRootPart")
+    local char=L_Plr.Character
+    local hrp=char and char:FindFirstChild("HumanoidRootPart")
+    local hum=char and char:FindFirstChildOfClass("Humanoid")
+    if not thrp or not hrp then return end
+    local dest=thrp.CFrame*CFrame.new(0,0,5)
+    if hum and hum.SeatPart then
+        -- Montado en moto: mueve la moto completa contigo
+        local seat=hum.SeatPart
+        local model=seat:FindFirstAncestorOfClass("Model")
+        if model then
+            pcall(function() model:PivotTo(dest*CFrame.new(0,3,0)) end)
+        else
+            seat.CFrame=dest*CFrame.new(0,3,0)
+        end
+    else
+        hrp.CFrame=dest
+    end
+end
+SecLbl(TT,"  JUGADORES")
+ActBtn(TT,"⏹️  Dejar de Espectear",Color3.fromRGB(180,40,40),function() StopSpectate() end)
+local PlrListFrame=Instance.new("Frame",TT)
+PlrListFrame.Size=UDim2.new(1,0,0,0); PlrListFrame.AutomaticSize=Enum.AutomaticSize.Y
+PlrListFrame.BackgroundTransparency=1
+local plLy=Instance.new("UIListLayout",PlrListFrame); plLy.Padding=UDim.new(0,6)
+local function RebuildPlrList()
+    for _,c in pairs(PlrListFrame:GetChildren()) do
+        if c:IsA("Frame") then c:Destroy() end
+    end
+    for _,p in pairs(Players:GetPlayers()) do
+        if p~=L_Plr then
+            local row=Instance.new("Frame",PlrListFrame)
+            row.Size=UDim2.new(1,0,0,52); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0
+            Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
+            local nm=Instance.new("TextLabel",row)
+            nm.Size=UDim2.new(1,-130,1,0); nm.Position=UDim2.new(0,14,0,0); nm.BackgroundTransparency=1
+            nm.Text=p.DisplayName.." (@"..p.Name..")"; nm.TextColor3=Color3.new(1,1,1)
+            nm.Font=Enum.Font.GothamBold; nm.TextSize=12; nm.TextXAlignment=Enum.TextXAlignment.Left
+            nm.TextTruncate=Enum.TextTruncate.AtEnd
+            local tp=Instance.new("TextButton",row)
+            tp.Size=UDim2.new(0,52,0,34); tp.Position=UDim2.new(1,-116,0.5,-17)
+            tp.BackgroundColor3=Color3.fromRGB(52,199,89); tp.TextColor3=Color3.new(0,0,0)
+            tp.Text="TP"; tp.Font=Enum.Font.GothamBold; tp.TextSize=12; tp.BorderSizePixel=0
+            Instance.new("UICorner",tp).CornerRadius=UDim.new(0,8)
+            tp.MouseButton1Click:Connect(function() TPToPlayer(p) end)
+            local sp=Instance.new("TextButton",row)
+            sp.Size=UDim2.new(0,52,0,34); sp.Position=UDim2.new(1,-58,0.5,-17)
+            sp.BackgroundColor3=Color3.fromRGB(90,60,200); sp.TextColor3=Color3.new(1,1,1)
+            sp.Text="👁️"; sp.Font=Enum.Font.GothamBold; sp.TextSize=14; sp.BorderSizePixel=0
+            Instance.new("UICorner",sp).CornerRadius=UDim.new(0,8)
+            sp.MouseButton1Click:Connect(function() SpectatePlayer(p) end)
+        end
+    end
+end
+ActBtn(TT,"🔄  Refrescar Lista",Color3.fromRGB(34,160,60),function() RebuildPlrList() end)
+RebuildPlrList()
+Players.PlayerAdded:Connect(function() task.wait(0.5) RebuildPlrList() end)
+Players.PlayerRemoving:Connect(function(p)
+    if Spectating==p then StopSpectate() end
+    task.wait(0.5) RebuildPlrList()
 end)
 
 -- ════════ HELPERS POST-KEY (solo arrancan tras validar key) ════════
