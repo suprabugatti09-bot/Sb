@@ -812,24 +812,14 @@ local function StartHub()
                     bv.MaxForce=Vector3.new(math.huge,math.huge,math.huge)
                     bv.P=1200; bv.Parent=hrp
                 end
-                local bg=hrp:FindFirstChild("JXJCG")
-                if not bg then
-                    bg=Instance.new("BodyGyro"); bg.Name="JXJCG"
-                    bg.MaxTorque=Vector3.new(math.huge,math.huge,math.huge)
-                    bg.P=3000; bg.D=250; bg.Parent=hrp
+                -- Sin gyro: el cuerpo queda suelto en caída libre, como en el video
+                local bg=hrp:FindFirstChild("JXJCG"); if bg then bg:Destroy() end
+                hum.PlatformStand=false
+                if hum:GetState()~=Enum.HumanoidStateType.Freefall then
+                    hum:ChangeState(Enum.HumanoidStateType.Freefall)
                 end
                 local camLook=Camera.CFrame.LookVector
-                local flat=Vector3.new(camLook.X,0,camLook.Z)
                 local md=hum.MoveDirection
-                if flat.Magnitude>0.01 then
-                    if md.Magnitude>0.05 then
-                        -- Moviéndote: se inclina hacia adelante (deslizándose, como en el video)
-                        bg.CFrame=CFrame.new(hrp.Position,hrp.Position+flat.Unit)*CFrame.Angles(-math.rad(38),0,0)
-                    else
-                        -- Quieto: parado normal mirando hacia la cámara
-                        bg.CFrame=CFrame.new(hrp.Position,hrp.Position+flat.Unit)
-                    end
-                end
                 local vy
                 if _G.Misc.FlyUp then vy=_G.Misc.FlyCharSpeed
                 elseif _G.Misc.FlyDown then vy=-_G.Misc.FlyCharSpeed
