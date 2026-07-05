@@ -867,18 +867,24 @@ local function StartHub()
             for _,p in pairs(Players:GetPlayers()) do
                 if p~=L_Plr and p.Character then
                     for n,act in pairs(_G.Parts_Active) do
-                        local part=p.Character:FindFirstChild(n)
-                        if part and part:IsA("BasePart") then
-                            local hb=p.Character:FindFirstChild("JXJHB_"..n)
+                        -- Separa la pieza real de la caja invisible (las dos se llaman igual)
+                        local real,hb=nil,nil
+                        for _,c in pairs(p.Character:GetChildren()) do
+                            if c.Name==n and c:IsA("BasePart") then
+                                if c:GetAttribute("JXJHB") then hb=c else real=c end
+                            end
+                        end
+                        if real then
                             if act then
-                                -- Caja invisible DENTRO del personaje: los disparos sí cuentan y el cuerpo se ve normal
+                                -- Caja invisible con el MISMO nombre que la pieza: los disparos cuentan
                                 if not hb then
-                                    hb=Instance.new("Part"); hb.Name="JXJHB_"..n
+                                    hb=Instance.new("Part"); hb.Name=n
+                                    hb:SetAttribute("JXJHB",true)
                                     hb.Transparency=1; hb.CanCollide=false; hb.Massless=true
                                     hb.CanQuery=true; hb.CanTouch=true
-                                    hb.CFrame=part.CFrame; hb.Parent=p.Character
+                                    hb.CFrame=real.CFrame; hb.Parent=p.Character
                                     local w=Instance.new("WeldConstraint")
-                                    w.Part0=part; w.Part1=hb; w.Parent=hb
+                                    w.Part0=real; w.Part1=hb; w.Parent=hb
                                 end
                                 hb.Size=Vector3.new(_G.Hitbox_Size,_G.Hitbox_Size,_G.Hitbox_Size)
                             elseif hb then
