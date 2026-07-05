@@ -437,7 +437,7 @@ local Mouse        = L_Plr:GetMouse()
 _G.Hitbox_Size   = 15
 _G.Parts_Active  = { UpperTorso = false, HumanoidRootPart = false, LeftUpperArm = false, RightUpperArm = false, LeftUpperLeg = false, RightUpperLeg = false }
 _G.Visuals       = { Box = false, Names = false, Dist = false, Weapon = false, HealthBar = false, Tracers = false }
-_G.Combat        = { SilentAim = false, TriggerBot = false, RapidFire = false, NoRecoil = false }
+_G.Combat        = { SilentAim = false, TriggerBot = false, NoRecoil = false }
 _G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false, FlyChar = false, FlyCharSpeed = 19, AntiRK = false }
 local DeletedObjects = {}
 
@@ -462,8 +462,6 @@ local TR={
     ["Pierna Der."]="Right Leg",
     ["Hitbox pierna der."]="Right leg hitbox",
     ["Aim silencioso automático"]="Automatic silent aim",
-    ["Rapid Fire"]="Rapid Fire",
-    ["Dispara súper rápido con el arma"]="Fires super fast with your weapon",
     ["Caja alrededor de jugadores"]="Box around players",
     ["Nombre sobre jugadores"]="Name above players",
     ["Distancia al jugador"]="Distance to player",
@@ -752,27 +750,6 @@ IosRow(CT,"Pierna Izq.","Hitbox pierna izq.",false,function(v) _G.Parts_Active.L
 IosRow(CT,"Pierna Der.","Hitbox pierna der.",false,function(v) _G.Parts_Active.RightUpperLeg=v end)
 SecLbl(CT,"  COMBAT")
 IosRow(CT,"Silent Aim","Aim silencioso automático",false,function(v) _G.Combat.SilentAim=v end)
-IosRow(CT,"Rapid Fire","Dispara súper rápido con el arma",false,function(v) _G.Combat.RapidFire=v end)
-task.spawn(function()
-    while true do
-        if _G.Combat.RapidFire then
-            local char=L_Plr.Character
-            local tool=char and char:FindFirstChildOfClass("Tool")
-            if tool then
-                -- 1) Activa el arma (juegos que usan Tool.Activated)
-                pcall(function() tool:Activate() end)
-                -- 2) Simula clic del mouse (juegos que disparan con clic)
-                if mouse1click then pcall(mouse1click)
-                elseif mouse1press and mouse1release then
-                    pcall(mouse1press); pcall(mouse1release)
-                end
-            end
-            task.wait(0.05)
-        else
-            task.wait(0.15)
-        end
-    end
-end)
 
 -- ════════ VISUALS ════════
 SecLbl(VT,"  ESP")
