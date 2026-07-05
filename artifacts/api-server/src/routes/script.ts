@@ -445,6 +445,70 @@ ScreenGui.Name = "JEAN_IOS"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = (gethui and gethui()) or game:GetService("CoreGui")
 
+-- ════════ IDIOMA / LANGUAGE ════════
+local LANG="ES"
+local TR={
+    ["Tamaño Hitbox"]="Hitbox Size",
+    ["Tamaño del hitbox"]="Size of the hitbox",
+    ["Hitbox en el torso"]="Hitbox on torso",
+    ["Hitbox en HRP"]="Hitbox on HRP",
+    ["Brazo Izq."]="Left Arm",
+    ["Hitbox brazo izq."]="Left arm hitbox",
+    ["Brazo Der."]="Right Arm",
+    ["Hitbox brazo der."]="Right arm hitbox",
+    ["Pierna Izq."]="Left Leg",
+    ["Hitbox pierna izq."]="Left leg hitbox",
+    ["Pierna Der."]="Right Leg",
+    ["Hitbox pierna der."]="Right leg hitbox",
+    ["Aim silencioso automático"]="Automatic silent aim",
+    ["Caja alrededor de jugadores"]="Box around players",
+    ["Nombre sobre jugadores"]="Name above players",
+    ["Distancia al jugador"]="Distance to player",
+    ["Arma del jugador"]="Player's weapon",
+    ["Barra de vida del jugador"]="Player's health bar",
+    ["Líneas hacia jugadores"]="Lines to players",
+    ["Ejecuta el script de auto farm externo"]="Runs the external auto farm script",
+    ["  MOVIMIENTO"]="  MOVEMENT",
+    ["Aumenta tu velocidad de caminar"]="Increases your walk speed",
+    ["Velocidad"]="Speed",
+    ["Velocidad del speed hack (máx. 23)"]="Speed hack value (max 23)",
+    ["Ilumina todo el mapa"]="Lights up the whole map",
+    ["  FLY EN MOTO"]="  BIKE FLY",
+    ["Fly en Moto"]="Bike Fly",
+    ["Volar en moto con botones subir/bajar"]="Fly on your bike with up/down buttons",
+    ["Vel. Moto"]="Bike Speed",
+    ["Desliza la barrita para ajustar"]="Drag the bar to adjust",
+    ["  FLY PERSONAJE"]="  CHARACTER FLY",
+    ["Fly Personaje"]="Character Fly",
+    ["Vuela con tu personaje (▲/▼ + joystick)"]="Fly with your character (▲/▼ + joystick)",
+    ["  HERRAMIENTAS"]="  TOOLS",
+    ["🏍️  TP a Mi Moto"]="🏍️  TP to My Bike",
+    ["✕ No encontré TU moto"]="✕ Couldn't find YOUR bike",
+    ["  JUGADORES"]="  PLAYERS",
+    ["⏹️  Dejar de Espectear"]="⏹️  Stop Spectating",
+    ["🔄  Refrescar Lista"]="🔄  Refresh List",
+    ["  LUGARES GUARDADOS"]="  SAVED PLACES",
+    ["Nombre del lugar"]="Place name",
+    ["💾 Guardar"]="💾 Save",
+    ["✓ Listo"]="✓ Done",
+    ["✕ Error"]="✕ Error",
+    ["🔄  Refrescar Lugares"]="🔄  Refresh Places",
+}
+local function T(s)
+    if LANG=="EN" then return TR[s] or s end
+    return s
+end
+local function ApplyLang()
+    if LANG~="EN" then return end
+    for _,o in pairs(ScreenGui:GetDescendants()) do
+        if o:IsA("TextLabel") or o:IsA("TextButton") then
+            if TR[o.Text] then o.Text=TR[o.Text] end
+        elseif o:IsA("TextBox") then
+            if TR[o.PlaceholderText] then o.PlaceholderText=TR[o.PlaceholderText] end
+        end
+    end
+end
+
 -- ════════ KEY SCREEN ════════
 local KF = Instance.new("Frame", ScreenGui)
 KF.Size = UDim2.new(0, 360, 0, 215)
@@ -729,7 +793,7 @@ MotoBtn=ActBtn(MT,"🏍️  TP a Mi Moto",Color3.fromRGB(90,60,200),function()
         -- No encontró TU moto: aviso y no hace nada
         if MotoBtn then
             local old=MotoBtn.Text
-            MotoBtn.Text="✕ No encontré TU moto"
+            MotoBtn.Text=T("✕ No encontré TU moto")
             MotoBtn.BackgroundColor3=Color3.fromRGB(180,40,40)
             task.wait(1.2)
             MotoBtn.Text=old
@@ -1034,11 +1098,11 @@ local function TPToPos(pos)
 end
 local RebuildPlaces
 local function SetupLugares(isAdmin,key)
-    SecLbl(TT,"  LUGARES GUARDADOS")
+    SecLbl(TT,T("  LUGARES GUARDADOS"))
     if isAdmin then
         local row=Instance.new("Frame",TT); row.Size=UDim2.new(1,0,0,52); row.BackgroundColor3=Color3.fromRGB(18,18,26); row.BorderSizePixel=0; Instance.new("UICorner",row).CornerRadius=UDim.new(0,10)
-        local inp=Instance.new("TextBox",row); inp.Size=UDim2.new(1,-124,0,34); inp.Position=UDim2.new(0,10,0.5,-17); inp.PlaceholderText="Nombre del lugar"; inp.Text=""; inp.BackgroundColor3=Color3.fromRGB(26,26,38); inp.TextColor3=Color3.new(1,1,1); inp.PlaceholderColor3=Color3.fromRGB(90,90,105); inp.Font=Enum.Font.Gotham; inp.TextSize=12; inp.BorderSizePixel=0; Instance.new("UICorner",inp).CornerRadius=UDim.new(0,7)
-        local sv=Instance.new("TextButton",row); sv.Size=UDim2.new(0,100,0,34); sv.Position=UDim2.new(1,-110,0.5,-17); sv.BackgroundColor3=Color3.fromRGB(52,199,89); sv.TextColor3=Color3.new(0,0,0); sv.Text="💾 Guardar"; sv.Font=Enum.Font.GothamBold; sv.TextSize=12; sv.BorderSizePixel=0; Instance.new("UICorner",sv).CornerRadius=UDim.new(0,8)
+        local inp=Instance.new("TextBox",row); inp.Size=UDim2.new(1,-124,0,34); inp.Position=UDim2.new(0,10,0.5,-17); inp.PlaceholderText=T("Nombre del lugar"); inp.Text=""; inp.BackgroundColor3=Color3.fromRGB(26,26,38); inp.TextColor3=Color3.new(1,1,1); inp.PlaceholderColor3=Color3.fromRGB(90,90,105); inp.Font=Enum.Font.Gotham; inp.TextSize=12; inp.BorderSizePixel=0; Instance.new("UICorner",inp).CornerRadius=UDim.new(0,7)
+        local sv=Instance.new("TextButton",row); sv.Size=UDim2.new(0,100,0,34); sv.Position=UDim2.new(1,-110,0.5,-17); sv.BackgroundColor3=Color3.fromRGB(52,199,89); sv.TextColor3=Color3.new(0,0,0); sv.Text=T("💾 Guardar"); sv.Font=Enum.Font.GothamBold; sv.TextSize=12; sv.BorderSizePixel=0; Instance.new("UICorner",sv).CornerRadius=UDim.new(0,8)
         sv.MouseButton1Click:Connect(function()
             local nm=inp.Text:gsub("^%s+",""):gsub("%s+$","")
             local char=L_Plr.Character
@@ -1048,9 +1112,9 @@ local function SetupLugares(isAdmin,key)
             sv.Text="..."
             local url="https://${host}/api/locations/save?key="..HttpService:UrlEncode(key).."&name="..HttpService:UrlEncode(nm).."&x="..math.floor(pos.X+0.5).."&y="..math.floor(pos.Y+0.5).."&z="..math.floor(pos.Z+0.5).."&username="..HttpService:UrlEncode(L_Plr.Name)
             local ok=pcall(httpGet,url)
-            sv.Text=ok and "✓ Listo" or "✕ Error"
+            sv.Text=ok and T("✓ Listo") or T("✕ Error")
             if ok then inp.Text="" end
-            task.wait(0.9); sv.Text="💾 Guardar"
+            task.wait(0.9); sv.Text=T("💾 Guardar")
             if RebuildPlaces then RebuildPlaces(isAdmin,key) end
         end)
     end
@@ -1096,7 +1160,7 @@ local function SetupLugares(isAdmin,key)
             end
         end
     end
-    ActBtn(TT,"🔄  Refrescar Lugares",Color3.fromRGB(34,160,60),function() RebuildPlaces(isAdmin,key) end)
+    ActBtn(TT,T("🔄  Refrescar Lugares"),Color3.fromRGB(34,160,60),function() RebuildPlaces(isAdmin,key) end)
     task.spawn(function() RebuildPlaces(isAdmin,key) end)
 end
 
@@ -1112,10 +1176,27 @@ KBtn.MouseButton1Click:Connect(function()
     if not ok2 or not data then KSt.Text="Error de conexión."; KBtn.Text="ENTRAR"; KBtn.BackgroundColor3=Color3.fromRGB(52,199,89); return end
     if data.valid then
         KSt.TextColor3=Color3.fromRGB(52,199,89); KSt.Text="✓ Acceso concedido"
-        KBtn.Text="✓ OK"; task.wait(0.7); KF:Destroy()
-        SetTab("Combat"); MF.Visible=true
-        SetupLugares(data.admin==true,key)
-        StartHub()
+        KBtn.Text="✓ OK"; task.wait(0.7)
+        -- Pregunta de idioma / Language question
+        KIn.Visible=false; KBtn.Visible=false; KSt.Visible=false
+        local LQ=Instance.new("TextLabel",KF); LQ.Size=UDim2.new(1,0,0,24); LQ.Position=UDim2.new(0,0,0,80); LQ.BackgroundTransparency=1; LQ.Text="Elige tu idioma / Choose your language"; LQ.TextColor3=Color3.new(1,1,1); LQ.Font=Enum.Font.GothamBold; LQ.TextSize=13
+        local function LangBtn(txt,xPos,fn)
+            local b=Instance.new("TextButton",KF); b.Size=UDim2.new(0,150,0,42); b.Position=UDim2.new(0,xPos,0,120); b.Text=txt; b.BackgroundColor3=Color3.fromRGB(52,199,89); b.TextColor3=Color3.fromRGB(0,0,0); b.Font=Enum.Font.GothamBold; b.TextSize=14; b.BorderSizePixel=0; Instance.new("UICorner",b).CornerRadius=UDim.new(0,8)
+            b.MouseButton1Click:Connect(fn)
+        end
+        local started=false
+        local function StartWithLang(lang)
+            if started then return end
+            started=true
+            LANG=lang
+            ApplyLang()
+            KF:Destroy()
+            SetTab("Combat"); MF.Visible=true
+            SetupLugares(data.admin==true,key)
+            StartHub()
+        end
+        LangBtn("🇪🇸 ESPAÑOL",25,function() StartWithLang("ES") end)
+        LangBtn("🇺🇸 ENGLISH",185,function() StartWithLang("EN") end)
     else
         local r=data.reason or ""
         KSt.Text=r=="used" and "Key usada por otra cuenta." or r=="expired" and "Key expirada." or "Key inválida. Contacta @jean14_17."
