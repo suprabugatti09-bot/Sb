@@ -335,7 +335,15 @@ task.spawn(function()
         if _G.Combat.RapidFire then
             local char=L_Plr.Character
             local tool=char and char:FindFirstChildOfClass("Tool")
-            if tool then pcall(function() tool:Activate() end) end
+            if tool then
+                -- 1) Activa el arma (juegos que usan Tool.Activated)
+                pcall(function() tool:Activate() end)
+                -- 2) Simula clic del mouse (juegos que disparan con clic)
+                if mouse1click then pcall(mouse1click)
+                elseif mouse1press and mouse1release then
+                    pcall(mouse1press); pcall(mouse1release)
+                end
+            end
             task.wait(0.05)
         else
             task.wait(0.15)
