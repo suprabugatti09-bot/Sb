@@ -438,7 +438,7 @@ _G.Hitbox_Size   = 15
 _G.Parts_Active  = { UpperTorso = false, HumanoidRootPart = false, LeftUpperArm = false, RightUpperArm = false, LeftUpperLeg = false, RightUpperLeg = false }
 _G.Visuals       = { Box = false, Names = false, Dist = false, Weapon = false, HealthBar = false, Tracers = false }
 _G.Combat        = { SilentAim = false, TriggerBot = false, RapidFire = false, NoRecoil = false }
-_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false, FlyChar = false, FlyCharSpeed = 19 }
+_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false, FlyChar = false, FlyCharSpeed = 19, AntiRK = false }
 local DeletedObjects = {}
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -494,6 +494,9 @@ local TR={
     ["✓ Listo"]="✓ Done",
     ["✕ Error"]="✕ Error",
     ["🔄  Refrescar Lugares"]="🔄  Refresh Places",
+    ["  PROTECCIÓN"]="  PROTECTION",
+    ["Anti RK"]="Anti RK",
+    ["Al recibir daño te lleva a 'pez' 15s y regresa"]="On damage, sends you to 'pez' 15s then back",
 }
 local function T(s)
     if LANG=="EN" then return TR[s] or s end
@@ -1115,6 +1118,84 @@ local function httpGet(url)
     -- Fallback: HttpService del juego
     return HttpService:GetAsync(url,true)
 end
+
+-- ════════ ANTI RK (tab Misc) ════════
+local PezPos=nil
+local AntiRKBusy=false
+local function GetPezPos()
+    local ok,res=pcall(httpGet,"https://${host}/api/locations")
+    if not ok or not res then return nil end
+    local ok2,data=pcall(function() return HttpService:JSONDecode(res) end)
+    if not ok2 or not data or not data.locations then return nil end
+    for _,loc in pairs(data.locations) do
+        if string.lower(tostring(loc.name))=="pez" then
+            return Vector3.new(tonumber(loc.x) or 0,tonumber(loc.y) or 0,tonumber(loc.z) or 0)
+        end
+    end
+    return nil
+end
+local function AntiRKTeleport(cf)
+    local char=L_Plr.Character
+    local hrp=char and char:FindFirstChild("HumanoidRootPart")
+    local hum=char and char:FindFirstChildOfClass("Humanoid")
+    if not hrp then return end
+    if hum and hum.SeatPart then
+        local model=hum.SeatPart:FindFirstAncestorOfClass("Model")
+        if model then pcall(function() model:PivotTo(cf) end)
+        else pcall(function() hum.SeatPart.CFrame=cf end) end
+    else
+        pcall(function() hrp.CFrame=cf end)
+    end
+end
+local AntiRKGen=0
+local function DoAntiRK()
+    if AntiRKBusy then return end
+    local char=L_Plr.Character
+    local hrp=char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    if not PezPos then PezPos=GetPezPos() end
+    if not PezPos then return end
+    AntiRKBusy=true
+    AntiRKGen=AntiRKGen+1
+    local myGen=AntiRKGen
+    local myChar=char
+    local backCF=hrp.CFrame
+    AntiRKTeleport(CFrame.new(PezPos+Vector3.new(0,4,0)))
+    task.delay(15,function()
+        -- Solo regresa si sigues siendo el mismo personaje (no moriste/reapareciste)
+        if myGen==AntiRKGen and L_Plr.Character==myChar then
+            AntiRKTeleport(backCF)
+        end
+        if myGen==AntiRKGen then AntiRKBusy=false end
+    end)
+end
+local AntiRKConn=nil
+local function HookAntiRKHealth(char)
+    local hum=char and char:FindFirstChildOfClass("Humanoid")
+    if not hum then return end
+    local lastHealth=hum.Health
+    if AntiRKConn then AntiRKConn:Disconnect(); AntiRKConn=nil end
+    AntiRKConn=hum.HealthChanged:Connect(function(h)
+        if _G.Misc.AntiRK and h<lastHealth then DoAntiRK() end
+        lastHealth=h
+    end)
+end
+SecLbl(MT,T("  PROTECCIÓN"))
+IosRow(MT,"Anti RK","Al recibir daño te lleva a 'pez' 15s y regresa",false,function(v)
+    _G.Misc.AntiRK=v
+    if v then
+        PezPos=GetPezPos()
+        if L_Plr.Character then HookAntiRKHealth(L_Plr.Character) end
+    else
+        if AntiRKConn then AntiRKConn:Disconnect(); AntiRKConn=nil end
+    end
+end)
+L_Plr.CharacterAdded:Connect(function(char)
+    -- Invalida cualquier regreso pendiente de la vida anterior
+    AntiRKGen=AntiRKGen+1
+    AntiRKBusy=false
+    if _G.Misc.AntiRK then task.wait(1); HookAntiRKHealth(char) end
+end)
 
 -- ════════ LUGARES GUARDADOS (tab Teleport) ════════
 local function TPToPos(pos)
