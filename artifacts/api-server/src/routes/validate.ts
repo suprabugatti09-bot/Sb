@@ -83,12 +83,13 @@ async function seedAdminKey() {
 
 async function seedBenjaKey() {
   try {
-    await db.insert(keysTable).values({
-      key: "BENJA-JX92-KM47",
-      isActive: true,
-      maxUses: 1,
-      note: "BENJA permanente",
-    }).onConflictDoNothing();
+    const benjaKeys = [
+      { key: "BENJA-JX92-KM47", note: "BENJA permanente" },
+      { key: "BENJA-WT63-PD81", note: "BENJA permanente 2" },
+    ];
+    await db.insert(keysTable).values(
+      benjaKeys.map(k => ({ key: k.key, isActive: true, maxUses: 1, note: k.note }))
+    ).onConflictDoNothing();
   } catch {}
 }
 
