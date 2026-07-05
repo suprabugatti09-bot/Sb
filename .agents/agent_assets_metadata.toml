@@ -6,3 +6,9 @@ id = "9NS4HnXlh8P5FIi_9ywxQ"
 uri = "file://exports/JEAN_X_JAY_script_completo.txt"
 type = "text"
 title = "CÓDIGO COMPLETO DEL SCRIPT (702 líneas)"
+
+[[outputs]]
+id = "-F_Rs-DwETppQ-fH-76re"
+uri = "file://exports/BENJA_script_completo.txt"
+type = "text"
+title = "Script BENJA completo"
