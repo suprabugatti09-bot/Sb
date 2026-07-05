@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db, keysTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { notifyKeyUse } from "../telegram";
 
 const router = Router();
@@ -108,10 +108,26 @@ router.get("/validate", async (req, res) => {
 
     if (found.timesUsed >= found.maxUses) return res.json({ valid: false, reason: "used" });
 
-    await db.update(keysTable).set({
-      timesUsed: found.timesUsed + 1,
-      usedBy: [...usedBy, username],
-    }).where(eq(keysTable.id, found.id));
+    const updated = await db.execute(sql`
+      UPDATE jean_keys
+      SET times_used = times_used + 1,
+          used_by = used_by || ${JSON.stringify([username])}::jsonb
+      WHERE id = ${found.id}
+        AND is_active = true
+        AND times_used < max_uses
+        AND NOT (used_by @> ${JSON.stringify([username])}::jsonb)
+      RETURNING id
+    `);
+
+    if (updated.rows.length === 0) {
+      const [recheck] = await db.select().from(keysTable).where(eq(keysTable.id, found.id));
+      const recheckUsedBy = (recheck?.usedBy as string[]) || [];
+      if (recheck && recheckUsedBy.includes(username)) {
+        notifyKeyUse({ key: found.key, username, userId: userid, cached: true }).catch(() => {});
+        return res.json({ valid: true, cached: true, admin: isAdmin, expiresAt });
+      }
+      return res.json({ valid: false, reason: "used" });
+    }
 
     notifyKeyUse({ key: found.key, username, userId: userid, cached: false }).catch(() => {});
 

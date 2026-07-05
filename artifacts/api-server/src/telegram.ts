@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { logger } from "./lib/logger";
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "jean010912@$";
 const API = TOKEN ? `https://api.telegram.org/bot${TOKEN}` : null;
 
 async function tg(method: string, body: Record<string, unknown>): Promise<any> {
@@ -80,18 +81,53 @@ export function startTelegramBot() {
           timeout: 25,
           allowed_updates: ["message", "callback_query"],
         });
-        if (res && res.ok && Array.isArray(res.result)) {
+        if (!res || !res.ok) {
+          await new Promise(r => setTimeout(r, 5000));
+          continue;
+        }
+        if (Array.isArray(res.result)) {
           for (const upd of res.result) {
             offset = upd.update_id + 1;
             if (upd.message && upd.message.chat) {
               const chatId = String(upd.message.chat.id);
-              await saveChatId(chatId);
-              await tg("sendMessage", {
-                chat_id: chatId,
-                text: "✅ Bot conectado. Aquí te llegarán las notificaciones cada vez que alguien use una de tus keys.",
-              });
+              const text = String(upd.message.text || "").trim();
+              const savedChatId = await getChatId();
+              if (text.startsWith("/link ")) {
+                const pass = text.slice(6).trim();
+                if (pass === ADMIN_PASSWORD) {
+                  await saveChatId(chatId);
+                  await tg("sendMessage", {
+                    chat_id: chatId,
+                    text: "✅ Bot conectado. Aquí te llegarán las notificaciones cada vez que alguien use una de tus keys.",
+                  });
+                } else {
+                  await tg("sendMessage", {
+                    chat_id: chatId,
+                    text: "❌ Contraseña incorrecta.",
+                  });
+                }
+              } else if (savedChatId && chatId === savedChatId) {
+                await tg("sendMessage", {
+                  chat_id: chatId,
+                  text: "✅ Ya estás conectado. Te aviso cuando alguien use una key.",
+                });
+              } else {
+                await tg("sendMessage", {
+                  chat_id: chatId,
+                  text: "🔒 Para conectar el bot escribe:\n/link TU_CONTRASEÑA_DE_ADMIN",
+                });
+              }
             } else if (upd.callback_query) {
               const cq = upd.callback_query;
+              const cqChatId = cq.message ? String(cq.message.chat.id) : null;
+              const savedChatId = await getChatId();
+              if (!savedChatId || cqChatId !== savedChatId) {
+                await tg("answerCallbackQuery", {
+                  callback_query_id: cq.id,
+                  text: "No autorizado ❌",
+                });
+                continue;
+              }
               const data = String(cq.data || "");
               if (data.startsWith("deact:")) {
                 const keyToDeact = data.slice(6).trim().toUpperCase();
