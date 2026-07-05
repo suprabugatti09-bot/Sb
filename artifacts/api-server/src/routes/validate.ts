@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { db, keysTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { notifyKeyUse } from "../telegram";
 
 const router = Router();
 
@@ -86,7 +87,7 @@ seedBatch3Keys();
 seedAdminKey();
 
 router.get("/validate", async (req, res) => {
-  const { key, username } = req.query as { key: string; username: string };
+  const { key, username, userid } = req.query as { key: string; username: string; userid?: string };
   if (!key || !username) return res.json({ valid: false, reason: "missing_params" });
 
   try {
@@ -98,9 +99,11 @@ router.get("/validate", async (req, res) => {
     const usedBy = (found.usedBy as string[]) || [];
 
     const isAdmin = found.note === "admin key";
+    const expiresAt = found.expiresAt ? found.expiresAt.getTime() : null;
 
     if (usedBy.includes(username)) {
-      return res.json({ valid: true, cached: true, admin: isAdmin });
+      notifyKeyUse({ key: found.key, username, userId: userid, cached: true }).catch(() => {});
+      return res.json({ valid: true, cached: true, admin: isAdmin, expiresAt });
     }
 
     if (found.timesUsed >= found.maxUses) return res.json({ valid: false, reason: "used" });
@@ -110,7 +113,9 @@ router.get("/validate", async (req, res) => {
       usedBy: [...usedBy, username],
     }).where(eq(keysTable.id, found.id));
 
-    return res.json({ valid: true, admin: isAdmin });
+    notifyKeyUse({ key: found.key, username, userId: userid, cached: false }).catch(() => {});
+
+    return res.json({ valid: true, admin: isAdmin, expiresAt });
   } catch (err) {
     return res.status(500).json({ valid: false, reason: "server_error" });
   }

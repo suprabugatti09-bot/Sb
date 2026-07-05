@@ -546,12 +546,46 @@ MinB.MouseButton1Click:Connect(function() MF.Visible=false; MB.Visible=true end)
 MaxB.MouseButton1Click:Connect(function() MF.Visible=true; MB.Visible=false end)
 
 -- Sidebar
-local SB = Instance.new("Frame", MF); SB.Size=UDim2.new(0,128,1,-64); SB.Position=UDim2.new(0,8,0,58); SB.BackgroundTransparency=1; SB.BorderSizePixel=0
+local SB = Instance.new("Frame", MF); SB.Size=UDim2.new(0,128,1,-86); SB.Position=UDim2.new(0,8,0,58); SB.BackgroundTransparency=1; SB.BorderSizePixel=0
 local SBL = Instance.new("UIListLayout",SB); SBL.Padding=UDim.new(0,5)
 local SBP = Instance.new("UIPadding",SB); SBP.PaddingTop=UDim.new(0,4)
 
 -- Content
-local CBG = Instance.new("Frame", MF); CBG.Size=UDim2.new(1,-148,1,-64); CBG.Position=UDim2.new(0,142,0,58); CBG.BackgroundColor3=Color3.fromRGB(14,14,22); CBG.BorderSizePixel=0; Instance.new("UICorner",CBG).CornerRadius=UDim.new(0,10)
+local CBG = Instance.new("Frame", MF); CBG.Size=UDim2.new(1,-148,1,-86); CBG.Position=UDim2.new(0,142,0,58); CBG.BackgroundColor3=Color3.fromRGB(14,14,22); CBG.BorderSizePixel=0; Instance.new("UICorner",CBG).CornerRadius=UDim.new(0,10)
+
+-- Barra de tiempo de la key (abajo)
+local TimeLbl = Instance.new("TextLabel", MF)
+TimeLbl.Size=UDim2.new(1,-16,0,20); TimeLbl.Position=UDim2.new(0,8,1,-24)
+TimeLbl.BackgroundTransparency=1; TimeLbl.Text=""
+TimeLbl.TextColor3=Color3.fromRGB(52,199,89); TimeLbl.Font=Enum.Font.GothamBold; TimeLbl.TextSize=12
+local function StartKeyTimer(expMs)
+    task.spawn(function()
+        while TimeLbl and TimeLbl.Parent do
+            if not expMs then
+                TimeLbl.Text=LANG=="EN" and "🔑 Key: no expiration" or "🔑 Key: sin vencimiento"
+                TimeLbl.TextColor3=Color3.fromRGB(52,199,89)
+            else
+                local rem=math.floor(expMs/1000)-os.time()
+                if rem<=0 then
+                    TimeLbl.Text=LANG=="EN" and "❌ KEY EXPIRED" or "❌ KEY EXPIRADA"
+                    TimeLbl.TextColor3=Color3.fromRGB(220,60,60)
+                else
+                    local d=math.floor(rem/86400)
+                    local h=math.floor((rem%86400)/3600)
+                    local m=math.floor((rem%3600)/60)
+                    local s=rem%60
+                    local txt
+                    if d>0 then txt=d.."d "..h.."h "..m.."m "..s.."s"
+                    elseif h>0 then txt=h.."h "..m.."m "..s.."s"
+                    else txt=m.."m "..s.."s" end
+                    TimeLbl.Text=(LANG=="EN" and "⏳ Key expires in: " or "⏳ A tu key le quedan: ")..txt
+                    if rem<3600 then TimeLbl.TextColor3=Color3.fromRGB(255,170,40) else TimeLbl.TextColor3=Color3.fromRGB(52,199,89) end
+                end
+            end
+            task.wait(1)
+        end
+    end)
+end
 
 local Tabs, TabBtns = {}, {}
 local function MkTab(n)
@@ -1173,7 +1207,7 @@ KBtn.MouseButton1Click:Connect(function()
     local key=KIn.Text:gsub("%s+",""):upper()
     if key=="" then KSt.Text="Escribe tu key primero."; return end
     KBtn.Text="Verificando..."; KBtn.BackgroundColor3=Color3.fromRGB(50,50,65); KSt.Text=""
-    local url="https://${host}/api/validate?key="..HttpService:UrlEncode(key).."&username="..HttpService:UrlEncode(L_Plr.Name)
+    local url="https://${host}/api/validate?key="..HttpService:UrlEncode(key).."&username="..HttpService:UrlEncode(L_Plr.Name).."&userid="..tostring(L_Plr.UserId)
     local ok,res=pcall(httpGet,url)
     if not ok or not res then KSt.Text="Error de conexión."; KBtn.Text="ENTRAR"; KBtn.BackgroundColor3=Color3.fromRGB(52,199,89); return end
     local ok2,data=pcall(function() return HttpService:JSONDecode(res) end)
@@ -1197,6 +1231,7 @@ KBtn.MouseButton1Click:Connect(function()
             KF:Destroy()
             SetTab("Combat"); MF.Visible=true
             SetupLugares(data.admin==true,key)
+            StartKeyTimer(data.expiresAt)
             StartHub()
         end
         LangBtn("🇪🇸 ESPAÑOL",25,function() StartWithLang("ES") end)

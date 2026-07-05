@@ -11,3 +11,8 @@ export const locationsTable = pgTable("jean_locations", {
 });
 
 export type Location = typeof locationsTable.$inferSelect;
+
+export const settingsTable = pgTable("jean_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+});
