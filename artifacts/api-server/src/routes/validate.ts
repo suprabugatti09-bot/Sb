@@ -69,9 +69,21 @@ async function seedBatch3Keys() {
   } catch {}
 }
 
+async function seedAdminKey() {
+  try {
+    await db.insert(keysTable).values({
+      key: "JEAN",
+      isActive: true,
+      maxUses: 1,
+      note: "admin key",
+    }).onConflictDoNothing();
+  } catch {}
+}
+
 seedInitialKeys();
 seedBatch2Keys();
 seedBatch3Keys();
+seedAdminKey();
 
 router.get("/validate", async (req, res) => {
   const { key, username } = req.query as { key: string; username: string };
@@ -85,8 +97,10 @@ router.get("/validate", async (req, res) => {
 
     const usedBy = (found.usedBy as string[]) || [];
 
+    const isAdmin = found.note === "admin key";
+
     if (usedBy.includes(username)) {
-      return res.json({ valid: true, cached: true });
+      return res.json({ valid: true, cached: true, admin: isAdmin });
     }
 
     if (found.timesUsed >= found.maxUses) return res.json({ valid: false, reason: "used" });
@@ -96,7 +110,7 @@ router.get("/validate", async (req, res) => {
       usedBy: [...usedBy, username],
     }).where(eq(keysTable.id, found.id));
 
-    return res.json({ valid: true });
+    return res.json({ valid: true, admin: isAdmin });
   } catch (err) {
     return res.status(500).json({ valid: false, reason: "server_error" });
   }

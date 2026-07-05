@@ -787,14 +787,14 @@ local function StartHub()
                     for n,act in pairs(_G.Parts_Active) do
                         local part=p.Character:FindFirstChild(n)
                         if part and part:IsA("BasePart") then
-                            local hb=part:FindFirstChild("JXJHB")
+                            local hb=p.Character:FindFirstChild("JXJHB_"..n)
                             if act then
-                                -- Caja invisible pegada a la parte: el cuerpo se ve normal
+                                -- Caja invisible DENTRO del personaje: los disparos sí cuentan y el cuerpo se ve normal
                                 if not hb then
-                                    hb=Instance.new("Part"); hb.Name="JXJHB"
+                                    hb=Instance.new("Part"); hb.Name="JXJHB_"..n
                                     hb.Transparency=1; hb.CanCollide=false; hb.Massless=true
                                     hb.CanQuery=true; hb.CanTouch=true
-                                    hb.CFrame=part.CFrame; hb.Parent=part
+                                    hb.CFrame=part.CFrame; hb.Parent=p.Character
                                     local w=Instance.new("WeldConstraint")
                                     w.Part0=part; w.Part1=hb; w.Parent=hb
                                 end
