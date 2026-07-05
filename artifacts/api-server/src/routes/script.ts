@@ -604,7 +604,7 @@ local function MkTab(n)
     local pd = Instance.new("UIPadding",sc); pd.PaddingTop=UDim.new(0,4); pd.PaddingBottom=UDim.new(0,8); pd.PaddingRight=UDim.new(0,4)
     Tabs[n]=sc; return sc
 end
-local CT=MkTab("Combat"); local VT=MkTab("Visuals"); local FT=MkTab("Farm"); local MT=MkTab("Misc"); local TT=MkTab("Teleport")
+local CT=MkTab("Combat"); local VT=MkTab("Visuals"); local FT=MkTab("Farm"); local MT=MkTab("Misc"); local TT=MkTab("Teleport"); local ET=MkTab("Espectear"); local PT=MkTab("TPMoto")
 do local ttLy=TT:FindFirstChildOfClass("UIListLayout"); if ttLy then ttLy.SortOrder=Enum.SortOrder.LayoutOrder end end
 
 local function SetTab(n)
@@ -618,7 +618,7 @@ local function MkTabBtn(lbl, n)
     local b=Instance.new("TextButton",SB); b.Size=UDim2.new(1,0,0,42); b.BackgroundColor3=Color3.fromRGB(20,20,30); b.TextColor3=Color3.fromRGB(150,150,160); b.Text=lbl; b.Font=Enum.Font.GothamBold; b.TextSize=12; b.BorderSizePixel=0; Instance.new("UICorner",b).CornerRadius=UDim.new(0,8)
     b.MouseButton1Click:Connect(function() SetTab(n) end); TabBtns[n]=b
 end
-MkTabBtn("⚔️ Combat","Combat"); MkTabBtn("👁️ Visuals","Visuals"); MkTabBtn("🚜 Farm","Farm"); MkTabBtn("⚙️ Misc","Misc"); MkTabBtn("🧭 Teleport","Teleport")
+MkTabBtn("⚔️ Combat","Combat"); MkTabBtn("👁️ Visuals","Visuals"); MkTabBtn("🚜 Farm","Farm"); MkTabBtn("⚙️ Misc","Misc"); MkTabBtn("🧭 Teleport","Teleport"); MkTabBtn("🎥 Espectear","Espectear"); MkTabBtn("🏍️ TP en Moto","TPMoto")
 
 -- ── UI Helpers ──
 local function IosRow(par, title, desc, init, cb)
@@ -856,7 +856,7 @@ ActBtn(MT,"🔄  Reset Map",Color3.fromRGB(180,40,40),function()
     for _,v in pairs(DeletedObjects) do if v.o then v.o.Parent=v.p end end; DeletedObjects={}
 end)
 
--- ════════ TAB TELEPORT: TP a jugadores + Espectear ════════
+-- ════════ ESPECTEAR + TP JUGADORES (tabs separados) ════════
 local Spectating=nil
 local function StopSpectate()
     Spectating=nil
@@ -888,16 +888,16 @@ local function TPToPlayer(target)
     end
     return true
 end
--- ════════ ESPECTEAR ════════
-local specHdr=SecLbl(TT,T("  ESPECTEAR")); specHdr.LayoutOrder=20
-local stopBtn=ActBtn(TT,"⏹️  Dejar de Espectear",Color3.fromRGB(180,40,40),function() StopSpectate() end); stopBtn.LayoutOrder=21
-local SpecListFrame=Instance.new("Frame",TT); SpecListFrame.LayoutOrder=22
+-- ════════ TAB ESPECTEAR ════════
+local specHdr=SecLbl(ET,T("  ESPECTEAR"))
+local stopBtn=ActBtn(ET,"⏹️  Dejar de Espectear",Color3.fromRGB(180,40,40),function() StopSpectate() end)
+local SpecListFrame=Instance.new("Frame",ET)
 SpecListFrame.Size=UDim2.new(1,0,0,0); SpecListFrame.AutomaticSize=Enum.AutomaticSize.Y
 SpecListFrame.BackgroundTransparency=1
 local slLy=Instance.new("UIListLayout",SpecListFrame); slLy.Padding=UDim.new(0,6)
--- ════════ TP JUGADORES ════════
-local tpHdr=SecLbl(TT,T("  TP JUGADORES")); tpHdr.LayoutOrder=30
-local PlrListFrame=Instance.new("Frame",TT); PlrListFrame.LayoutOrder=31
+-- ════════ TAB TP EN MOTO (TP JUGADORES) ════════
+local tpHdr=SecLbl(PT,T("  TP JUGADORES"))
+local PlrListFrame=Instance.new("Frame",PT)
 PlrListFrame.Size=UDim2.new(1,0,0,0); PlrListFrame.AutomaticSize=Enum.AutomaticSize.Y
 PlrListFrame.BackgroundTransparency=1
 local plLy=Instance.new("UIListLayout",PlrListFrame); plLy.Padding=UDim.new(0,6)
@@ -950,7 +950,8 @@ local function RebuildPlrList()
         end
     end
 end
-local refreshBtn=ActBtn(TT,"🔄  Refrescar Lista",Color3.fromRGB(34,160,60),function() RebuildPlrList() end); refreshBtn.LayoutOrder=32
+local refreshBtn=ActBtn(PT,"🔄  Refrescar Lista",Color3.fromRGB(34,160,60),function() RebuildPlrList() end)
+local refreshBtnSpec=ActBtn(ET,"🔄  Refrescar Lista",Color3.fromRGB(34,160,60),function() RebuildPlrList() end)
 RebuildPlrList()
 Players.PlayerAdded:Connect(function() task.wait(0.5) RebuildPlrList() end)
 Players.PlayerRemoving:Connect(function(p)
