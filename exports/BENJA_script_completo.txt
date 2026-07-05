@@ -15,7 +15,7 @@ _G.Hitbox_Size   = 15
 _G.Parts_Active  = { UpperTorso = false, HumanoidRootPart = false, LeftUpperArm = false, RightUpperArm = false, LeftUpperLeg = false, RightUpperLeg = false }
 _G.Visuals       = { Box = false, Names = false, Dist = false, Weapon = false, HealthBar = false, Tracers = false }
 _G.Combat        = { SilentAim = false, TriggerBot = false, NoRecoil = false }
-_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false, FlyChar = false, FlyCharSpeed = 19, AntiRK = false }
+_G.Misc          = { Speed_On = false, SpeedVal = 16, FullBright = false, FlyMoto = false, FlyMotoSpeed = 50, FlyUp = false, FlyDown = false, FlyChar = false, FlyCharSpeed = 19, AntiRK = false, AntiAFK = false }
 local DeletedObjects = {}
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -51,6 +51,8 @@ local TR={
     ["Velocidad"]="Speed",
     ["Velocidad del speed hack (máx. 23)"]="Speed hack value (max 23)",
     ["Ilumina todo el mapa"]="Lights up the whole map",
+    ["Anti AFK"]="Anti AFK",
+    ["Te mueve solito cada 7 min para que no te saquen"]="Moves you every 7 min so you don't get kicked",
     ["  FLY EN MOTO"]="  BIKE FLY",
     ["Fly en Moto"]="Bike Fly",
     ["Volar en moto con botones subir/bajar"]="Fly on your bike with up/down buttons",
@@ -353,6 +355,34 @@ SecLbl(MT,"  MOVIMIENTO")
 IosRow(MT,"Speed Hack","Aumenta tu velocidad de caminar",false,function(v) _G.Misc.Speed_On=v end)
 ValRow(MT,"Velocidad","Velocidad del speed hack (máx. 23)",16,function(v) _G.Misc.SpeedVal=math.min(v,23) end)
 IosRow(MT,"Full Bright","Ilumina todo el mapa",false,function(v) _G.Misc.FullBright=v end)
+IosRow(MT,"Anti AFK","Te mueve solito cada 7 min para que no te saquen",false,function(v) _G.Misc.AntiAFK=v end)
+-- ── ANTI AFK: evita el kick por inactividad ──
+local VirtualUser=game:GetService("VirtualUser")
+L_Plr.Idled:Connect(function()
+    if _G.Misc.AntiAFK then
+        pcall(function()
+            VirtualUser:CaptureController()
+            VirtualUser:ClickButton2(Vector2.new())
+        end)
+    end
+end)
+task.spawn(function()
+    while true do
+        task.wait(420) -- 7 minutos
+        if _G.Misc.AntiAFK then
+            local char=L_Plr.Character
+            local hum=char and char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                pcall(function()
+                    hum:Move(Vector3.new(1,0,0),false); task.wait(0.4)
+                    hum:Move(Vector3.new(-1,0,0),false); task.wait(0.4)
+                    hum:Move(Vector3.new(0,0,0),false)
+                    hum.Jump=true
+                end)
+            end
+        end
+    end
+end)
 SecLbl(MT,"  FLY EN MOTO")
 IosRow(MT,"Fly en Moto","Volar en moto con botones subir/bajar",false,function(v)
     _G.Misc.FlyMoto=v; FlyBtns.Visible=v or _G.Misc.FlyChar
