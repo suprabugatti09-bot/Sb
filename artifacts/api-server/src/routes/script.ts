@@ -687,6 +687,38 @@ IosRow(MT,"Fly Personaje","Vuela con tu personaje (▲/▼ + joystick)",false,fu
     end
 end)
 SecLbl(MT,"  HERRAMIENTAS")
+ActBtn(MT,"🏍️  TP a Mi Moto",Color3.fromRGB(90,60,200),function()
+    local char=L_Plr.Character
+    local hrp=char and char:FindFirstChild("HumanoidRootPart")
+    local hum=char and char:FindFirstChildOfClass("Humanoid")
+    if not hrp or not hum then return end
+    if hum.SeatPart then return end
+    -- Busca tu moto: primero por nombre del dueño, si no la más cercana vacía
+    local best,bestDist=nil,math.huge
+    local owned=nil
+    for _,d in pairs(workspace:GetDescendants()) do
+        if d:IsA("VehicleSeat") and not d.Occupant then
+            local m=d:FindFirstAncestorOfClass("Model")
+            local dist=(d.Position-hrp.Position).Magnitude
+            -- ¿Es tuya? (el modelo o algún valor lleva tu nombre)
+            local mine=false
+            if m then
+                if string.find(string.lower(m.Name),string.lower(L_Plr.Name)) then mine=true end
+                for _,c in pairs(m:GetChildren()) do
+                    if (c:IsA("StringValue") or c:IsA("ObjectValue")) and tostring(c.Value)==L_Plr.Name then mine=true break end
+                end
+            end
+            if mine and dist<(owned and (owned.Position-hrp.Position).Magnitude or math.huge) then owned=d end
+            if dist<bestDist then best=d; bestDist=dist end
+        end
+    end
+    local seat=owned or best
+    if not seat then return end
+    -- Teleport encima del asiento y montarse automático
+    hrp.CFrame=seat.CFrame*CFrame.new(0,3,0)
+    task.wait(0.15)
+    pcall(function() seat:Sit(hum) end)
+end)
 ActBtn(MT,"🖱️  Click Delete Tool",Color3.fromRGB(34,160,60),function()
     local T=Instance.new("Tool"); T.Name="Click Delete"; T.RequiresHandle=false; T.Parent=L_Plr.Backpack
     T.Activated:Connect(function() if Mouse.Target then table.insert(DeletedObjects,{o=Mouse.Target,p=Mouse.Target.Parent}); Mouse.Target.Parent=nil end end)
