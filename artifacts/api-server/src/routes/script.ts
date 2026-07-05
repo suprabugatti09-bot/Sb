@@ -746,20 +746,18 @@ local function TPToPlayer(target)
     local char=L_Plr.Character
     local hrp=char and char:FindFirstChild("HumanoidRootPart")
     local hum=char and char:FindFirstChildOfClass("Humanoid")
-    if not thrp or not hrp then return end
+    if not thrp or not hrp then return false end
+    -- Solo funciona montado en tu moto
+    if not (hum and hum.SeatPart) then return false end
     local dest=thrp.CFrame*CFrame.new(0,0,5)
-    if hum and hum.SeatPart then
-        -- Montado en moto: mueve la moto completa contigo
-        local seat=hum.SeatPart
-        local model=seat:FindFirstAncestorOfClass("Model")
-        if model then
-            pcall(function() model:PivotTo(dest*CFrame.new(0,3,0)) end)
-        else
-            seat.CFrame=dest*CFrame.new(0,3,0)
-        end
+    local seat=hum.SeatPart
+    local model=seat:FindFirstAncestorOfClass("Model")
+    if model then
+        pcall(function() model:PivotTo(dest*CFrame.new(0,3,0)) end)
     else
-        hrp.CFrame=dest
+        seat.CFrame=dest*CFrame.new(0,3,0)
     end
+    return true
 end
 SecLbl(TT,"  JUGADORES")
 ActBtn(TT,"⏹️  Dejar de Espectear",Color3.fromRGB(180,40,40),function() StopSpectate() end)
@@ -786,7 +784,14 @@ local function RebuildPlrList()
             tp.BackgroundColor3=Color3.fromRGB(52,199,89); tp.TextColor3=Color3.new(0,0,0)
             tp.Text="TP"; tp.Font=Enum.Font.GothamBold; tp.TextSize=12; tp.BorderSizePixel=0
             Instance.new("UICorner",tp).CornerRadius=UDim.new(0,8)
-            tp.MouseButton1Click:Connect(function() TPToPlayer(p) end)
+            tp.MouseButton1Click:Connect(function()
+                if not TPToPlayer(p) then
+                    -- No estás en moto: avisa en el botón
+                    tp.Text="🏍️!"; tp.BackgroundColor3=Color3.fromRGB(180,40,40); tp.TextColor3=Color3.new(1,1,1)
+                    task.wait(1)
+                    tp.Text="TP"; tp.BackgroundColor3=Color3.fromRGB(52,199,89); tp.TextColor3=Color3.new(0,0,0)
+                end
+            end)
             local sp=Instance.new("TextButton",row)
             sp.Size=UDim2.new(0,52,0,34); sp.Position=UDim2.new(1,-58,0.5,-17)
             sp.BackgroundColor3=Color3.fromRGB(90,60,200); sp.TextColor3=Color3.new(1,1,1)
