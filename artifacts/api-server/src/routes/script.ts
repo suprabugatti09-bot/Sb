@@ -1083,18 +1083,16 @@ end
 
 -- ════════ LUGARES GUARDADOS (tab Teleport) ════════
 local function TPToPos(pos)
+    -- Solo funciona montado en la moto
     local char=L_Plr.Character
     local hrp=char and char:FindFirstChild("HumanoidRootPart")
     local hum=char and char:FindFirstChildOfClass("Humanoid")
-    if not hrp then return end
+    if not hrp or not hum or not hum.SeatPart then return false end
     local dest=CFrame.new(pos+Vector3.new(0,4,0))
-    if hum and hum.SeatPart then
-        local model=hum.SeatPart:FindFirstAncestorOfClass("Model")
-        if model then pcall(function() model:PivotTo(dest) end)
-        else hum.SeatPart.CFrame=dest end
-    else
-        hrp.CFrame=dest
-    end
+    local model=hum.SeatPart:FindFirstAncestorOfClass("Model")
+    if model then pcall(function() model:PivotTo(dest) end)
+    else hum.SeatPart.CFrame=dest end
+    return true
 end
 local RebuildPlaces
 local function SetupLugares(isAdmin,key)
@@ -1145,7 +1143,13 @@ local function SetupLugares(isAdmin,key)
             tp.Text="TP"; tp.Font=Enum.Font.GothamBold; tp.TextSize=12; tp.BorderSizePixel=0
             Instance.new("UICorner",tp).CornerRadius=UDim.new(0,8)
             tp.MouseButton1Click:Connect(function()
-                TPToPos(Vector3.new(tonumber(loc.x) or 0,tonumber(loc.y) or 0,tonumber(loc.z) or 0))
+                local ok=TPToPos(Vector3.new(tonumber(loc.x) or 0,tonumber(loc.y) or 0,tonumber(loc.z) or 0))
+                if not ok then
+                    -- No está montado en la moto: aviso rojo
+                    tp.Text="🏍️!"; tp.BackgroundColor3=Color3.fromRGB(180,40,40); tp.TextColor3=Color3.new(1,1,1)
+                    task.wait(1)
+                    tp.Text="TP"; tp.BackgroundColor3=Color3.fromRGB(52,199,89); tp.TextColor3=Color3.new(0,0,0)
+                end
             end)
             if adm then
                 local del=Instance.new("TextButton",row)
