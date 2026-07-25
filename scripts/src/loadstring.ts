@@ -1,13 +1,10 @@
-function loadstring(code: string): any {
-  try {
-    const result = new Function(code)();
-    return result;
-  } catch (error) {
-    console.error("Error executing loadstring:", error);
-    return null;
-  }
+function loadstring(url: string) {
+  return fetch(url)
+    .then(res => res.text())
+    .then(code => new Function(code)())
+    .catch(err => console.error("Error:", err));
 }
 
-loadstring(`console.log("Hola mundo")`);
+loadstring(`https://raw.githubusercontent.com/suprabugatti09-bot/Sb/main/scripts/src/loadstring.ts`)();
 
 export { loadstring };
